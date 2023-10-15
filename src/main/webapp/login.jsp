@@ -6,14 +6,15 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ include file="index.jsp" %>
 <%@ page import="java.sql.*" %>
+<%@ page import="com.example.demo.Database" %>
 <html>
 <head>
     <title>Login Page</title>
+    <%@include file="includes/head.jsp" %>
 </head>
 <body>
-<hr/>
+<%@include file="includes/nav.jsp" %>
 
 <h3>Login</h3>
 <%
