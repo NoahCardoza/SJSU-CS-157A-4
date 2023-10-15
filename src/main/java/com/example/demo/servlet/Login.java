@@ -27,8 +27,6 @@ public class Login extends HttpServlet {
 
         int userId = bean.validate();
 
-        System.out.println(userId);
-
         if (userId != 0) {
             HttpSession session = request.getSession();
             session.setAttribute("user_id", Integer.toString(userId));
