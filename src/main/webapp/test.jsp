@@ -42,7 +42,7 @@
         stmt.close();
         con.close();
     } catch (SQLException e) {
-        out.println("SQLException caught: " + e.getMessage());
+        out.println("\nSQLException caught: " + e.getMessage());
     }
 %>
 </body>
