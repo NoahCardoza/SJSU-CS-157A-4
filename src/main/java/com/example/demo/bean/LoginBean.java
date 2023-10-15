@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.bean;
 
 public class LoginBean {
     private String email,password;

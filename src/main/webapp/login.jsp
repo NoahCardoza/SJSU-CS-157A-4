@@ -1,57 +1,44 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: kalan
-  Date: 10/14/2023
-  Time: 11:51 AM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="com.example.demo.Database" %>
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Login Page</title>
-    <%@include file="includes/head.jsp" %>
-</head>
-<body>
-<%@include file="includes/nav.jsp" %>
+    <head>
+        <title>Login Page</title>
+        <%@include file="includes/head.jsp" %>
+    </head>
+    <body>
 
-<h3>Login</h3>
-<%
-    String profile_msg=(String)request.getAttribute("profile_msg");
-    if(profile_msg!=null){
-        out.print(profile_msg);
-    }
-    String login_msg=(String)request.getAttribute("login_msg");
-    if(login_msg!=null){
-        out.print(login_msg);
-    }
-%>
-<br/>
-<form action="loginprocess.jsp" method="post">
-    Email:<input type="text" name="email"/><br/><br/>
-    Password:<input type="password" name="password"/><br/><br/>
-    <input type="submit" value="login"/>
-</form>
-<%
-    try {
-        Connection conn = Database.getConnection();
+        <%@include file="includes/nav.jsp" %>
 
-        if (conn != null) {
-            out.println("Initial entries in table \"User\": <br/>");
+        <div class="container-sm mt-5" style="max-width: 600px">
+            <h3>Login</h3>
 
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM user");
-            while (rs.next()) {
-                out.println(rs.getInt(1) + " " + rs.getString(2) + " " + rs.getString(3) + "<br/>");
-            }
-            rs.close();
-            stmt.close();
-            conn.close();
-        }
-    } catch (SQLException e) {
-        out.println("SQLException caught: " + e.getMessage());
-    }
-%>
-</body>
+            <%
+                String profile_msg=(String)request.getAttribute("profile_msg");
+                if(profile_msg!=null){
+                    out.print(profile_msg);
+                }
+                String login_msg=(String)request.getAttribute("login_msg");
+                if(login_msg!=null){
+                    out.print(login_msg);
+                }
+            %>
+
+            <form action="loginprocess.jsp" method="post">
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Email address</label>
+                    <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" id="exampleInputPassword1">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="keepMeLoggedIn" class="form-check-input" id="exampleCheck1">
+                    <label class="form-check-label" for="exampleCheck1">Keep me logged in</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </body>
 </html>

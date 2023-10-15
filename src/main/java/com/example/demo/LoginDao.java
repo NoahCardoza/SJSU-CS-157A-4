@@ -1,4 +1,6 @@
 package com.example.demo;
+import com.example.demo.bean.LoginBean;
+
 import java.sql.*;
 public class LoginDao {
 
