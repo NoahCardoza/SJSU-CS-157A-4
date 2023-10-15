@@ -1,14 +1,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.lang.Boolean" %>
 
 <%
     Boolean isLoggedIn = session.getAttribute("user_id") != null;
     request.setAttribute("isLoggedIn", isLoggedIn);
 
-    String path = request.getServletPath();
+    String path = (String) request.getAttribute("jakarta.servlet.forward.servlet_path");
+    if (path == null) {
+        path = request.getServletPath();
+    }
 %>
-
-
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
@@ -22,7 +22,7 @@
                     <a class="nav-link <%= path.equals("/index.jsp") ? "active" : "" %>" aria-current="page" href="index.jsp">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= path.equals("/login.jsp") ? "active" : "" %>" href="<%= isLoggedIn ? "logout.jsp" : "login.jsp" %>"><%= isLoggedIn ? "Logout" : "Login" %></a>
+                    <a class="nav-link <%= path.equals("/login") ? "active" : "" %>" href="<%= isLoggedIn ? "logout.jsp" : "login" %>"><%= isLoggedIn ? "Logout" : "Login" %></a>
                 </li>
                 <c:if test="${!isLoggedIn}">
                     <li class="nav-item">
@@ -30,7 +30,7 @@
                     </li>
                 </c:if>
             </ul>
-            <form class="d-flex mb-0" action="/search.jsp" method="get">
+            <form class="d-flex mb-0" action="search.jsp" method="get">
                 <input class="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
