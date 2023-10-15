@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 
-@WebServlet(name = "helloServlet", value = "/login")
+@WebServlet(name = "Login", value = "/login")
 public class Login extends HttpServlet {
     private String message;
 
@@ -31,7 +31,7 @@ public class Login extends HttpServlet {
 
         if (userId != 0) {
             HttpSession session = request.getSession();
-            session.setAttribute("user_id", userId);
+            session.setAttribute("user_id", Integer.toString(userId));
             response.sendRedirect("index.jsp");
         } else {
             request.setAttribute(
@@ -39,7 +39,6 @@ public class Login extends HttpServlet {
                 new Alert("danger", "That email/password combination cannot be found in our records")
             );
 
-            System.out.println("set alert");
             request.getRequestDispatcher("template/login.jsp").forward(request, response);
         }
     }
