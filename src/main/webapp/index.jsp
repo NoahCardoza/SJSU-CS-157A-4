@@ -24,6 +24,7 @@
                 review at a time.
             </p>
             <%
+
             String userId = (String) session.getAttribute("user_id");
 
             if(userId != null){

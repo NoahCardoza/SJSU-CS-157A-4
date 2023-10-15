@@ -36,7 +36,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apiguardian:apiguardian-api:1.1.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.8.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-engine:1.8.2" level="project" />
-    <orderEntry type="library" name="mysql-connector-j-8.1.0" level="project" />
     <orderEntry type="library" name="mysql-connector-j-8.1.0 (2)" level="project" />
     <orderEntry type="library" name="jakarta.servlet.jsp.jstl.api" level="project" />
     <orderEntry type="library" name="glassfish.web.jakarta.servlet.jsp.jstl" level="project" />
