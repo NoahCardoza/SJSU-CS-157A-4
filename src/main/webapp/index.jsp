@@ -5,15 +5,10 @@
 <html>
 <head>
     <title>JSP - Hello World</title>
+    <%@include file="includes/head.jsp" %>
 </head>
 <body>
-<h1><%= "Hello World!" %>
-</h1>
-<br/>
-<a href="hello-servlet">Hello Servlet</a>|
-<a href="login.jsp">login</a>|
-<a href="logout.jsp">logout</a>|
-<a href="profile.jsp">profile</a>
+<%@include file="includes/nav.jsp" %>
 
 <%
     String userId = (String) session.getAttribute("user_id");

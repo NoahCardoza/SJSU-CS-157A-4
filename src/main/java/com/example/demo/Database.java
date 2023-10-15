@@ -1,4 +1,5 @@
 package com.example.demo;
+
 import java.sql.*;
 public class Database {
     static public Connection getConnection() {
