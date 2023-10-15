@@ -7,3 +7,7 @@
 /dataSources/
 /dataSources.local.xml
 /artifacts
+/dataSources.xml
+/misc.xml
+/codeStyles/
+/webContexts.xml
