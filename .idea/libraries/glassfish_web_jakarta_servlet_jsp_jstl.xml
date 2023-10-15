@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="glassfish.web.jakarta.servlet.jsp.jstl" type="repository">
+    <properties maven-id="org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jakarta.servlet.jsp.jstl-3.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
