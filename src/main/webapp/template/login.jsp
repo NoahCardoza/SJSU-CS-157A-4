@@ -1,29 +1,26 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
+<%--@elvariable id="alert" type="com.example.demo.bean.Alert"--%>
+
 <!DOCTYPE html>
 <html>
     <head>
         <title>Login Page</title>
-        <%@include file="includes/head.jsp" %>
+        <%@include file="../includes/head.jsp" %>
     </head>
     <body>
 
-        <%@include file="includes/nav.jsp" %>
+        <%@include file="../includes/nav.jsp" %>
 
         <div class="container-sm mt-5" style="max-width: 600px">
             <h3>Login</h3>
 
-            <%
-                String profile_msg=(String)request.getAttribute("profile_msg");
-                if(profile_msg!=null){
-                    out.print(profile_msg);
-                }
-                String login_msg=(String)request.getAttribute("login_msg");
-                if(login_msg!=null){
-                    out.print(login_msg);
-                }
-            %>
-
-            <form action="loginprocess.jsp" method="post">
+            <form method="post">
+                <c:if test="${alert != null}">
+                    <div class="alert alert-${alert.color}" role="alert">
+                            ${alert.message}
+                    </div>
+                </c:if>
                 <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Email address</label>
                     <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
