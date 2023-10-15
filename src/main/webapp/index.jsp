@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
+<%@ page import="com.example.demo.Database" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,32 +17,25 @@
 
 <%
     String userId = (String) session.getAttribute("user_id");
+
     if(userId != null){
+        Connection conn = Database.getConnection();
 
-    java.sql.Connection con;
-        String user; // Use your last name as the database name
-        user = "root";
-        String password = "MySQLPass@710.";
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hidden_gems", user,
-                    password);
+        if (conn != null) {
+            try {
+                PreparedStatement ps=conn.prepareStatement("select email from user where id=?");
 
-            PreparedStatement ps=con.prepareStatement(
-                    "select email from user where id=?");
+                ps.setString(1,userId);
 
-            ps.setString(1,userId);
+                ResultSet rs=ps.executeQuery();
 
+                if (rs.next()){
+                     out.println("You are logged in as " + rs.getString(1));
+                }
 
-            System.out.println(ps.toString());
-            ResultSet rs=ps.executeQuery();
-            if (rs.next()){
-                 out.println("You are logged in as " + rs.getString(1));
-            }
-
-        } catch (SQLException e) {
-
-        }}
+            } catch (SQLException ignore) {}
+        }
+    }
 %>
 
 </body>

@@ -33,24 +33,21 @@
     <input type="submit" value="login"/>
 </form>
 <%
-    String user; // Use your last name as the database name
-    user = "root";
-    String password = "MySQLPass@710.";
     try {
-        java.sql.Connection con;
-        Class.forName("com.mysql.jdbc.Driver");
-        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hidden_gems", user,
-                password);
+        Connection conn = Database.getConnection();
 
-        out.println("Initial entries in table \"User\": <br/>");
-        Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT * FROM user");
-        while (rs.next()) {
-            out.println(rs.getInt(1) + " " + rs.getString(2) + " " + rs.getString(3) + "<br/>");
+        if (conn != null) {
+            out.println("Initial entries in table \"User\": <br/>");
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM user");
+            while (rs.next()) {
+                out.println(rs.getInt(1) + " " + rs.getString(2) + " " + rs.getString(3) + "<br/>");
+            }
+            rs.close();
+            stmt.close();
+            conn.close();
         }
-        rs.close();
-        stmt.close();
-        con.close();
     } catch (SQLException e) {
         out.println("SQLException caught: " + e.getMessage());
     }
