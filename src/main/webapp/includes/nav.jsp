@@ -26,7 +26,7 @@
                 </li>
                 <c:if test="${!isLoggedIn}">
                     <li class="nav-item">
-                        <a class="nav-link <%= path.equals("/signup.jsp") ? "active" : "" %>" href="signup.jsp">Signup</a>
+                        <a class="nav-link <%= path.equals("/signup") ? "active" : "" %>" href="signup">Signup</a>
                     </li>
                 </c:if>
             </ul>
