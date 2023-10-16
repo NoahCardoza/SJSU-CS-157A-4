@@ -4,13 +4,13 @@ import com.example.demo.Util;
 import com.example.demo.Validation;
 import jakarta.servlet.http.HttpServletRequest;
 
-public class SignupBean {
+public class SignupForm {
 
     private String email = "";
     private String password = "";
     private String username = "";
 
-    public SignupBean() {}
+    public SignupForm() {}
 
     public String getUsername() {
         return username;
@@ -35,7 +35,7 @@ public class SignupBean {
         this.password = password;
     }
 
-    public void SignupForm(HttpServletRequest request) {
+    public void SignupBean(HttpServletRequest request) {
         this.username = request.getParameter("username");
         this.password = request.getParameter("password");
         this.email = request.getParameter("email");
@@ -78,5 +78,4 @@ public class SignupBean {
         return v;
 
     }
-
 }
