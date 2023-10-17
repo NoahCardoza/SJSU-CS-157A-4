@@ -35,7 +35,7 @@ public class SignupForm {
         this.password = password;
     }
 
-    public void SignupBean(HttpServletRequest request) {
+    public SignupForm(HttpServletRequest request) {
         this.username = request.getParameter("username");
         this.password = request.getParameter("password");
         this.email = request.getParameter("email");

@@ -1,10 +1,9 @@
 package com.example.demo.orm;
 
 import com.example.demo.Database;
-
 import java.sql.*;
 
-public class NewUser {
+public class User {
 
     Integer userId = 0;
     String username = "";
@@ -49,9 +48,9 @@ public class NewUser {
                 return;
             }
 
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO User (id, username, email, password) VALUES (?, ?, ?, ?)");
-            statement.setInt(1, this.getUserId());
-            statement.setString(2, this.getUsername());
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password) VALUES (?, ?, ?, ?)");
+            statement.setString(1, this.getUsername());
+            statement.setString(2, this.getEmail());
             statement.setString(3, this.getEmail());
             statement.setString(4, this.getPassword());
 
@@ -60,5 +59,33 @@ public class NewUser {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public int isUnique(){
+        Connection conn = Database.getConnection();
+
+        if (conn == null) {
+            return 0;
+        }
+
+        PreparedStatement ps;
+
+        try {
+            ps = conn.prepareStatement("SELECT * FROM User WHERE username=? OR email=?");
+
+            ps.setString(1, getUsername());
+            ps.setString(2, getEmail());
+
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()){
+                return 1;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return 0;
     }
 }
