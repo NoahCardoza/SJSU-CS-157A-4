@@ -1,8 +1,9 @@
 package com.example.demo.servlet;
 
 import com.example.demo.Validation;
+import com.example.demo.bean.Alert;
 import com.example.demo.bean.SignupForm;
-import com.example.demo.orm.NewUser;
+import com.example.demo.orm.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,7 +22,7 @@ public class Signup extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        SignupForm form = new SignupForm();
+        SignupForm form = new SignupForm(request);
 
         String action = request.getParameter("action");
 
@@ -29,20 +30,31 @@ public class Signup extends HttpServlet {
             Validation v = form.validate();
 
             if (v.isValid()) {
-                NewUser user = new NewUser();
-                user.setUserId(1);
+                User user = new User();
+                // eventually user session id for user.setUserId(7);
                 user.setUsername(form.getUsername());
                 user.setPassword(form.getPassword());
                 user.setEmail(form.getEmail());
 
-                user.createNewUser();
+                if(user.isUnique() != 0){
+                    user.createNewUser();
 
-                response.sendRedirect("../index.jsp");
+                    response.sendRedirect("index.jsp");
+                    return;
+                }
+                else {
+                    request.setAttribute(
+                            "alert",
+                            new Alert("danger", "Duplicate username/password")
+                    );
+                }
             }
             else {
                 request.setAttribute("errors", v.getMessages());
             }
         }
+
+        request.setAttribute("form", form);
 
         request.getRequestDispatcher("/template/signup.jsp").forward(request, response);
     }
