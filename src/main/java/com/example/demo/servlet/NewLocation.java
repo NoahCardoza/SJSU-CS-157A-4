@@ -64,7 +64,7 @@ public class NewLocation extends HttpServlet {
 
                     // TODO: redirect to location page
 
-                    response.sendRedirect("../locations");
+                    response.sendRedirect(request.getContextPath() + "/locations");
                     return;
                 } else {
                     request.setAttribute("errors", v.getMessages());
