@@ -7,3 +7,11 @@
 /dataSources/
 /dataSources.local.xml
 /artifacts
+/modules.xml
+/dataSources.xml
+/misc.xml
+/codeStyles/
+/webContexts.xml
+/uiDesigner.xml
+/sqldialects.xml
+/libraries
