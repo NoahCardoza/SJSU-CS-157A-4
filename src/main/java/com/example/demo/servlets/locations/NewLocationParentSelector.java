@@ -1,8 +1,9 @@
-package com.example.demo.servlet;
+package com.example.demo.servlets.locations;
 
 import com.example.demo.beans.Location;
 import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.LocationDao;
+import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @WebServlet(name = "New Location Parent Selector", value = "/location/new/parent")
-public class NewLocationParentSelector extends HttpServlet {
+public class NewLocationParentSelector extends DatabaseHttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
             LocationForm form = new LocationForm(request);

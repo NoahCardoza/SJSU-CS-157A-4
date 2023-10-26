@@ -21,11 +21,10 @@ public class LocationDao implements Dao<Location> {
         return instance;
     }
 
-    private LocationDao() {
-    }
+    private LocationDao() {}
 
     public List<Location> getAll() throws SQLException {
-        Connection conn = Database.getConnection();
+        Connection conn = Database.getInstance().getConnection();
 
         List<Location> results = new ArrayList<>();
 
@@ -44,11 +43,7 @@ public class LocationDao implements Dao<Location> {
     }
 
     public Optional<Location> get(long id) throws SQLException {
-        Connection conn = Database.getConnection();
-
-        if (conn == null) {
-            return Optional.empty();
-        }
+        Connection conn = Database.getInstance().getConnection();
 
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location WHERE id = ?");
         statement.setDouble(1, id);
@@ -63,12 +58,9 @@ public class LocationDao implements Dao<Location> {
     }
 
     public List<Location> getParentLocationsOf(Long id) throws SQLException {
-        List<Location> results = new ArrayList<>();
-        Connection conn = Database.getConnection();
+        Connection conn = Database.getInstance().getConnection();
 
-        if (conn == null) {
-            return results;
-        }
+        List<Location> results = new ArrayList<>();
 
         PreparedStatement statement;
 
@@ -109,32 +101,23 @@ public class LocationDao implements Dao<Location> {
     }
 
     public void create(Location location) throws SQLException {
-        try {
-            Connection conn = Database.getConnection();
+        Connection conn = Database.getInstance().getConnection();
 
-            if (conn == null) {
-                return;
-            }
-
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            statement.setInt(1, location.getUserId());
-            if (location.getParentLocationId() == null) {
-                statement.setNull(2, Types.INTEGER);
-            } else {
-                statement.setDouble(2, location.getParentLocationId());
-            }
-            statement.setDouble(3, location.getLongitude());
-            statement.setDouble(4, location.getLatitude());
-            statement.setString(5, location.getName());
-            statement.setString(6, location.getAddress());
-            statement.setString(7, location.getDescription());
-
-            statement.executeUpdate();
-
-            // todo: get the id of the newly created location
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        statement.setInt(1, location.getUserId());
+        if (location.getParentLocationId() == null) {
+            statement.setNull(2, Types.INTEGER);
+        } else {
+            statement.setDouble(2, location.getParentLocationId());
         }
+        statement.setDouble(3, location.getLongitude());
+        statement.setDouble(4, location.getLatitude());
+        statement.setString(5, location.getName());
+        statement.setString(6, location.getAddress());
+        statement.setString(7, location.getDescription());
+
+        statement.executeUpdate();
+
+        // todo: get the id of the newly created location
     }
 }

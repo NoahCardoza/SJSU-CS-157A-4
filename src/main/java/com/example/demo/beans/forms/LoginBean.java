@@ -32,12 +32,8 @@ public class LoginBean {
         this.password = password;
     }
 
-    public int validate(){
-        Connection conn = Database.getConnection();
-
-        if (conn == null) {
-            return 0;
-        }
+    public int validate() throws SQLException {
+        Connection conn = Database.getInstance().getConnection();
 
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT id FROM User WHERE email=? AND password=?");

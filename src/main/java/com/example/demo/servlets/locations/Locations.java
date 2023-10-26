@@ -1,7 +1,8 @@
-package com.example.demo.servlet;
+package com.example.demo.servlets.locations;
 
 import com.example.demo.beans.Location;
 import com.example.demo.daos.LocationDao;
+import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,13 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(name = "Locations", value = "/locations")
-public class Locations extends HttpServlet {
-    private String message;
-
-    public void init() {
-
-    }
-
+public class Locations extends DatabaseHttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
 
@@ -38,9 +33,5 @@ public class Locations extends HttpServlet {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    public void destroy() {
     }
 }

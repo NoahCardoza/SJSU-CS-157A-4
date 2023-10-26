@@ -42,11 +42,7 @@ public class UserDao {
 
     public void createNewUser(){
         try {
-            Connection conn = Database.getConnection();
-
-            if (conn == null) {
-                return;
-            }
+            Connection conn = Database.getInstance().getConnection();
 
             PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password) VALUES (?, ?, ?, ?)");
             statement.setString(1, this.getUsername());
@@ -61,12 +57,8 @@ public class UserDao {
         }
     }
 
-    public int isUnique(){
-        Connection conn = Database.getConnection();
-
-        if (conn == null) {
-            return 0;
-        }
+    public int isUnique() throws SQLException {
+        Connection conn = Database.getInstance().getConnection();
 
         PreparedStatement ps;
 
