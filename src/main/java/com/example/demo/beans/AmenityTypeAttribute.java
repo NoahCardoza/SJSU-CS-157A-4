@@ -1,15 +1,26 @@
 package com.example.demo.beans;
 
 public class AmenityTypeAttribute {
+    private Long id;
+    private Long amenityTypeId;
+    private String name;
+    private String icon;
+    private String type;
 
-    Long id;
-    Long parentAmenityTypeId;
-    String name;
-    String icon;
-    String description;
+    // Constructors
+    public AmenityTypeAttribute() {
+        // Default constructor
+    }
 
-    public AmenityTypeAttribute() {}
+    public AmenityTypeAttribute(Long id, Long amenityTypeId, String name, String icon, String type) {
+        this.id = id;
+        this.amenityTypeId = amenityTypeId;
+        this.name = name;
+        this.icon = icon;
+        this.type = type;
+    }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -18,12 +29,12 @@ public class AmenityTypeAttribute {
         this.id = id;
     }
 
-    public Long getParentAmenityTypeId() {
-        return parentAmenityTypeId;
+    public Long getAmenityTypeId() {
+        return amenityTypeId;
     }
 
-    public void setParentAmenityTypeId(Long parentAmenityTypeId) {
-        this.parentAmenityTypeId = parentAmenityTypeId;
+    public void setAmenityTypeId(Long amenityTypeId) {
+        this.amenityTypeId = amenityTypeId;
     }
 
     public String getName() {
@@ -42,22 +53,22 @@ public class AmenityTypeAttribute {
         this.icon = icon;
     }
 
-    public String getDescription() {
-        return description;
+    public String getType() {
+        return type;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override
     public String toString() {
         return "AmenityTypeAttribute{" +
                 "id=" + id +
-                ", parentAmenityTypeId=" + parentAmenityTypeId +
+                ", amenityTypeId=" + amenityTypeId +
                 ", name='" + name + '\'' +
                 ", icon='" + icon + '\'' +
-                ", description='" + description + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 }

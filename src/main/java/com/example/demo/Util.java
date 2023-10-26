@@ -1,5 +1,10 @@
 package com.example.demo;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class Util {
     static public Integer parseIntOrNull(String s) {
         if (s == null) {
@@ -29,5 +34,36 @@ public class Util {
             return null;
         }
         return Double.parseDouble(s);
+    }
+    static public HashMap<String, String> getGetParameters(HttpServletRequest request) {
+        HashMap<String, String> getParams = new HashMap<>();
+
+        String queryString = request.getQueryString();
+
+        if (queryString != null) {
+            String[] queryParams = queryString.split("&");
+            for (String queryParam : queryParams) {
+                String[] paramParts = queryParam.split("=");
+                if (paramParts.length == 2) {
+                    getParams.put(paramParts[0], paramParts[1]);
+                }
+            }
+        }
+
+        return getParams;
+    }
+
+    static public HashMap<String, String> getPostParameters(HttpServletRequest request) {
+        HashMap<String, String> getParams = getGetParameters(request);
+
+        HashMap<String, String> postParams = new HashMap<>();
+
+        for (String param : request.getParameterMap().keySet()) {
+            if (!getParams.containsKey(param)) {
+                postParams.put(param, request.getParameter(param));
+            }
+        }
+
+        return postParams;
     }
 }

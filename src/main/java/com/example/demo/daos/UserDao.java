@@ -46,6 +46,10 @@ public class UserDao implements Dao<User> {
     }
 
     public Optional<User> fromSession(HttpSession session) throws SQLException {
+        Long userId = (Long) session.getAttribute("user_id");
+
+        if (userId == null) return Optional.empty();
+
         return get((Long) session.getAttribute("user_id"));
     }
 

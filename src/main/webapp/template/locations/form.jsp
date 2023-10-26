@@ -30,7 +30,7 @@
                         class="btn btn-primary float-end"
                         onclick="(function(self) {
                             const form = document.getElementById('new-location-form');
-                            form.action = 'new/parent';
+                            form.action = '/locations?f=parentSelect';
                             form.submit();
                         })(this)"
                 >Select Parent</button>
