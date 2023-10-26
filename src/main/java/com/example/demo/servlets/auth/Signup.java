@@ -2,6 +2,7 @@ package com.example.demo.servlets.auth;
 
 import com.example.demo.Validation;
 import com.example.demo.beans.Alert;
+import com.example.demo.beans.User;
 import com.example.demo.beans.forms.SignupForm;
 import com.example.demo.daos.UserDao;
 import com.example.demo.servlets.DatabaseHttpServlet;
@@ -30,20 +31,21 @@ public class Signup extends DatabaseHttpServlet {
             Validation v = form.validate();
 
             if (v.isValid()) {
-                UserDao user = new UserDao();
-                // eventually user session id for user.setUserId(7);
+                User user = new User();
+
                 user.setUsername(form.getUsername());
                 user.setPassword(form.getPassword());
                 user.setEmail(form.getEmail());
 
                 try {
-                    if(user.isUnique() != 0){
-                        user.createNewUser();
+                    if (UserDao.getInstance().isUnique(user)) {
+                        UserDao.getInstance().create(user);
+
+                        request.getSession().setAttribute("user_id", user.getId());
 
                         response.sendRedirect("index.jsp");
                         return;
-                    }
-                    else {
+                    } else {
                         request.setAttribute(
                                 "alert",
                                 new Alert("danger", "Duplicate username/password")

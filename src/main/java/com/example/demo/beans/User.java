@@ -1,25 +1,18 @@
 package com.example.demo.beans;
 
-import com.example.demo.Database;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 public class User {
 
-    Integer userId = 0;
-    String username = "";
-    String password = "";
-    String email = "";
+    Long id;
+    String username;
+    String password;
+    String email;
 
-    public Integer getUserId() {
-        return userId;
+    public Long getId() {
+        return id;
     }
 
-    public void setUserId(Integer integer) {
-        this.userId = integer;
+    public void setId(Long integer) {
+        this.id = integer;
     }
 
     public String getUsername() {

@@ -25,16 +25,16 @@
             </p>
             <%
 
-            String userId = (String) session.getAttribute("user_id");
+            Long userId = (Long) session.getAttribute("user_id");
 
             if(userId != null){
-                Connection conn = Database.getConnection();
+                Connection conn = Database.getInstance().getConnection();
 
                 if (conn != null) {
                     try {
                         PreparedStatement ps=conn.prepareStatement("select email from user where id=?");
 
-                        ps.setString(1,userId);
+                        ps.setLong(1, userId);
 
                         ResultSet rs=ps.executeQuery();
 

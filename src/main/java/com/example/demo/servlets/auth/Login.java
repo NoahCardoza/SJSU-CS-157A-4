@@ -18,13 +18,13 @@ public class Login extends DatabaseHttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LoginBean bean = new LoginBean(request.getParameter("email"), request.getParameter("password"));
 
-        int userId = 0;
+        Long userId = null;
         try {
             userId = bean.validate();
 
-            if (userId != 0) {
+            if (userId != null) {
                 HttpSession session = request.getSession();
-                session.setAttribute("user_id", Integer.toString(userId));
+                session.setAttribute("user_id", userId);
                 response.sendRedirect("index.jsp");
             } else {
                 request.setAttribute(

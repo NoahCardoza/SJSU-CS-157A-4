@@ -4,7 +4,7 @@ import java.sql.*;
 
 public class Location {
     Long id;
-    Integer userId;
+    Long userId;
     Long parentLocationId;
     Double longitude;
     Double latitude;
@@ -22,11 +22,11 @@ public class Location {
         this.id = id;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

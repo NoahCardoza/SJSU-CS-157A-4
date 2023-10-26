@@ -1,63 +1,71 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
+import com.example.demo.beans.User;
+import jakarta.servlet.http.HttpSession;
+
 import java.sql.*;
+import java.util.List;
+import java.util.Optional;
 
-public class UserDao {
-
-    Integer userId = 0;
-    String username = "";
-    String password = "";
-    String email = "";
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer integer) {
-        this.userId = integer;
-    }
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void createNewUser(){
-        try {
-            Connection conn = Database.getInstance().getConnection();
-
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password) VALUES (?, ?, ?, ?)");
-            statement.setString(1, this.getUsername());
-            statement.setString(2, this.getEmail());
-            statement.setString(3, this.getEmail());
-            statement.setString(4, this.getPassword());
-
-            statement.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+public class UserDao implements Dao<User> {
+    static UserDao instance = null;
+    static public UserDao getInstance() {
+        if (instance == null) {
+            instance = new UserDao();
         }
+        return instance;
     }
 
-    public int isUnique() throws SQLException {
+    private UserDao() {}
+
+    public Optional<User> get(Long id) throws SQLException {
+        Connection conn = Database.getInstance().getConnection();
+
+        PreparedStatement statement = conn.prepareStatement("SELECT id, username, email, password FROM User WHERE id = ?");
+        statement.setDouble(1, id);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            return Optional.of(fromResultSet(resultSet));
+        }
+
+        return Optional.empty();
+    }
+
+    private User fromResultSet(ResultSet resultSet) throws SQLException {
+        User user = new User();
+
+        user.setId(resultSet.getLong("id"));
+        user.setUsername(resultSet.getString("username"));
+        user.setEmail(resultSet.getString("email"));
+        user.setPassword(resultSet.getString("password"));
+
+        return user;
+    }
+
+    public Optional<User> fromSession(HttpSession session) throws SQLException {
+        return get((Long) session.getAttribute("user_id"));
+    }
+
+    public Long create(User user) throws SQLException {
+        Connection conn = Database.getInstance().getConnection();
+
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password) VALUES (?, ?, ?, ?)");
+        statement.setString(1, user.getUsername());
+        statement.setString(2, user.getEmail());
+        statement.setString(3, user.getEmail());
+        statement.setString(4, user.getPassword());
+
+        statement.executeUpdate();
+
+        user.setId(Database.getInstance().getLastInsertedId("User"));
+        // get the id of the newly created user
+        return user.getId();
+    }
+
+    public boolean isUnique(User user) throws SQLException {
         Connection conn = Database.getInstance().getConnection();
 
         PreparedStatement ps;
@@ -65,19 +73,29 @@ public class UserDao {
         try {
             ps = conn.prepareStatement("SELECT * FROM User WHERE username=? OR email=?");
 
-            ps.setString(1, getUsername());
-            ps.setString(2, getEmail());
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getEmail());
 
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()){
-                return 1;
+                return true;
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        return 0;
+        return false;
+    }
+
+    @Override
+    public Optional get(long id) throws SQLException {
+        return Optional.empty();
+    }
+
+    @Override
+    public List getAll() throws SQLException {
+        return null;
     }
 }

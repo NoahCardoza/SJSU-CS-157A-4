@@ -1,7 +1,6 @@
 package com.example.demo.daos;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +11,7 @@ public interface Dao<T> {
 
 //    void save(T t);
 
-    void create(T t) throws SQLException;
+    Long create(T t) throws SQLException;
 //
 //    void update(T t);
 //

@@ -1,9 +1,12 @@
 package com.example.demo.servlets.locations;
 
 import com.example.demo.Validation;
+import com.example.demo.beans.Alert;
 import com.example.demo.beans.Location;
+import com.example.demo.beans.User;
 import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.LocationDao;
+import com.example.demo.daos.UserDao;
 import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet(name = "New Location", value = "/location/new")
 public class NewLocation extends DatabaseHttpServlet {
@@ -41,15 +45,27 @@ public class NewLocation extends DatabaseHttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        try {
         LocationForm form = new LocationForm(request);
 
         String action = request.getParameter("action");
 
         if (action != null && action.equals("submit")) {
+            Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
+            if (!user.isPresent()) {
+                response.setStatus(401);
+                request.setAttribute(
+                        "alert",
+                        new Alert("danger", "You must be logged in to create a location.")
+                );
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
             Validation v = form.validate();
+
             if (v.isValid()) {
                 Location location = new Location();
-                location.setUserId(1); // TODO: update to session user id
+                location.setUserId(user.get().getId());
                 location.setName(form.getName());
                 location.setDescription(form.getDescription());
                 location.setAddress(form.getAddress());
@@ -74,5 +90,8 @@ public class NewLocation extends DatabaseHttpServlet {
         request.setAttribute("form", form);
 
         request.getRequestDispatcher("/template/locations/new-location.jsp").forward(request, response);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

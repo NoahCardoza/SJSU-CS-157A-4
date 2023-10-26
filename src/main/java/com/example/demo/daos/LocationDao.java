@@ -3,10 +3,6 @@ package com.example.demo.daos;
 import com.example.demo.Database;
 import com.example.demo.beans.Location;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +80,7 @@ public class LocationDao implements Dao<Location> {
         Location location = new Location();
 
         location.setId(row.getLong(1));
-        location.setUserId(row.getInt(2));
+        location.setUserId(row.getLong(2));
 
         location.setParentLocationId(row.getLong(3));
         if (row.wasNull()) location.setParentLocationId(null);
@@ -100,11 +96,11 @@ public class LocationDao implements Dao<Location> {
         return location;
     }
 
-    public void create(Location location) throws SQLException {
+    public Long create(Location location) throws SQLException {
         Connection conn = Database.getInstance().getConnection();
 
         PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        statement.setInt(1, location.getUserId());
+        statement.setLong(1, location.getUserId());
         if (location.getParentLocationId() == null) {
             statement.setNull(2, Types.INTEGER);
         } else {
@@ -117,6 +113,10 @@ public class LocationDao implements Dao<Location> {
         statement.setString(7, location.getDescription());
 
         statement.executeUpdate();
+
+        location.setId(Database.getInstance().getLastInsertedId("Location"));
+
+        return location.getId();
 
         // todo: get the id of the newly created location
     }

@@ -32,24 +32,20 @@ public class LoginBean {
         this.password = password;
     }
 
-    public int validate() throws SQLException {
+    public Long validate() throws SQLException {
         Connection conn = Database.getInstance().getConnection();
 
-        try {
-            PreparedStatement ps = conn.prepareStatement("SELECT id FROM User WHERE email=? AND password=?");
+        PreparedStatement ps = conn.prepareStatement("SELECT id FROM User WHERE email=? AND password=?");
 
-            ps.setString(1, getEmail());
-            ps.setString(2, getPassword());
+        ps.setString(1, getEmail());
+        ps.setString(2, getPassword());
 
-            ResultSet rs = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
 
-            if (rs.next()){
-                return rs.getInt(1);
-            }
+        if (rs.next()){
+            return rs.getLong(1);
+        }
 
-        } catch (SQLException ignored) {}
-
-        return 0;
-
+        return null;
     }
 }

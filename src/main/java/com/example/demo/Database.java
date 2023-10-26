@@ -36,4 +36,11 @@ public class Database {
             connection = null;
         }
     }
+
+    public Long getLastInsertedId(String table) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("SELECT last_insert_id() FROM " + table + ";");
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getLong(1);
+    }
 }
