@@ -22,7 +22,8 @@ public class Location {
         this.id = id;
     }
 
-    public Long getUserId() {
+    public Long
+    getUserId() {
         return userId;
     }
 
@@ -92,5 +93,21 @@ public class Location {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", parentLocationId=" + parentLocationId +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", description='" + description + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                '}';
     }
 }
