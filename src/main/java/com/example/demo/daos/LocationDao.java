@@ -1,26 +1,33 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
+import com.example.demo.beans.Location;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class LocationDao {
-    Integer id;
-    Integer userId;
-    Integer parentLocationId;
-    Double longitude;
-    Double latitude;
-    String name;
-    String address;
-    String description;
-    String createdAt;
-    String updatedAt;
+public class LocationDao implements Dao<Location> {
+    static LocationDao instance = null;
+    static public LocationDao getInstance() {
+        if (instance == null) {
+            instance = new LocationDao();
+        }
+        return instance;
+    }
 
-    static public List<LocationDao> getAllLocations() throws SQLException {
-        List<LocationDao> results = new ArrayList<>();
+    private LocationDao() {
+    }
+
+    public List<Location> getAll() throws SQLException {
         Connection conn = Database.getConnection();
+
+        List<Location> results = new ArrayList<>();
 
         if (conn == null) {
             return results;
@@ -36,27 +43,27 @@ public class LocationDao {
         return results;
     }
 
-    static public LocationDao getLocationById(int id) throws SQLException {
+    public Optional<Location> get(long id) throws SQLException {
         Connection conn = Database.getConnection();
 
         if (conn == null) {
-            return null;
+            return Optional.empty();
         }
 
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location WHERE id = ?");
-        statement.setInt(1, id);
+        statement.setDouble(1, id);
 
         ResultSet resultSet = statement.executeQuery();
 
         if (resultSet.next()) {
-            return fromResultSet(resultSet);
+            return Optional.of(fromResultSet(resultSet));
         }
 
-        return null;
+        return Optional.empty();
     }
 
-    static public List<LocationDao> getParentLocationsOf(Integer id) throws SQLException {
-        List<LocationDao> results = new ArrayList<>();
+    public List<Location> getParentLocationsOf(Long id) throws SQLException {
+        List<Location> results = new ArrayList<>();
         Connection conn = Database.getConnection();
 
         if (conn == null) {
@@ -69,7 +76,7 @@ public class LocationDao {
             statement = conn.prepareStatement("SELECT * FROM Location WHERE parent_location_id IS NULL");
         } else {
             statement = conn.prepareStatement("SELECT * FROM Location WHERE parent_location_id = ?");
-            statement.setInt(1, id);
+            statement.setLong(1, id);
         }
 
         ResultSet resultSet = statement.executeQuery();
@@ -81,107 +88,27 @@ public class LocationDao {
         return results;
     }
 
-    static private LocationDao fromResultSet(ResultSet row) throws SQLException {
-        LocationDao entity = new LocationDao();
+    static private Location fromResultSet(ResultSet row) throws SQLException {
+        Location location = new Location();
 
-        entity.setId(row.getInt(1));
-        entity.setUserId(row.getInt(2));
+        location.setId(row.getLong(1));
+        location.setUserId(row.getInt(2));
 
-        entity.setParentLocationId(row.getInt(3));
-        if (row.wasNull()) entity.setParentLocationId(null);
+        location.setParentLocationId(row.getLong(3));
+        if (row.wasNull()) location.setParentLocationId(null);
 
-        entity.setLongitude(row.getDouble(4));
-        entity.setLatitude(row.getDouble(5));
-        entity.setName(row.getString(6));
-        entity.setAddress(row.getString(7));
-        entity.setDescription(row.getString(8));
-        entity.setCreatedAt(row.getString(9));
-        entity.setUpdatedAt(row.getString(10));
+        location.setLongitude(row.getDouble(4));
+        location.setLatitude(row.getDouble(5));
+        location.setName(row.getString(6));
+        location.setAddress(row.getString(7));
+        location.setDescription(row.getString(8));
+        location.setCreatedAt(row.getString(9));
+        location.setUpdatedAt(row.getString(10));
 
-        return entity;
+        return location;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getParentLocationId() {
-        return parentLocationId;
-    }
-
-    public void setParentLocationId(Integer parentLocationId) {
-        this.parentLocationId = parentLocationId;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void create() {
+    public void create(Location location) throws SQLException {
         try {
             Connection conn = Database.getConnection();
 
@@ -190,17 +117,17 @@ public class LocationDao {
             }
 
             PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            statement.setInt(1, this.getUserId());
-            if (this.getParentLocationId() == null) {
+            statement.setInt(1, location.getUserId());
+            if (location.getParentLocationId() == null) {
                 statement.setNull(2, Types.INTEGER);
             } else {
-                statement.setInt(2, this.getParentLocationId());
+                statement.setDouble(2, location.getParentLocationId());
             }
-            statement.setDouble(3, this.getLongitude());
-            statement.setDouble(4, this.getLatitude());
-            statement.setString(5, this.getName());
-            statement.setString(6, this.getAddress());
-            statement.setString(7, this.getDescription());
+            statement.setDouble(3, location.getLongitude());
+            statement.setDouble(4, location.getLatitude());
+            statement.setString(5, location.getName());
+            statement.setString(6, location.getAddress());
+            statement.setString(7, location.getDescription());
 
             statement.executeUpdate();
 

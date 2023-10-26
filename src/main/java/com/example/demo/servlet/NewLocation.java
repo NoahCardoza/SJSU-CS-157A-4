@@ -1,6 +1,7 @@
 package com.example.demo.servlet;
 
 import com.example.demo.Validation;
+import com.example.demo.beans.Location;
 import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.LocationDao;
 import jakarta.servlet.ServletException;
@@ -21,7 +22,7 @@ public class NewLocation extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
-            List<LocationDao> locations = LocationDao.getParentLocationsOf(null);
+            List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);
 
             for (int i = 0; i < locations.size(); i++) {
                 System.out.println(locations.get(i).getId());
@@ -51,7 +52,7 @@ public class NewLocation extends HttpServlet {
             if (action != null && action.equals("submit")) {
                 Validation v = form.validate();
                 if (v.isValid()) {
-                    LocationDao location = new LocationDao();
+                    Location location = new Location();
                     location.setUserId(1); // TODO: update to session user id
                     location.setName(form.getName());
                     location.setDescription(form.getDescription());
@@ -59,8 +60,11 @@ public class NewLocation extends HttpServlet {
                     location.setLatitude(form.getLatitude());
                     location.setLongitude(form.getLongitude());
                     location.setParentLocationId(form.getParentId());
-
-                    location.create();
+                    try {
+                        LocationDao.getInstance().create(location);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
 
                     // TODO: redirect to location page
 

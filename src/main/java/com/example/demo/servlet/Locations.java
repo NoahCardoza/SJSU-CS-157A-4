@@ -1,5 +1,6 @@
 package com.example.demo.servlet;
 
+import com.example.demo.beans.Location;
 import com.example.demo.daos.LocationDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,7 +22,8 @@ public class Locations extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
-            List<LocationDao> locations = LocationDao.getAllLocations();
+
+            List<Location> locations = LocationDao.getInstance().getAll();
 
             for (int i = 0; i < locations.size(); i++) {
                 System.out.println(locations.get(i).getId());

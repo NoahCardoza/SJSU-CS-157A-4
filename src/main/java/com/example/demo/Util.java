@@ -11,6 +11,16 @@ public class Util {
         return Integer.parseInt(s);
     }
 
+    static public Long parseLongOrNull(String s) {
+        if (s == null) {
+            return null;
+        }
+        if (s.isEmpty()) {
+            return null;
+        }
+        return Long.parseLong(s);
+    }
+
     static public Double parseDoubleOrNull(String s) {
         if (s == null) {
             return null;

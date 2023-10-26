@@ -5,7 +5,7 @@ import com.example.demo.Validation;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class LocationForm {
-   Integer parentId = null;
+    Long parentId = null;
    String parentName = "None";
 
     String name = "";
@@ -18,7 +18,7 @@ public class LocationForm {
     public LocationForm() {}
 
     public LocationForm(HttpServletRequest request) {
-        this.parentId = Util.parseIntOrNull(request.getParameter("parentId"));
+        this.parentId = Util.parseLongOrNull(request.getParameter("parentId"));
         this.parentName = request.getParameter("parentName");
         this.name = request.getParameter("name");
         this.description = request.getParameter("description");
@@ -78,11 +78,11 @@ public class LocationForm {
         return v;
     }
 
-    public Integer getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(Integer parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 

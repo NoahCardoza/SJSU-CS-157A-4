@@ -1,5 +1,6 @@
 package com.example.demo.servlet;
 
+import com.example.demo.beans.Location;
 import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.LocationDao;
 import jakarta.servlet.ServletException;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet(name = "New Location Parent Selector", value = "/location/new/parent")
 public class NewLocationParentSelector extends HttpServlet {
@@ -27,17 +29,17 @@ public class NewLocationParentSelector extends HttpServlet {
 
             // if the user clicks the back button, we need to get the parent of the current parent
             if (action != null && action.equals("back") && form.getParentId() != null) {
-                LocationDao parentLocation = LocationDao.getLocationById(form.getParentId());
-                if (parentLocation != null) {
-                    form.setParentId(parentLocation.getParentLocationId());
-                    if (parentLocation.getParentLocationId() == null) {
+                Optional<Location> parentLocationOpt = LocationDao.getInstance().get(form.getParentId());
+                if (parentLocationOpt.isPresent()) {
+                    form.setParentId(parentLocationOpt.get().getParentLocationId());
+                    if (parentLocationOpt.get().getParentLocationId() == null) {
                         // if the parent of the parent is null, it means that the parent is the root
                         form.setParentName("None");
                     } else {
                         // get the name of the parent
-                        parentLocation = LocationDao.getLocationById(parentLocation.getParentLocationId());
-                        if (parentLocation != null) {
-                            form.setParentName(parentLocation.getName());
+                        parentLocationOpt = LocationDao.getInstance().get(parentLocationOpt.get().getParentLocationId());
+                        if (parentLocationOpt.isPresent()) {
+                            form.setParentName(parentLocationOpt.get().getName());
                         } else {
                             // just to be safe, this shouldn't happen unless something is removed
                             // from the database while the user is using the app
@@ -49,12 +51,12 @@ public class NewLocationParentSelector extends HttpServlet {
 
             }
 
-            List<LocationDao> locations = LocationDao.getParentLocationsOf(form.getParentId());
+            List<Location> locations = LocationDao.getInstance().getParentLocationsOf(form.getParentId());
 
             // if a parent is selected, add it to the list of locations
             // so the user can see it
             if (form.getParentId() != null) {
-                LocationDao selected = new LocationDao();
+                Location selected = new Location();
 
                 selected.setId(form.getParentId());
                 selected.setName(form.getParentName());
