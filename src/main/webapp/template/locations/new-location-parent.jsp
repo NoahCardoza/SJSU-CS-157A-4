@@ -1,17 +1,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%--@elvariable id="locations" type="List<com.example.demo.orm.Location>"--%>
-<%--@elvariable id="form" type="List<com.example.demo.bean.LocationForm>"--%>
+<%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
+<%--@elvariable id="form" type="List<com.example.demo.beans.forms.LocationForm>"--%>
 
 <!DOCTYPE html>
 <html>
     <head>
         <title>Locations</title>
-        <%@include file="../includes/head.jsp" %>
+        <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
-        <%@include file="../includes/nav.jsp" %>
+        <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
             <h1>Location Parent Select</h1>
             <form method="POST" class="mb-5">

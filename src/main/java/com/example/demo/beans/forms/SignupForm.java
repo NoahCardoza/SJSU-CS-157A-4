@@ -1,6 +1,5 @@
-package com.example.demo.bean;
+package com.example.demo.beans.forms;
 
-import com.example.demo.Util;
 import com.example.demo.Validation;
 import jakarta.servlet.http.HttpServletRequest;
 

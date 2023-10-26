@@ -1,9 +1,9 @@
-package com.example.demo.orm;
+package com.example.demo.daos;
 
 import com.example.demo.Database;
 import java.sql.*;
 
-public class User {
+public class UserDao {
 
     Integer userId = 0;
     String username = "";

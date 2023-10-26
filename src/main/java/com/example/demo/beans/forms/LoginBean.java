@@ -1,7 +1,6 @@
-package com.example.demo.bean;
+package com.example.demo.beans.forms;
 
 import com.example.demo.Database;
-import com.example.demo.servlet.Login;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

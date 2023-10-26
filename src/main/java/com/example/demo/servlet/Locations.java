@@ -1,5 +1,6 @@
 package com.example.demo.servlet;
 
+import com.example.demo.daos.LocationDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,7 +21,7 @@ public class Locations extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
-            List<com.example.demo.orm.Location> locations = com.example.demo.orm.Location.getAllLocations();
+            List<LocationDao> locations = LocationDao.getAllLocations();
 
             for (int i = 0; i < locations.size(); i++) {
                 System.out.println(locations.get(i).getId());
@@ -31,7 +32,7 @@ public class Locations extends HttpServlet {
                     locations
             );
 
-            request.getRequestDispatcher("template/locations.jsp").forward(request, response);
+            request.getRequestDispatcher("template/locations/index.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

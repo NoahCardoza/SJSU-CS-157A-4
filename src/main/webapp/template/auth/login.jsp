@@ -1,16 +1,16 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
-<%--@elvariable id="alert" type="com.example.demo.bean.Alert"--%>
+<%--@elvariable id="alert" type="com.example.demo.beans.Alert"--%>
 
 <!DOCTYPE html>
 <html>
     <head>
         <title>Login Page</title>
-        <%@include file="../includes/head.jsp" %>
+        <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
 
-        <%@include file="../includes/nav.jsp" %>
+        <%@include file="../../includes/nav.jsp" %>
 
         <div class="container-sm mt-5" style="max-width: 600px">
             <h3>Login</h3>

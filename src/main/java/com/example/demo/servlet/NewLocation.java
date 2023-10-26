@@ -1,8 +1,8 @@
 package com.example.demo.servlet;
 
 import com.example.demo.Validation;
-import com.example.demo.bean.LocationForm;
-import com.example.demo.orm.Location;
+import com.example.demo.beans.forms.LocationForm;
+import com.example.demo.daos.LocationDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,7 +21,7 @@ public class NewLocation extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
-            List<com.example.demo.orm.Location> locations = com.example.demo.orm.Location.getParentLocationsOf(null);
+            List<LocationDao> locations = LocationDao.getParentLocationsOf(null);
 
             for (int i = 0; i < locations.size(); i++) {
                 System.out.println(locations.get(i).getId());
@@ -36,7 +36,7 @@ public class NewLocation extends HttpServlet {
                     locations
             );
 
-            request.getRequestDispatcher("/template/new-location.jsp").forward(request, response);
+            request.getRequestDispatcher("/template/locations/new-location.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -51,7 +51,7 @@ public class NewLocation extends HttpServlet {
             if (action != null && action.equals("submit")) {
                 Validation v = form.validate();
                 if (v.isValid()) {
-                    Location location = new Location();
+                    LocationDao location = new LocationDao();
                     location.setUserId(1); // TODO: update to session user id
                     location.setName(form.getName());
                     location.setDescription(form.getDescription());
@@ -73,7 +73,7 @@ public class NewLocation extends HttpServlet {
 
             request.setAttribute("form", form);
 
-            request.getRequestDispatcher("/template/new-location.jsp").forward(request, response);
+            request.getRequestDispatcher("/template/locations/new-location.jsp").forward(request, response);
 //        } catch (SQLException e) {
 //            throw new RuntimeException(e);
 //        }

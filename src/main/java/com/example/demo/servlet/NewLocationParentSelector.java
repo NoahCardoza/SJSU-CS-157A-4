@@ -1,7 +1,7 @@
 package com.example.demo.servlet;
 
-import com.example.demo.bean.LocationForm;
-import com.example.demo.orm.Location;
+import com.example.demo.beans.forms.LocationForm;
+import com.example.demo.daos.LocationDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,7 +27,7 @@ public class NewLocationParentSelector extends HttpServlet {
 
             // if the user clicks the back button, we need to get the parent of the current parent
             if (action != null && action.equals("back") && form.getParentId() != null) {
-                Location parentLocation = Location.getLocationById(form.getParentId());
+                LocationDao parentLocation = LocationDao.getLocationById(form.getParentId());
                 if (parentLocation != null) {
                     form.setParentId(parentLocation.getParentLocationId());
                     if (parentLocation.getParentLocationId() == null) {
@@ -35,7 +35,7 @@ public class NewLocationParentSelector extends HttpServlet {
                         form.setParentName("None");
                     } else {
                         // get the name of the parent
-                        parentLocation = Location.getLocationById(parentLocation.getParentLocationId());
+                        parentLocation = LocationDao.getLocationById(parentLocation.getParentLocationId());
                         if (parentLocation != null) {
                             form.setParentName(parentLocation.getName());
                         } else {
@@ -49,12 +49,12 @@ public class NewLocationParentSelector extends HttpServlet {
 
             }
 
-            List<Location> locations = Location.getParentLocationsOf(form.getParentId());
+            List<LocationDao> locations = LocationDao.getParentLocationsOf(form.getParentId());
 
             // if a parent is selected, add it to the list of locations
             // so the user can see it
             if (form.getParentId() != null) {
-                Location selected = new Location();
+                LocationDao selected = new LocationDao();
 
                 selected.setId(form.getParentId());
                 selected.setName(form.getParentName());
@@ -69,7 +69,7 @@ public class NewLocationParentSelector extends HttpServlet {
 
             request.setAttribute("form", form);
 
-            request.getRequestDispatcher("/template/new-location-parent.jsp").forward(request, response);
+            request.getRequestDispatcher("/template/locations/new-location-parent.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -1,18 +1,18 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
-<%--@elvariable id="alert" type="com.example.demo.bean.Alert"--%>
-<%--@elvariable id="User" type="List<com.example.demo.orm.User>"--%>
-<%--@elvariable id="form" type="List<com.example.demo.bean.SignupForm>"--%>
+<%--@elvariable id="alert" type="com.example.demo.beans.Alert"--%>
+<%--@elvariable id="User" type="List<com.example.demo.daos.UserDao>"--%>
+<%--@elvariable id="form" type="List<com.example.demo.beans.forms.SignupForm>"--%>
 
 <!DOCTYPE html>
 <html>
     <head>
         <title>Signup</title>
-        <%@include file="../includes/head.jsp" %>
+        <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
 
-        <%@include file="../includes/nav.jsp" %>
+        <%@include file="../../includes/nav.jsp" %>
 
         <div class="container-sm mt-5" style="max-width: 600px">
             <h3>Signup</h3>

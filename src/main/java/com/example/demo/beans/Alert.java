@@ -1,11 +1,4 @@
-package com.example.demo.bean;
-
-import com.example.demo.Database;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+package com.example.demo.beans;
 
 public class Alert {
     public String color;

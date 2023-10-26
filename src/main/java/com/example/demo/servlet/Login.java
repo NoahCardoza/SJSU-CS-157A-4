@@ -1,8 +1,7 @@
 package com.example.demo.servlet;
 
-import com.example.demo.Database;
-import com.example.demo.bean.Alert;
-import com.example.demo.bean.LoginBean;
+import com.example.demo.beans.Alert;
+import com.example.demo.beans.forms.LoginBean;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,8 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.*;
 
 @WebServlet(name = "Login", value = "/login")
 public class Login extends HttpServlet {
@@ -37,12 +34,12 @@ public class Login extends HttpServlet {
                 new Alert("danger", "That email/password combination cannot be found in our records")
             );
 
-            request.getRequestDispatcher("template/login.jsp").forward(request, response);
+            request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
         }
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        request.getRequestDispatcher("template/login.jsp").forward(request, response);
+        request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
     }
 
     public void destroy() {

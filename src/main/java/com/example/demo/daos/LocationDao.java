@@ -1,13 +1,12 @@
-package com.example.demo.orm;
+package com.example.demo.daos;
 
 import com.example.demo.Database;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Location {
+public class LocationDao {
     Integer id;
     Integer userId;
     Integer parentLocationId;
@@ -19,8 +18,8 @@ public class Location {
     String createdAt;
     String updatedAt;
 
-    static public List<Location> getAllLocations() throws SQLException {
-        List<Location> results = new ArrayList<>();
+    static public List<LocationDao> getAllLocations() throws SQLException {
+        List<LocationDao> results = new ArrayList<>();
         Connection conn = Database.getConnection();
 
         if (conn == null) {
@@ -37,7 +36,7 @@ public class Location {
         return results;
     }
 
-    static public Location getLocationById(int id) throws SQLException {
+    static public LocationDao getLocationById(int id) throws SQLException {
         Connection conn = Database.getConnection();
 
         if (conn == null) {
@@ -56,8 +55,8 @@ public class Location {
         return null;
     }
 
-    static public List<Location> getParentLocationsOf(Integer id) throws SQLException {
-        List<Location> results = new ArrayList<>();
+    static public List<LocationDao> getParentLocationsOf(Integer id) throws SQLException {
+        List<LocationDao> results = new ArrayList<>();
         Connection conn = Database.getConnection();
 
         if (conn == null) {
@@ -82,8 +81,8 @@ public class Location {
         return results;
     }
 
-    static private Location fromResultSet(ResultSet row) throws SQLException {
-        Location entity = new Location();
+    static private LocationDao fromResultSet(ResultSet row) throws SQLException {
+        LocationDao entity = new LocationDao();
 
         entity.setId(row.getInt(1));
         entity.setUserId(row.getInt(2));

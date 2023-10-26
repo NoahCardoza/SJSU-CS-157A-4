@@ -1,9 +1,9 @@
 package com.example.demo.servlet;
 
 import com.example.demo.Validation;
-import com.example.demo.bean.Alert;
-import com.example.demo.bean.SignupForm;
-import com.example.demo.orm.User;
+import com.example.demo.beans.Alert;
+import com.example.demo.beans.forms.SignupForm;
+import com.example.demo.daos.UserDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,7 +17,7 @@ public class Signup extends HttpServlet {
     public void init() {}
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        request.getRequestDispatcher("/template/signup.jsp").forward(request, response);
+        request.getRequestDispatcher("/template/auth/signup.jsp").forward(request, response);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -30,7 +30,7 @@ public class Signup extends HttpServlet {
             Validation v = form.validate();
 
             if (v.isValid()) {
-                User user = new User();
+                UserDao user = new UserDao();
                 // eventually user session id for user.setUserId(7);
                 user.setUsername(form.getUsername());
                 user.setPassword(form.getPassword());
@@ -56,7 +56,7 @@ public class Signup extends HttpServlet {
 
         request.setAttribute("form", form);
 
-        request.getRequestDispatcher("/template/signup.jsp").forward(request, response);
+        request.getRequestDispatcher("/template/auth/signup.jsp").forward(request, response);
     }
 
 
