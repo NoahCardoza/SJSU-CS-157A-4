@@ -1,9 +1,7 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.AmenityType;
-import com.example.demo.beans.User;
-import jakarta.servlet.http.HttpSession;
+import com.example.demo.beans.entities.AmenityType;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

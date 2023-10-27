@@ -1,16 +1,18 @@
 package com.example.demo.servlets.locations;
 
+import com.example.demo.Util;
 import com.example.demo.Validation;
-import com.example.demo.beans.Alert;
-import com.example.demo.beans.Location;
-import com.example.demo.beans.User;
+import com.example.demo.beans.*;
+import com.example.demo.beans.entities.AmenityWithImage;
+import com.example.demo.beans.entities.Location;
+import com.example.demo.beans.entities.User;
 import com.example.demo.beans.forms.LocationForm;
+import com.example.demo.daos.AmenityDao;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.UserDao;
 import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -38,6 +40,8 @@ public class Locations extends DatabaseHttpServlet {
 
         try {
             switch (function) {
+                case "get":
+                    get(request, response);
                 case "create":
                     create(request, response);
                     break;
@@ -59,6 +63,37 @@ public class Locations extends DatabaseHttpServlet {
         }
     }
 
+    public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        Long locationId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (locationId == null) {
+            response.sendRedirect(request.getContextPath() + "/locations");
+            return;
+        }
+
+        Optional<Location> location = LocationDao.getInstance().get(locationId);
+
+        if (location.isPresent()) {
+            request.setAttribute(
+                    "location",
+                    location.get()
+            );
+        } else {
+            System.out.println("Location not found");
+            response.sendRedirect(request.getContextPath() + "/locations");
+            return;
+        }
+
+        List<AmenityWithImage> amenities = AmenityDao.getInstance().getOfLocationId(locationId);
+
+        request.setAttribute(
+                "amenities",
+                amenities
+        );
+
+        request.getRequestDispatcher("template/locations/get.jsp").forward(request, response);
+    }
     public void parentSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         LocationForm form = new LocationForm(request);
 

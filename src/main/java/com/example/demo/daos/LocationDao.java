@@ -1,7 +1,7 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.Location;
+import com.example.demo.beans.entities.Location;
 
 import java.sql.*;
 import java.util.ArrayList;

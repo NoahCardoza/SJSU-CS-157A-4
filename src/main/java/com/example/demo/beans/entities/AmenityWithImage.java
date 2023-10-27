@@ -1,9 +1,9 @@
-package com.example.demo.beans;
+package com.example.demo.beans.entities;
 
-public class AmenityWIthImage extends Amenity {
+public class AmenityWithImage extends Amenity {
     ReviewImage image;
 
-    public AmenityWIthImage() {
+    public AmenityWithImage() {
         super();
     }
 

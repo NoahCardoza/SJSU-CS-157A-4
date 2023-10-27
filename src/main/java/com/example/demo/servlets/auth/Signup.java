@@ -2,13 +2,12 @@ package com.example.demo.servlets.auth;
 
 import com.example.demo.Validation;
 import com.example.demo.beans.Alert;
-import com.example.demo.beans.User;
+import com.example.demo.beans.entities.User;
 import com.example.demo.beans.forms.SignupForm;
 import com.example.demo.daos.UserDao;
 import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 

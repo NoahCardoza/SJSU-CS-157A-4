@@ -1,4 +1,4 @@
-package com.example.demo.beans;
+package com.example.demo.beans.entities;
 
 public class ReviewImage {
     private Long id;

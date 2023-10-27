@@ -1,7 +1,7 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.User;
+import com.example.demo.beans.entities.User;
 import jakarta.servlet.http.HttpSession;
 
 import java.sql.*;

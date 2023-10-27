@@ -19,10 +19,16 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link <%= path.equals("/index.jsp") ? "active" : "" %>" aria-current="page" href="index.jsp">Home</a>
+                    <a class="nav-link <%= path.startsWith("/index.jsp") ? "active" : "" %>" aria-current="page" href="index.jsp">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= path.equals("/login") ? "active" : "" %>" href="<%= isLoggedIn ? "logout.jsp" : "login" %>"><%= isLoggedIn ? "Logout" : "Login" %></a>
+                    <a class="nav-link <%= path.startsWith("/login") ? "active" : "" %>" href="<%= isLoggedIn ? "logout.jsp" : "login" %>"><%= isLoggedIn ? "Logout" : "Login" %></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= path.startsWith("/locations") ? "active" : "" %>" href="/locations">Locations</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= path.startsWith("/search") ? "active" : "" %>" href="/search">Search</a>
                 </li>
                 <c:if test="${!isLoggedIn}">
                     <li class="nav-item">
@@ -30,10 +36,10 @@
                     </li>
                 </c:if>
             </ul>
-            <form class="d-flex mb-0" action="search.jsp" method="get">
-                <input class="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+<%--            <form class="d-flex mb-0" action="search.jsp" method="get">--%>
+<%--                <input class="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search">--%>
+<%--                <button class="btn btn-outline-success" type="submit">Search</button>--%>
+<%--            </form>--%>
         </div>
     </div>
 </nav>

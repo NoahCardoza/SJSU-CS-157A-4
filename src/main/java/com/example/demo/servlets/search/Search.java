@@ -1,8 +1,9 @@
 package com.example.demo.servlets.search;
 
-import com.example.demo.Validation;
-import com.example.demo.beans.*;
-import com.example.demo.beans.forms.LocationForm;
+import com.example.demo.Util;
+import com.example.demo.beans.entities.AmenityType;
+import com.example.demo.beans.entities.AmenityTypeAttribute;
+import com.example.demo.beans.entities.AmenityWithImage;
 import com.example.demo.daos.*;
 import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
@@ -12,8 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @WebServlet(name = "Search", value = "/search")
 public class Search extends DatabaseHttpServlet {
@@ -41,19 +42,20 @@ public class Search extends DatabaseHttpServlet {
                 amenityTypes
         );
 
-        Long amenityTypeId = request.getParameter("amenityTypeId") == null ? null : Long.parseLong(request.getParameter("amenityTypeId"));
+        Long amenityTypeId = Util.nullIfZero(Util.parseLongOrNull(request.getParameter("amenityTypeId")));
 
         if (amenityTypeId != null) {
-
             List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenityTypeId);
+
+            var amenityTypeAttributeGrouper = new AmenityTypeAttributeGrouper(request, amenityTypeAttributes);
 
             request.setAttribute(
                     "amenityTypeAttributes",
-                    amenityTypeAttributes
+                    amenityTypeAttributeGrouper
             );
         }
 
-        List<Amenity> amenities = AmenityDao.getInstance().getWithFilter(amenityTypeId);
+        List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityTypeId);
 
         request.setAttribute(
                 "amenities",

@@ -6,33 +6,58 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Util {
-    static public Integer parseIntOrNull(String s) {
+
+    static public String nullify(String s) {
         if (s == null) {
             return null;
         }
+
         if (s.isEmpty()) {
             return null;
         }
+
+        if (s.equals("null")) {
+            return null;
+        }
+
+        return s;
+    }
+
+    static public Integer parseIntOrNull(String s) {
+        s = nullify(s);
+
+        if (s == null) {
+            return null;
+        }
+
         return Integer.parseInt(s);
     }
 
     static public Long parseLongOrNull(String s) {
+        s = nullify(s);
+
         if (s == null) {
             return null;
         }
-        if (s.isEmpty()) {
-            return null;
-        }
+
         return Long.parseLong(s);
     }
 
+    static public Long nullIfZero(Long l) {
+        if (l == null || l == 0) {
+            return null;
+        }
+
+        return l;
+    }
+
     static public Double parseDoubleOrNull(String s) {
+        s = nullify(s);
+
         if (s == null) {
             return null;
         }
-        if (s.isEmpty()) {
-            return null;
-        }
+
         return Double.parseDouble(s);
     }
     static public HashMap<String, String> getGetParameters(HttpServletRequest request) {

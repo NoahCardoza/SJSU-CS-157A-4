@@ -1,9 +1,9 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.Amenity;
-import com.example.demo.beans.AmenityWIthImage;
-import com.example.demo.beans.ReviewImage;
+import com.example.demo.beans.entities.Amenity;
+import com.example.demo.beans.entities.AmenityWithImage;
+import com.example.demo.beans.entities.ReviewImage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -66,15 +66,15 @@ public class AmenityDao implements Dao<Amenity> {
         return null;
     }
 
-    public List<Amenity> getWithFilter(Long amenityTypeId) throws SQLException {
-        ArrayList<Amenity> amenityTypes = new ArrayList<>();
+    public List<AmenityWithImage> getWithFilter(Long amenityTypeId) throws SQLException {
+        ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
         Connection conn = Database.getInstance().getConnection();
 
         PreparedStatement statement;
         ResultSet resultSet;
 
         if (amenityTypeId == null) {
-            statement = conn.prepareStatement("SELECT * FROM Amenity");
+            statement = conn.prepareStatement("SELECT *, (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image FROM Amenity");
         } else {
             statement = conn.prepareStatement("SELECT " +
                     "*, (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image\n" +
@@ -102,7 +102,60 @@ public class AmenityDao implements Dao<Amenity> {
         resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
-            AmenityWIthImage amenity = new AmenityWIthImage();
+            AmenityWithImage amenity = new AmenityWithImage();
+
+            amenity.setId(resultSet.getLong("id"));
+            amenity.setName(resultSet.getString("name"));
+            amenity.setDescription(resultSet.getString("description"));
+            amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
+            amenity.setLocationId(resultSet.getLong("location_id"));
+            amenity.setUserId(resultSet.getLong("user_id"));
+            amenity.setAccessible(resultSet.getBoolean("accessible"));
+            amenity.setCreatedAt(resultSet.getString("created_at"));
+            amenity.setUpdatedAt(resultSet.getString("updated_at"));
+            ReviewImage reviewImage = new ReviewImage();
+            reviewImage.setUrl(resultSet.getString("image"));
+            amenity.setImage(reviewImage);
+            amenityTypes.add(amenity);
+        }
+
+        return amenityTypes;
+    }
+
+    public List<AmenityWithImage> getOfLocationId(Long locationId) throws SQLException {
+        ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
+        Connection conn = Database.getInstance().getConnection();
+
+        PreparedStatement statement;
+        ResultSet resultSet;
+
+        statement = conn.prepareStatement("SELECT\n" +
+                "    *,\n" +
+                "    (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image\n" +
+                "FROM Amenity\n" +
+                "WHERE\n" +
+                "    Amenity.location_id IN (\n" +
+                "    WITH RECURSIVE location_hierarchy AS (\n" +
+                "        SELECT  id,\n" +
+                "                parent_location_id\n" +
+                "        FROM Location\n" +
+                "        WHERE id = ?\n" +
+                "\n" +
+                "        UNION ALL\n" +
+                "\n" +
+                "        SELECT\n" +
+                "        e.id,\n" +
+                "        e.parent_location_id\n" +
+                "        FROM Location e, location_hierarchy\n" +
+                "        WHERE location_hierarchy.id = e.parent_location_id\n" +
+                "    ) SELECT id FROM location_hierarchy\n" +
+                ");");
+        statement.setDouble(1, locationId);
+
+        resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            AmenityWithImage amenity = new AmenityWithImage();
 
             amenity.setId(resultSet.getLong("id"));
             amenity.setName(resultSet.getString("name"));

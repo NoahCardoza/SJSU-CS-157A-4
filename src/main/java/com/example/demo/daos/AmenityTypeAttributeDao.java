@@ -1,8 +1,8 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.AmenityType;
-import com.example.demo.beans.AmenityTypeAttribute;
+import com.example.demo.beans.MinMax;
+import com.example.demo.beans.entities.AmenityTypeAttribute;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
+    static public String TYPE_NUMBER_ID_PREFIX = "amenityTypeNumberAttribute-";
+    static public String TYPE_TEXT_ID_PREFIX = "amenityTypeTextAttribute-";
+    static public String TYPE_BOOLEAN_ID = "amenityTypeBooleanAttributes";
     static AmenityTypeAttributeDao instance = null;
     static public AmenityTypeAttributeDao getInstance() {
         if (instance == null) {
@@ -59,7 +62,6 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
         return null;
     }
 
-
     public List<AmenityTypeAttribute> getAllByAmenityType(Long amenityTypeId) throws SQLException {
         ArrayList<AmenityTypeAttribute> amenityTypes = new ArrayList<>();
 
@@ -77,5 +79,49 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
         }
 
         return amenityTypes;
+    }
+
+    public List<String> getAllTextValuesForAttribute(Long attributeId) throws SQLException {
+        ArrayList<String> attributeValues = new ArrayList<>();
+
+        Connection conn = Database.getInstance().getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
+        );
+
+        statement.setDouble(1, attributeId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            attributeValues.add(resultSet.getString("value"));
+        }
+
+        return attributeValues;
+    }
+
+    public Optional<MinMax> getMinMaxIntValuesForAttribute(Long attributeId) throws SQLException {
+        Connection conn = Database.getInstance().getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT MIN(value), MAX(value) FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
+        );
+
+        statement.setDouble(1, attributeId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            try {
+                MinMax minMax = new MinMax(
+                        resultSet.getInt(1),
+                        resultSet.getInt(2)
+                );
+                return Optional.of(minMax);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return Optional.empty();
     }
 }
