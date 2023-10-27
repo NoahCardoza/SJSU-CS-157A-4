@@ -32,7 +32,7 @@
                     </select>
                 </div>
 
-                <c:if test="${amenityTypeAttributes != null}">
+                <c:if test="${not empty amenityTypeAttributes}">
                     ${amenityTypeAttributes.textAttributes}
                     ${amenityTypeAttributes.booleanAttributes}
                     ${amenityTypeAttributes.numberAttributes}

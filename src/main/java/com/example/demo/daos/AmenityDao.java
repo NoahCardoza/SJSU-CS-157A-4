@@ -4,14 +4,11 @@ import com.example.demo.Database;
 import com.example.demo.beans.entities.Amenity;
 import com.example.demo.beans.entities.AmenityWithImage;
 import com.example.demo.beans.entities.ReviewImage;
+import com.example.demo.servlets.search.AmenityFilter;
+import jakarta.servlet.ServletRequest;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.sql.*;
+import java.util.*;
 
 public class AmenityDao implements Dao<Amenity> {
     static AmenityDao instance = null;
@@ -66,19 +63,17 @@ public class AmenityDao implements Dao<Amenity> {
         return null;
     }
 
-    public List<AmenityWithImage> getWithFilter(Long amenityTypeId) throws SQLException {
+    public List<AmenityWithImage> getWithFilter(AmenityFilter filter) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
         Connection conn = Database.getInstance().getConnection();
 
-        PreparedStatement statement;
+        PreparedStatement stmt ;
         ResultSet resultSet;
-
-        if (amenityTypeId == null) {
-            statement = conn.prepareStatement("SELECT *, (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image FROM Amenity");
-        } else {
-            statement = conn.prepareStatement("SELECT " +
-                    "*, (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image\n" +
-                    "FROM Amenity\n" +
+        ArrayList<String> params = new ArrayList<>();
+        String filterSubQuery = "";
+        String statement = "SELECT *, (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image FROM Amenity\n";
+        if (filter.getAmenityTypeId() != null) {
+            statement = statement +
                     "WHERE\n" +
                     "    Amenity.amenity_type_id IN (\n" +
                     "    WITH RECURSIVE amenity_type_hierarchy AS (\n" +
@@ -95,11 +90,84 @@ public class AmenityDao implements Dao<Amenity> {
                     "        FROM AmenityType e, amenity_type_hierarchy\n" +
                     "        WHERE amenity_type_hierarchy.id = e.parent_amenity_type_id\n" +
                     "    ) SELECT id FROM amenity_type_hierarchy\n" +
-                    ")");
-            statement.setDouble(1, amenityTypeId);
-
+                    ")";
+            params.add(filter.getAmenityTypeId().toString());
         }
-        resultSet = statement.executeQuery();
+
+        if (!filter.getBooleanAttributes().isEmpty() || !filter.getNumberAttributes().isEmpty() || !filter.getTextAttributes().isEmpty()) {
+            StringJoiner joiner = new StringJoiner(",");
+            StringJoiner valueJoiner = new StringJoiner(",");
+            ArrayList<String> valueParams = new ArrayList<>();
+            ArrayList<String> idParams = new ArrayList<>();
+
+            filterSubQuery = "SELECT DISTINCT review_id FROM AmenityAttributeRecord WHERE value IN (";
+
+            if (!filter.getBooleanAttributes().isEmpty()) {
+                valueJoiner.add("'T'"); // find all the true values
+                for (String attributeId : filter.getBooleanAttributes()) {
+                    joiner.add("?");
+                    idParams.add(attributeId);
+                }
+            }
+            filter.getTextAttributes().forEach((attributeId, values) -> {
+                // TODO: later we might move to OR instead of AND logic
+                // right now there should only every be one value per attribute
+                for (String value : values) {
+                    valueJoiner.add("?");
+                    joiner.add("?");
+                    valueParams.add(value);
+                    idParams.add(attributeId);
+                }
+            });
+
+            filter.getNumberAttributes().forEach((attributeId, values) -> {
+                // TODO: later we might move to min/max instead of exact value
+                // right now there should only every be one value per attribute
+                for (String value : values) {
+                    valueJoiner.add("?");
+                    joiner.add("?");
+                    valueParams.add(value);
+                    idParams.add(attributeId);
+                }
+            });
+
+            filterSubQuery = filterSubQuery + valueJoiner + ") AND amenity_attribute_id IN (" + joiner + ") GROUP BY review_id HAVING COUNT(*) >= ?\n";
+
+            params.addAll(valueParams);
+            params.addAll(idParams);
+            params.add(String.valueOf(filter.getBooleanAttributes().size() + filter.getNumberAttributes().size() + filter.getTextAttributes().size()));
+        }
+
+//        if (!filter.getNumberAttributes().isEmpty()) {
+//            StringJoiner joiner = new StringJoiner(",");
+//            filterSubQuery = "SELECT amenity_id FROM AmenityAttributeRecord WHERE amenity_attribute_id IN (";
+//            for (String attributeId : filter.getNumberAttributes().keySet()) {
+//                joiner.add("?");
+//                params.add(attributeId);
+//            }
+//            filterSubQuery = filterSubQuery + joiner + ")\n";
+//        }
+//
+//        if (!filter.getTextAttributes().isEmpty()) {
+//            StringJoiner joiner = new StringJoiner(",");
+//            filterSubQuery = "SELECT amenity_id FROM AmenityAttributeRecord WHERE value IN (";
+//            for (String attributeId : filter.getTextAttributes().keySet()) {
+//                joiner.add("?");
+//                params.add(attributeId);
+//            }
+//            filterSubQuery = filterSubQuery + joiner + ")\n";
+//        }
+//
+        if (!filterSubQuery.isEmpty()) {
+            statement = statement + "AND Amenity.id IN (SELECT DISTINCT amenity_id FROM Review JOIN (" + filterSubQuery + ") amenity ON review_id = Review.id)\n";
+        }
+
+        stmt = conn.prepareStatement(statement);
+        for (int i = 0; i < params.size(); i++) {
+            stmt.setString(i+1, params.get(i));
+        }
+        System.out.println(stmt.toString());
+        resultSet = stmt.executeQuery();
 
         while (resultSet.next()) {
             AmenityWithImage amenity = new AmenityWithImage();

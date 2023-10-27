@@ -49,7 +49,7 @@ public class AmenityTypeAttributeNumberGroup {
                         "   <label for=\"" + formId + "\" class=\"form-label\">" + attribute.getName() + " ("+ minMax.get().getMin() +" to "+ minMax.get().getMax() +") </label>\n" +
                                 "<div class=\"row\">" +
                                 "<div class=\"col-10\">" +
-                                "<input type=\"range\" class=\"form-range\" id=\""+formId+"\" value="+ currentValue+" name=\""+formId+"\" min=\""+minMax.get().getMin()+"\" max=\""+minMax.get().getMax()+"\" >\n" +
+                                "<input type=\"range\" class=\"form-range\" id=\""+formId+"\" value=\""+ currentValue +"\" name=\""+formId+"\" min=\""+minMax.get().getMin()+"\" max=\""+minMax.get().getMax()+"\" >\n" +
                                 "</div>" +
                                 "<div class=\"col-2\">" +
                                 "<output id=\""+formId+"-output\"></output>" +

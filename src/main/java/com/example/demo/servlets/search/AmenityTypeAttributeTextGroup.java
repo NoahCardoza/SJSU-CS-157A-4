@@ -48,9 +48,11 @@ public class AmenityTypeAttributeTextGroup {
                 joiner.add(
                         "<div class=\"row mb-2\">\n" +
                         "   <label for=\"" + formId + "\" class=\"form-label\">" + attribute.getName() + "</label>\n" +
-                        "       <select class=\"form-select\" name=\"" + formId + "\" id=\"" + formId + "\" multiple>\n");
+                        "       <select class=\"form-select\" name=\"" + formId + "\" id=\"" + formId + "\">\n" +
+                                "<option value=\"0\">All</option>");
 
-                List<String> selectedValues = request.getParameterValues(formId) == null ? new ArrayList<>() : List.of(request.getParameterValues(TYPE_BOOLEAN_ID));
+
+                List<String> selectedValues = request.getParameterValues(formId) == null ? new ArrayList<>() : List.of(request.getParameterValues(formId));
 
                 for (String value : values) {
                     selected = selectedValues.contains(value) ? "selected" : "";

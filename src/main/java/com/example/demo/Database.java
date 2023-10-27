@@ -22,8 +22,6 @@ public class Database {
     public Connection getConnection() throws SQLException {
         if (connection == null) {
             String url = "jdbc:mysql://" + System.getProperty("DBMS_HOST", "localhost") +":" + System.getProperty("DBMS_PORT", "3306") + "/" + System.getProperty("DBMS_SCHEMA");
-            System.out.println(url);
-
             connection =  DriverManager.getConnection(url, System.getProperty("DBMS_USERNAME"), System.getProperty("DBMS_PASSWORD"));
         }
 

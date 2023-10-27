@@ -42,10 +42,10 @@ public class Search extends DatabaseHttpServlet {
                 amenityTypes
         );
 
-        Long amenityTypeId = Util.nullIfZero(Util.parseLongOrNull(request.getParameter("amenityTypeId")));
+        AmenityFilter amenityFilter = new AmenityFilter(request);
 
-        if (amenityTypeId != null) {
-            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenityTypeId);
+        if (amenityFilter.getAmenityTypeId() != null) {
+            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenityFilter.getAmenityTypeId());
 
             var amenityTypeAttributeGrouper = new AmenityTypeAttributeGrouper(request, amenityTypeAttributes);
 
@@ -55,7 +55,8 @@ public class Search extends DatabaseHttpServlet {
             );
         }
 
-        List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityTypeId);
+
+        List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityFilter);
 
         request.setAttribute(
                 "amenities",
