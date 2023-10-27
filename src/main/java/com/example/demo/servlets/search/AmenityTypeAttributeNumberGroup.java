@@ -46,25 +46,15 @@ public class AmenityTypeAttributeNumberGroup {
 
                 joiner.add(
                         "<div class=\"row mb-2\">\n" +
-                        "   <label for=\"" + formId + "\" class=\"form-label\">" + attribute.getName() + " ("+ minMax.get().getMin() +" to "+ minMax.get().getMax() +") </label>\n" +
-                                "<div class=\"row\">" +
-                                "<div class=\"col-10\">" +
-                                "<input type=\"range\" class=\"form-range\" id=\""+formId+"\" value=\""+ currentValue +"\" name=\""+formId+"\" min=\""+minMax.get().getMin()+"\" max=\""+minMax.get().getMax()+"\" >\n" +
-                                "</div>" +
-                                "<div class=\"col-2\">" +
-                                "<output id=\""+formId+"-output\"></output>" +
-                                "</div>" +
-                                "</div>" +
-                                "</div>" +
-                                "<script>" +
-                                "(function(){const input = document.querySelector(\"#"+formId+"\");\n" +
-                                "const value = document.querySelector(\"#"+formId+"-output\");\n" +
-                                "value.textContent = input.value;\n" +
-                                "input.addEventListener(\"input\", (event) => {\n" +
-                                "  value.textContent = event.target.value;\n" +
-                                "});})()\n" +
-                                "</script>"
-                );
+                                "   <label for=\"" + formId + "\" class=\"form-label\">" + attribute.getName() + "</label>\n" +
+                                "       <select class=\"form-select\" name=\"" + formId + "\" id=\"" + formId + "\">\n" +
+                                "<option value=\"0\">All</option>");
+
+                for (int value = minMax.get().getMin(); value <= minMax.get().getMax(); value++) {
+                    String selected = currentValue.equals(Integer.toString(value)) ? "selected" : "";
+                    joiner.add("<option " + selected + " value=\"" + value + "\">" + value + "</option>");
+                }
+                joiner.add("</select></div>");
             }
             return joiner.toString();
         } catch (SQLException e) {
