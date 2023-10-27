@@ -32,12 +32,6 @@ public class AmenityTypeAttributeTextGroup {
         if (attributes.isEmpty()) {
             return "";
         }
-//        Connection connection;
-//        try {
-//            connection = (Connection) Database.getInstance().getConnection();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
 
         String selected;
         StringJoiner joiner = new StringJoiner("");

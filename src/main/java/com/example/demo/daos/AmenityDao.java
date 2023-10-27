@@ -100,7 +100,7 @@ public class AmenityDao implements Dao<Amenity> {
             ArrayList<String> valueParams = new ArrayList<>();
             ArrayList<String> idParams = new ArrayList<>();
 
-            filterSubQuery = "SELECT DISTINCT review_id FROM AmenityAttributeRecord WHERE value IN (";
+            filterSubQuery = "SELECT DISTINCT amenity_id FROM AmenityAttributeRecord WHERE value IN (";
 
             if (!filter.getBooleanAttributes().isEmpty()) {
                 valueJoiner.add("'T'"); // find all the true values
@@ -131,35 +131,15 @@ public class AmenityDao implements Dao<Amenity> {
                 }
             });
 
-            filterSubQuery = filterSubQuery + valueJoiner + ") AND amenity_attribute_id IN (" + joiner + ") GROUP BY review_id HAVING COUNT(*) >= ?\n";
+            filterSubQuery = filterSubQuery + valueJoiner + ") AND amenity_attribute_id IN (" + joiner + ") GROUP BY amenity_id HAVING COUNT(*) >= ?\n";
 
             params.addAll(valueParams);
             params.addAll(idParams);
             params.add(String.valueOf(filter.getBooleanAttributes().size() + filter.getNumberAttributes().size() + filter.getTextAttributes().size()));
         }
 
-//        if (!filter.getNumberAttributes().isEmpty()) {
-//            StringJoiner joiner = new StringJoiner(",");
-//            filterSubQuery = "SELECT amenity_id FROM AmenityAttributeRecord WHERE amenity_attribute_id IN (";
-//            for (String attributeId : filter.getNumberAttributes().keySet()) {
-//                joiner.add("?");
-//                params.add(attributeId);
-//            }
-//            filterSubQuery = filterSubQuery + joiner + ")\n";
-//        }
-//
-//        if (!filter.getTextAttributes().isEmpty()) {
-//            StringJoiner joiner = new StringJoiner(",");
-//            filterSubQuery = "SELECT amenity_id FROM AmenityAttributeRecord WHERE value IN (";
-//            for (String attributeId : filter.getTextAttributes().keySet()) {
-//                joiner.add("?");
-//                params.add(attributeId);
-//            }
-//            filterSubQuery = filterSubQuery + joiner + ")\n";
-//        }
-//
         if (!filterSubQuery.isEmpty()) {
-            statement = statement + "AND Amenity.id IN (SELECT DISTINCT amenity_id FROM Review JOIN (" + filterSubQuery + ") amenity ON review_id = Review.id)\n";
+            statement = statement + "AND Amenity.id IN (" + filterSubQuery + ")\n";
         }
 
         stmt = conn.prepareStatement(statement);
