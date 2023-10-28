@@ -12,9 +12,9 @@ import com.example.demo.daos.AmenityDao;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.RevisionDao;
 import com.example.demo.daos.UserDao;
-import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -28,7 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "Locations", value = "/locations")
-public class Locations extends DatabaseHttpServlet {
+public class LocationsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         doRequest(request, response);
     }

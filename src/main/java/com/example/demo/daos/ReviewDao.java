@@ -1,12 +1,9 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.Review;
-import com.example.demo.servlets.reviews.Reviews;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

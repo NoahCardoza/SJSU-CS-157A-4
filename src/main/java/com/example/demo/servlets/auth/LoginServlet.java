@@ -2,7 +2,7 @@ package com.example.demo.servlets.auth;
 
 import com.example.demo.beans.Alert;
 import com.example.demo.beans.forms.LoginBean;
-import com.example.demo.servlets.DatabaseHttpServlet;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet(name = "Login", value = "/login")
-public class Login extends DatabaseHttpServlet {
+public class LoginServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LoginBean bean = new LoginBean(request.getParameter("email"), request.getParameter("password"));
 
