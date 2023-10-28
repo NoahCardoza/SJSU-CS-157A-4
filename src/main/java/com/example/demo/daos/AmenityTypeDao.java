@@ -35,7 +35,15 @@ public class AmenityTypeDao implements Dao<AmenityType> {
     }
 
     @Override
-    public Optional get(long id) throws SQLException {
+    public Optional<AmenityType> get(long id) throws SQLException {
+        var ps = Database.getInstance().getConnection().prepareStatement("SELECT * FROM AmenityType WHERE id = ?");
+        ps.setLong(1, id);
+        var rs = ps.executeQuery();
+
+        if (rs.next()) {
+            return Optional.of(fromResultSet(rs));
+        }
+
         return Optional.empty();
     }
 
@@ -56,5 +64,21 @@ public class AmenityTypeDao implements Dao<AmenityType> {
     @Override
     public Long create(AmenityType amenityType) throws SQLException {
         return null;
+    }
+
+    public void update(AmenityType amenityType) throws SQLException {
+        var ps = Database.getInstance().getConnection().prepareStatement("UPDATE AmenityType SET name = ?, icon = ?, description = ?, parent_amenity_type_id = ? WHERE id = ?");
+        ps.setString(1, amenityType.getName());
+        ps.setString(2, amenityType.getIcon());
+        ps.setString(3, amenityType.getDescription());
+        ps.setLong(4, amenityType.getParentAmenityTypeId());
+        ps.setLong(5, amenityType.getId());
+        ps.executeUpdate();
+    }
+
+    public void delete(Long amenityTypeId) throws SQLException {
+        var ps = Database.getInstance().getConnection().prepareStatement("DELETE FROM AmenityType WHERE id = ?");
+        ps.setLong(1, amenityTypeId);
+        ps.executeUpdate();
     }
 }
