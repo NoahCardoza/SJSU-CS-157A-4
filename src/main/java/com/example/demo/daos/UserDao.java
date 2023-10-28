@@ -20,7 +20,7 @@ public class UserDao implements Dao<User> {
     private UserDao() {}
 
     public Optional<User> get(Long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM User WHERE id = ?");
         statement.setDouble(1, id);
@@ -62,7 +62,7 @@ public class UserDao implements Dao<User> {
 
 
     public Long create(User user) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password) VALUES (?, ?, ?, ?)");
         statement.setString(1, user.getUsername());
@@ -72,13 +72,13 @@ public class UserDao implements Dao<User> {
 
         statement.executeUpdate();
 
-        user.setId(Database.getInstance().getLastInsertedId("User"));
+        user.setId(Database.getLastInsertedId("User"));
         // get the id of the newly created user
         return user.getId();
     }
 
     public boolean isUnique(User user) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement ps;
 

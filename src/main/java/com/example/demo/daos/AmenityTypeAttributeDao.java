@@ -46,7 +46,7 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
     @Override
     public List<AmenityTypeAttribute> getAll() throws SQLException {
         ArrayList<AmenityTypeAttribute> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM AmenityType");
         ResultSet resultSet = statement.executeQuery();
 
@@ -65,7 +65,7 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
     public List<AmenityTypeAttribute> getAllByAmenityType(Long amenityTypeId) throws SQLException {
         ArrayList<AmenityTypeAttribute> amenityTypes = new ArrayList<>();
 
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM AmenityTypeAttribute WHERE amenity_type_id = ?"
         );
@@ -84,7 +84,7 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
     public List<String> getAllTextValuesForAttribute(Long attributeId) throws SQLException {
         ArrayList<String> attributeValues = new ArrayList<>();
 
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
                 "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
         );
@@ -101,7 +101,7 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
     }
 
     public Optional<MinMax> getMinMaxIntValuesForAttribute(Long attributeId) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
                 "SELECT MIN(value), MAX(value) FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
         );

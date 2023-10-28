@@ -50,7 +50,7 @@ public class AmenityTypeDao implements Dao<AmenityType> {
     @Override
     public List<AmenityType> getAll() throws SQLException {
         ArrayList<AmenityType> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM AmenityType");
         ResultSet resultSet = statement.executeQuery();
 

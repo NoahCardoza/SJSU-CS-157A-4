@@ -64,7 +64,7 @@ public class AmenityDao implements Dao<Amenity> {
     @Override
     public List<Amenity> getAll() throws SQLException {
         ArrayList<Amenity> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity");
         ResultSet resultSet = statement.executeQuery();
 
@@ -84,7 +84,7 @@ public class AmenityDao implements Dao<Amenity> {
 
     public List<AmenityWithImage> getWithFilter(AmenityFilter filter) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement stmt ;
         ResultSet resultSet;
@@ -191,7 +191,7 @@ public class AmenityDao implements Dao<Amenity> {
 
     public List<AmenityWithImage> getFromLocationId(Long locationId) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement;
         ResultSet resultSet;

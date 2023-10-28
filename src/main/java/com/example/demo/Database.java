@@ -6,23 +6,8 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
 
-/**
- * Singleton class for connecting to the database.
- *
- * TODO: remove singleton pattern
- */
 public class Database {
-    static private Database database;
-    public static Database getInstance() {
-        if (database == null) {
-            database = new Database();
-        }
-        return database;
-    }
-
-    private Database() {}
-
-    public Connection getConnection() throws SQLException {
+    static public Connection getConnection() throws SQLException {
         try {
             Context ctx = new InitialContext();
             ctx = (Context) ctx.lookup("java:comp/env");
@@ -33,7 +18,7 @@ public class Database {
         }
     }
 
-    public Long getLastInsertedId(String table) throws SQLException {
+    static public Long getLastInsertedId(String table) throws SQLException {
         PreparedStatement ps = getConnection().prepareStatement("SELECT last_insert_id() FROM " + table + ";");
         ResultSet rs = ps.executeQuery();
         rs.next();
