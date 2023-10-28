@@ -1,18 +1,26 @@
 package com.example.demo.beans.entities;
 
-public class User {
+import java.sql.Timestamp;
 
-    Long id;
-    String username;
-    String password;
-    String email;
+public class User {
+    private Long id;
+    private String username;
+    private String email;
+    private String normalizedEmail;
+    private boolean administrator;
+    private boolean moderator;
+    private boolean banned;
+    private String password;
+    private Timestamp createdAt;
+
+    // Getters and Setters for each field
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long integer) {
-        this.id = integer;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -31,6 +39,38 @@ public class User {
         this.email = email;
     }
 
+    public String getNormalizedEmail() {
+        return normalizedEmail;
+    }
+
+    public void setNormalizedEmail(String normalizedEmail) {
+        this.normalizedEmail = normalizedEmail;
+    }
+
+    public boolean isAdministrator() {
+        return administrator;
+    }
+
+    public void setAdministrator(boolean administrator) {
+        this.administrator = administrator;
+    }
+
+    public boolean isModerator() {
+        return moderator;
+    }
+
+    public void setModerator(boolean moderator) {
+        this.moderator = moderator;
+    }
+
+    public boolean isBanned() {
+        return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -39,13 +79,27 @@ public class User {
         this.password = password;
     }
 
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
+                ", normalizedEmail='" + normalizedEmail + '\'' +
+                ", administrator=" + administrator +
+                ", moderator=" + moderator +
+                ", banned=" + banned +
+                ", password='" + password + '\'' +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 }
+

@@ -22,7 +22,7 @@ public class UserDao implements Dao<User> {
     public Optional<User> get(Long id) throws SQLException {
         Connection conn = Database.getInstance().getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("SELECT id, username, email, password FROM User WHERE id = ?");
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM User WHERE id = ?");
         statement.setDouble(1, id);
 
         ResultSet resultSet = statement.executeQuery();
@@ -40,7 +40,14 @@ public class UserDao implements Dao<User> {
         user.setId(resultSet.getLong("id"));
         user.setUsername(resultSet.getString("username"));
         user.setEmail(resultSet.getString("email"));
+        user.setNormalizedEmail(resultSet.getString("normalized_email"));
+        user.setAdministrator(resultSet.getBoolean("administrator"));
+        user.setBanned(resultSet.getBoolean("banned"));
+        user.setModerator(resultSet.getBoolean("moderator"));
         user.setPassword(resultSet.getString("password"));
+        user.setCreatedAt(resultSet.getTimestamp("created_at"));
+
+
 
         return user;
     }
