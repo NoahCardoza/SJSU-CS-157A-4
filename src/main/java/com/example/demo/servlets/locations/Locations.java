@@ -17,6 +17,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +48,9 @@ public class Locations extends DatabaseHttpServlet {
                 case "create":
                     create(request, response);
                     break;
+                case "map":
+                    map(request, response);
+                    break;
                 case "edit":
                     request.getRequestDispatcher("/template/locations/edit-location.jsp").forward(request, response);
                     break;
@@ -62,6 +68,51 @@ public class Locations extends DatabaseHttpServlet {
             throw new RuntimeException(e);
         }
     }
+
+    protected void map(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            Long locationId = Util.parseLongOrNull(request.getParameter("id"));
+            if (locationId == null) {
+                response.setStatus(400);
+                response.getWriter().write("Location ID is required");
+                return;
+            }
+
+            Location location = LocationDao.getInstance().get(locationId).orElse(null);
+
+            if (location == null) {
+                response.setStatus(404);
+                response.getWriter().write("Location not found");
+                return;
+            }
+
+
+            Integer width = Util.parseIntOrDefault(request.getParameter("width"), 200);
+            Integer height = Util.parseIntOrDefault(request.getParameter("height"), 200);
+
+            String apiKey = System.getProperty("GEOAPIFY_API_KEY");
+
+            URL url = new URL("https://maps.geoapify.com/v1/staticmap?style=osm-carto&" +
+                    "width=" + width +
+                    "&height=" + height +
+                    "&center=lonlat:" + location.getLatitude() + "," + location.getLongitude() +
+                    "&marker=lonlat:" + location.getLatitude() + "," + location.getLongitude() + ";" +
+                    "color:%23ff0000;size:medium&zoom=14&" +
+                    "apiKey=" + apiKey
+            );
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+            InputStream inputStream = connection.getInputStream();
+            response.setContentType("image/jpeg");
+
+            inputStream.transferTo(response.getOutputStream());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
@@ -85,7 +136,7 @@ public class Locations extends DatabaseHttpServlet {
             return;
         }
 
-        List<AmenityWithImage> amenities = AmenityDao.getInstance().getOfLocationId(locationId);
+        List<AmenityWithImage> amenities = AmenityDao.getInstance().getFromLocationId(locationId);
 
         request.setAttribute(
                 "amenities",

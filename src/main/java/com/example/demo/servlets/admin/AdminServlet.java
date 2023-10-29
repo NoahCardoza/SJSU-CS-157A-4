@@ -103,7 +103,7 @@ public class AdminServlet extends HttpServlet {
             return;
         }
 
-        List<AmenityWithImage> amenities = AmenityDao.getInstance().getOfLocationId(locationId);
+        List<AmenityWithImage> amenities = AmenityDao.getInstance().getFromLocationId(locationId);
 
         request.setAttribute(
                 "amenities",
