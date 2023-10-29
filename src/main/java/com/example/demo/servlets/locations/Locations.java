@@ -23,6 +23,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "Locations", value = "/locations")
 public class Locations extends DatabaseHttpServlet {
@@ -52,7 +53,7 @@ public class Locations extends DatabaseHttpServlet {
                     map(request, response);
                     break;
                 case "edit":
-                    request.getRequestDispatcher("/template/locations/edit-location.jsp").forward(request, response);
+                    edit(request, response);
                     break;
                 case "parentSelect":
                     parentSelect(request, response);
@@ -148,6 +149,8 @@ public class Locations extends DatabaseHttpServlet {
     public void parentSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         LocationForm form = new LocationForm(request);
 
+        System.out.println(form);
+
         // if parent id is 0, it means that the user has selected "None"
         if (form.getParentId() != null && form.getParentId() == 0) {
             form.setParentId(null);
@@ -181,6 +184,19 @@ public class Locations extends DatabaseHttpServlet {
 
         List<Location> locations = LocationDao.getInstance().getParentLocationsOf(form.getParentId());
 
+        Long locationId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (locationId == null) {
+            response.sendRedirect(request.getContextPath() + "/locations");
+            return;
+        }
+
+        // remove the current location from the list of locations
+        locations = locations.stream().filter(
+                (location) -> !location.getId().equals(locationId)
+        ).collect(Collectors.toList());
+
+
         // if a parent is selected, add it to the list of locations
         // so the user can see it
         if (form.getParentId() != null) {
@@ -198,15 +214,87 @@ public class Locations extends DatabaseHttpServlet {
         );
 
         request.setAttribute("form", form);
+        System.out.println(form);
 
         request.getRequestDispatcher("/template/locations/parent-select.jsp").forward(request, response);
     }
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        Long locationId = Util.parseLongOrNull(request.getParameter("id"));
+        if (locationId == null) {
+            response.sendRedirect(request.getContextPath() + "/locations");
+            return;
+        }
 
+        Optional<Location> location = LocationDao.getInstance().get(locationId);
+
+        if (!location.isPresent()) {
+            response.sendRedirect(request.getContextPath() + "/locations");
+            return;
+        }
+
+
+        LocationForm form;
+        if (request.getMethod().equals("GET")) {
+            form = new LocationForm(location.get());
+            form.setParentName("None");
+
+            if (location.get().getParentLocationId() != null) {
+                Optional<Location> parentLocation = LocationDao.getInstance().get(location.get().getParentLocationId());
+                parentLocation.ifPresent(value -> form.setParentName(value.getName()));
+            }
+        } else {
+            form = new LocationForm(request);
+
+            String action = request.getParameter("action");
+            if (action != null && action.equals("submit")) {
+                Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
+                if (user.isEmpty()) {
+                    response.setStatus(401);
+                    request.getSession(true).setAttribute(
+                            "alert",
+                            new Alert("danger", "You must be logged in to edit a location.")
+                    );
+                    response.sendRedirect(request.getContextPath() + "/login");
+                    return;
+                }
+                Validation v = form.validate();
+
+                if (v.isValid()) {
+                    Location newLocation = new Location();
+                    newLocation.setId(locationId);
+                    newLocation.setUserId(user.get().getId());
+                    newLocation.setName(form.getName());
+                    newLocation.setDescription(form.getDescription());
+                    newLocation.setAddress(form.getAddress());
+                    newLocation.setLatitude(form.getLatitude());
+                    newLocation.setLongitude(form.getLongitude());
+                    newLocation.setParentLocationId(form.getParentId());
+
+                    // TODO: implement diff and track changes
+                    LocationDao.getInstance().update(newLocation);
+
+                    response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + locationId);
+                    return;
+                } else {
+                    // TODO: implement form errors and a list of alerts
+                    request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
+                    System.out.println(v.getMessages());
+                }
+            }
+        }
+
+        request.setAttribute("form", form);
+        request.setAttribute("primaryButtonText", "Update");
+        request.setAttribute("headerText", "Update Location");
+
+        request.getRequestDispatcher("/template/locations/form.jsp").forward(request, response);
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        request.setAttribute("headerText", "Create Location");
+        request.setAttribute("primaryButtonText", "Create");
+
         switch (request.getMethod()) {
             case "GET":
                 List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);

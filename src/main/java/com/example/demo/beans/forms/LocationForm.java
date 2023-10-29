@@ -2,6 +2,7 @@ package com.example.demo.beans.forms;
 
 import com.example.demo.Util;
 import com.example.demo.Validation;
+import com.example.demo.beans.entities.Location;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class LocationForm {
@@ -25,6 +26,15 @@ public class LocationForm {
         this.address = request.getParameter("address");
         this.longitude = Util.parseDoubleOrNull(request.getParameter("longitude"));
         this.latitude = Util.parseDoubleOrNull(request.getParameter("latitude"));
+    }
+
+    public LocationForm(Location location) {
+        this.parentId = location.getParentLocationId();
+        this.name = location.getName();
+        this.description = location.getDescription();
+        this.address = location.getAddress();
+        this.longitude = location.getLongitude();
+        this.latitude = location.getLatitude();
     }
 
     public Validation validate() {
@@ -51,11 +61,11 @@ public class LocationForm {
             v.addMessage("Name is required.");
         }
 
-        if (longitude < -180 || longitude > 180) {
+        if (latitude < -180 || latitude > 180) {
             v.addMessage("Longitude must be between -180 and 180.");
         }
 
-        if (latitude < -90 || latitude > 90) {
+        if (longitude < -90 || longitude > 90) {
             v.addMessage("Latitude must be between -90 and 90.");
         }
 
@@ -132,5 +142,18 @@ public class LocationForm {
 
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
+    }
+
+    @Override
+    public String toString() {
+        return "LocationForm{" +
+                "parentId=" + parentId +
+                ", parentName='" + parentName + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", address='" + address + '\'' +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                '}';
     }
 }
