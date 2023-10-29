@@ -11,6 +11,15 @@
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
             <h1 class="mb-2">${location.name}</h1>
+            <div class="col">
+<%--                <img width="200" height="200"--%>
+<%--                     src="https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=200&height=200&center=lonlat:${location.latitude},${location.longitude}&marker=lonlat:${location.latitude},${location.longitude};color:%23ff0000;size:medium&zoom=14&apiKey=108efff5666c4ffd96cdb62b1d775d13">--%>
+                    <img width="200" height="200" src="/locations?f=map&id=${location.id}">
+                <div>
+                    <p>${location.description}</p>
+                </div>
+            </div>
+            <a class="btn btn-secondary" href="/locations?f=edit&id=${location.id}">Edit</a>
             <div class="row">
             <div class="col-12" style="">
                 <div class="row">

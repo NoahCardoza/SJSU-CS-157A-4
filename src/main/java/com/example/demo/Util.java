@@ -91,4 +91,14 @@ public class Util {
 
         return postParams;
     }
+
+    public static Integer parseIntOrDefault(String s, int i) {
+        Integer parsed = parseIntOrNull(s);
+
+        if (parsed == null) {
+            return i;
+        }
+
+        return parsed;
+    }
 }

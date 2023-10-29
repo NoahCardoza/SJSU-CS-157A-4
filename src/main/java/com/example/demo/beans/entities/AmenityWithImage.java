@@ -14,4 +14,12 @@ public class AmenityWithImage extends Amenity {
     public void setImage(ReviewImage image) {
         this.image = image;
     }
+
+    @Override
+    public String toString() {
+        return "AmenityWithImage{" +
+                super.toString() + "," +
+                "image=" + image +
+                '}';
+    }
 }

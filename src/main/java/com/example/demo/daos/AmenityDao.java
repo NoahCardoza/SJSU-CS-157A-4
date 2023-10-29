@@ -5,7 +5,6 @@ import com.example.demo.beans.entities.Amenity;
 import com.example.demo.beans.entities.AmenityWithImage;
 import com.example.demo.beans.entities.ReviewImage;
 import com.example.demo.servlets.search.AmenityFilter;
-import jakarta.servlet.ServletRequest;
 
 import java.sql.*;
 import java.util.*;
@@ -170,7 +169,7 @@ public class AmenityDao implements Dao<Amenity> {
         return amenityTypes;
     }
 
-    public List<AmenityWithImage> getOfLocationId(Long locationId) throws SQLException {
+    public List<AmenityWithImage> getFromLocationId(Long locationId) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
         Connection conn = Database.getInstance().getConnection();
 
@@ -198,7 +197,9 @@ public class AmenityDao implements Dao<Amenity> {
                 "        WHERE location_hierarchy.id = e.parent_location_id\n" +
                 "    ) SELECT id FROM location_hierarchy\n" +
                 ");");
-        statement.setDouble(1, locationId);
+        statement.setLong(1, locationId);
+
+        System.out.println(statement);
 
         resultSet = statement.executeQuery();
 
@@ -219,6 +220,8 @@ public class AmenityDao implements Dao<Amenity> {
             amenity.setImage(reviewImage);
             amenityTypes.add(amenity);
         }
+
+        System.out.println(amenityTypes);
 
         return amenityTypes;
     }
