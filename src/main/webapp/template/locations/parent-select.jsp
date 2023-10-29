@@ -42,19 +42,22 @@
                 </select>
 
                 <input type="hidden" name="parentName" id="parentName" value="${form.parentName}">
+                <button type="submit" class="btn btn-secondary w-100" name="action" value="back">Back</button>
 
                 <c:forEach items="${postParams}" var="p">
-                    <c:if test="${!fn:startsWith(p.key, 'parent')}">
+                    <c:if test="${!fn:startsWith(p.key, 'parent') && p.key != 'action'}">
                         <input type="hidden" name="${p.key}" value="${p.value}">
                     </c:if>
                 </c:forEach>
-
-                <button type="submit" class="btn btn-secondary w-100" name="action" value="back">Back</button>
             </form>
 
-            <form action="/locations?f=create" method="post">
+            <form action="${postParams['redirect']}" method="post">
+                <input type="hidden" name="parentId" value="${form.parentId}">
+                <input type="hidden" name="parentName" value="${form.parentName}">
                 <c:forEach items="${postParams}" var="p">
-                    <input type="hidden" name="${p.key}" value="${p.value}">
+                    <c:if test="${!fn:startsWith(p.key, 'parent') && p.key != 'action'}">
+                        <input type="hidden" name="${p.key}" value="${p.value}">
+                    </c:if>
                 </c:forEach>
                 <button type="submit" class="btn btn-primary w-100" name="action" value="select">Select</button>
             </form>

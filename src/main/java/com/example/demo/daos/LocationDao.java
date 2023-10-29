@@ -120,4 +120,25 @@ public class LocationDao implements Dao<Location> {
 
         // todo: get the id of the newly created location
     }
+
+    public void update(Location location) throws SQLException {
+        PreparedStatement ps = Database.getInstance().getConnection().prepareStatement("UPDATE Location SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
+
+        ps.setLong(1, location.getUserId());
+
+        if (location.getParentLocationId() == null) {
+            ps.setNull(2, Types.INTEGER);
+        } else {
+            ps.setDouble(2, location.getParentLocationId());
+        }
+        ps.setDouble(3, location.getLongitude());
+        ps.setDouble(4, location.getLatitude());
+        ps.setString(5, location.getName());
+        ps.setString(6, location.getAddress());
+        ps.setString(7, location.getDescription());
+        ps.setLong(8, location.getId());
+
+        ps.executeUpdate();
+
+    }
 }
