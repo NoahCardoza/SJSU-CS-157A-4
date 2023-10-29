@@ -19,12 +19,7 @@
 
             <form method="POST" class="mt-5" id="new-location-form">
                 <div class="row">
-                    <c:if test="${alert != null}">
-                        <div class="alert alert-${alert.color}" role="alert">
-                                ${alert.message}
-                        </div>
-                    </c:if>
-
+                    <%@include file="../../includes/alerts.jsp" %>
                     <div class="col mb-3 d-flex justify-content-between align-items-center">
                         <div>
                             Parent Location:

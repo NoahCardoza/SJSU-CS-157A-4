@@ -1,7 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
-<%--@elvariable id="alert" type="com.example.demo.beans.Alert"--%>
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -16,11 +14,7 @@
             <h3>Login</h3>
 
             <form method="post">
-                <c:if test="${alert != null}">
-                    <div class="alert alert-${alert.color}" role="alert">
-                            ${alert.message}
-                    </div>
-                </c:if>
+                <%@include file="../../includes/alerts.jsp" %>
                 <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Email address</label>
                     <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
