@@ -5,10 +5,12 @@ import com.example.demo.Validation;
 import com.example.demo.beans.*;
 import com.example.demo.beans.entities.AmenityWithImage;
 import com.example.demo.beans.entities.Location;
+import com.example.demo.beans.entities.Revision;
 import com.example.demo.beans.entities.User;
 import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.AmenityDao;
 import com.example.demo.daos.LocationDao;
+import com.example.demo.daos.RevisionDao;
 import com.example.demo.daos.UserDao;
 import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
@@ -137,6 +139,13 @@ public class Locations extends DatabaseHttpServlet {
             return;
         }
 
+        List<Revision> revisions = RevisionDao.getInstance().getRevisionsForLocation(locationId);
+
+        request.setAttribute(
+                "revisions",
+                revisions
+        );
+
         List<AmenityWithImage> amenities = AmenityDao.getInstance().getFromLocationId(locationId);
 
         request.setAttribute(
@@ -228,7 +237,7 @@ public class Locations extends DatabaseHttpServlet {
 
         Optional<Location> location = LocationDao.getInstance().get(locationId);
 
-        if (!location.isPresent()) {
+        if (location.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/locations");
             return;
         }
@@ -273,6 +282,7 @@ public class Locations extends DatabaseHttpServlet {
 
                     // TODO: implement diff and track changes
                     LocationDao.getInstance().update(newLocation);
+                    RevisionDao.getInstance().createRevisionForLocationEdit(user.get().getId(), location.get(), newLocation);
 
                     response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + locationId);
                     return;
@@ -334,6 +344,7 @@ public class Locations extends DatabaseHttpServlet {
                         try {
                             LocationDao.getInstance().create(location);
                         } catch (SQLException e) {
+                            request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
                             throw new RuntimeException(e);
                         }
 
