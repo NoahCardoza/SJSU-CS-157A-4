@@ -21,6 +21,10 @@
                 location.href = '/search';
                 return false;
                 }">
+                </br>
+                <a href="/amenities?f=create" class="btn btn-secondary">Add New Amenity</a>
+                </br>
+                </br>
                 <div class="row mb-2">
                     <label for="amenityType" class="form-label">Amenity Type</label>
                     <select class="form-select" name="amenityTypeId" id="amenityType" onchange="$('#search-form').submit()">
