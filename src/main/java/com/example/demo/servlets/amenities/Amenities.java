@@ -50,10 +50,10 @@ public class Amenities extends DatabaseHttpServlet {
                     create(request, response);
                     break;
                 case "edit":
-                    request.getRequestDispatcher("/template/amenity/edit-location.jsp").forward(request, response);
+                    request.getRequestDispatcher("/template/amenity/edit-amenity.jsp").forward(request, response);
                     break;
                 case "delete":
-                    request.getRequestDispatcher("/template/amenity/delete-location.jsp").forward(request, response);
+                    request.getRequestDispatcher("/template/amenity/delete-amenity.jsp").forward(request, response);
                     break;
                 case "parentSelect":
                     parentSelect(request, response);
@@ -99,7 +99,7 @@ public class Amenities extends DatabaseHttpServlet {
                 amenities
         );
 
-        request.getRequestDispatcher("template/locations/get.jsp").forward(request, response);
+        request.getRequestDispatcher("template/amenity/view-amenity.jsp").forward(request, response);
     }
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -163,6 +163,7 @@ public class Amenities extends DatabaseHttpServlet {
     }
 
 
+    // TODO: ask if this should be parent_amenity_type or just the amentiy type's id
     public void parentSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         AmenityForm form = new AmenityForm(request);
 
@@ -175,17 +176,17 @@ public class Amenities extends DatabaseHttpServlet {
 
         // if the user clicks the back button, we need to get the parent of the current parent
         if (action != null && action.equals("back") && form.getParentId() != null) {
-            Optional<AmenityType> parentAmenityOpt = AmenityTypeDao.getInstance().get(form.getParentId());
-            if (parentAmenityOpt.isPresent()) {
-                form.setParentId(parentAmenityOpt.get().getParentAmenityTypeId());
-                if (parentAmenityOpt.get().getParentAmenityTypeId() == null) {
+            Optional<AmenityType> amenityTypeOpt = AmenityTypeDao.getInstance().get(form.getParentId());
+            if (amenityTypeOpt.isPresent()) {
+                form.setParentId(amenityTypeOpt.get().getParentAmenityTypeId());
+                if (amenityTypeOpt.get().getParentAmenityTypeId() == null) {
                     // if the parent of the parent is null, it means that the parent is the root
                     form.setParentName("None");
                 } else {
                     // get the name of the parent
-                    parentAmenityOpt = AmenityTypeDao.getInstance().get(parentAmenityOpt.get().getParentAmenityTypeId());
-                    if (parentAmenityOpt.isPresent()) {
-                        form.setParentName(parentAmenityOpt.get().getName());
+                    amenityTypeOpt = AmenityTypeDao.getInstance().get(amenityTypeOpt.get().getParentAmenityTypeId());
+                    if (amenityTypeOpt.isPresent()) {
+                        form.setParentName(amenityTypeOpt.get().getName());
                     } else {
                         // just to be safe, this shouldn't happen unless something is removed
                         // from the database while the user is using the app
@@ -197,7 +198,7 @@ public class Amenities extends DatabaseHttpServlet {
 
         }
 
-        /*List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getParentLocationsOf(form.getParentId());
+        List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
 
         // if a parent is selected, add it to the list of locations
         // so the user can see it
@@ -215,9 +216,9 @@ public class Amenities extends DatabaseHttpServlet {
                 amenityTypes
         );
 
-        request.setAttribute("form", form);*/
+        request.setAttribute("form", form);
 
-        request.getRequestDispatcher("/template/locations/parent-select.jsp").forward(request, response);
+        request.getRequestDispatcher("/template/amenity/amenity-type-select.jsp").forward(request, response);
     }
 
     public void locationSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -251,43 +252,44 @@ public class Amenities extends DatabaseHttpServlet {
                     }
                 }
             }
-
         }
 
-        /*List<Amenity> amenities = AmenityDao.getInstance().getParentLocationsOf(form.getParentId());
+        List<Location> locations = LocationDao.getInstance().getParentLocationsOf(form.getParentId());
 
         // if a parent is selected, add it to the list of locations
         // so the user can see it
         if (form.getParentId() != null) {
-            Amenity selected = new Amenity();
+            Location selected = new Location();
 
             selected.setId(form.getParentId());
             selected.setName(form.getParentName());
 
-            amenities.add(0, selected);
+            locations.add(0, selected);
         }
-
-        request.setAttribute(
-                "locations",
-                amenities
-        );
-
-        request.setAttribute("form", form);*/
-
-        request.getRequestDispatcher("/template/amenity/location-select.jsp").forward(request, response);
-    }
-
-    public void getAll(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        List<Location> locations = LocationDao.getInstance().getAll();
 
         request.setAttribute(
                 "locations",
                 locations
         );
 
-        request.getRequestDispatcher("template/locations/index.jsp").forward(request, response);
+        request.setAttribute("form", form);
+
+        request.getRequestDispatcher("/template/amenity/location-select.jsp").forward(request, response);
+
     }
 
+
+    public void getAll(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        List<Amenity> amenities = AmenityDao.getInstance().getAll();
+
+        request.setAttribute(
+                "amenities",
+                amenities
+        );
+
+        // TODO: change the path later
+        request.getRequestDispatcher("template/amenity/amenityForm.jsp").forward(request, response);
+    }
 
 
 }

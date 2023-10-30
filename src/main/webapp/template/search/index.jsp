@@ -56,6 +56,7 @@
                                 <h5 class="card-title">${amenity.name}</h5>
                                 <p class="card-text">${amenity.description}</p>
                                 <a href="/amenities?id=f=get&id=${amenity.id}" class="btn btn-primary">Select</a>
+                                <a href="/amenities?id=f=edit&id=${amenity.id}" class="btn btn-secondary">Edit</a>
                             </div>
                         </div>
                     </div>

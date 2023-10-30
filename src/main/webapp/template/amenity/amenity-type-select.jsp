@@ -21,12 +21,12 @@
     <body>
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
-            <h1>Select a Location</h1>
+            <h1>Select an Amenity</h1>
             <form method="POST" class="mb-5">
                 <select
                         name="parentId"
                         class="form-select mb-3"
-                        aria-label="Select a location"
+                        aria-label="Select an Amenity"
                         onchange='
                             (function onchange(self) {
                                 console.log(event.target.value);

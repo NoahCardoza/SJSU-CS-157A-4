@@ -33,7 +33,7 @@
                             form.action = '/amenities?f=locationSelect';
                             form.submit();
                         })(this)"
-                >Select Parent</button>
+                >Select Location</button>
                  </br>
                  </br>
                  </br>
@@ -51,7 +51,7 @@
                         class="btn btn-primary float-end"
                         onclick="(function(self) {
                             const form = document.getElementById('new-amenity-form');
-                            form.action = '/amenities?f=categorySelect';
+                            form.action = '/amenities?f=parentSelect';
                             form.submit();
                         })(this)"
                    >Select Amenity Category</button>
@@ -61,6 +61,9 @@
 
                 <input type="text" name="name" value="${form.name}" class="form-control mt-5 mb-3" placeholder="Name" />
                 <textarea name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
+
+                <%
+                %>
 
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
             </form>
