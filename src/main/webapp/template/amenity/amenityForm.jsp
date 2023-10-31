@@ -1,7 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
 <%--@elvariable id="form" type="List<com.example.demo.beans.forms.AmenityForm>"--%>
 
 <!DOCTYPE html>
@@ -62,8 +61,19 @@
                 <input type="text" name="name" value="${form.name}" class="form-control mt-5 mb-3" placeholder="Name" />
                 <textarea name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
 
-                <%
-                %>
+                <%-- TODO: dynamically display attribute inputs
+                <% int attributeTypeId = ${form.parentName}%>
+
+                <% if (attributeTypeId == ) { %>
+                    <!-- Display text inputs when the condition is met -->
+                    <label for="textInput1">Text Input 1:</label>
+                    <input type="text" name="textInput1" id="textInput1">
+                    <br>
+                    <label for="textInput2">Text Input 2:</label>
+                    <input type="text" name="textInput2" id="textInput2">
+                <% } %>
+                --%>
+
 
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
             </form>

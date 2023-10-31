@@ -53,6 +53,7 @@ public class UserDao implements Dao<User> {
         return get((Long) session.getAttribute("user_id"));
     }
 
+
     public Long create(User user) throws SQLException {
         Connection conn = Database.getInstance().getConnection();
 
@@ -76,6 +77,30 @@ public class UserDao implements Dao<User> {
 
         try {
             ps = conn.prepareStatement("SELECT * FROM User WHERE username=? OR email=?");
+
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getEmail());
+
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()){
+                return true;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return false;
+    }
+
+    public boolean isAdmin(User user) throws SQLException {
+        Connection conn = Database.getInstance().getConnection();
+
+        PreparedStatement ps;
+
+        try {
+            ps = conn.prepareStatement("SELECT administrator FROM User WHERE username=? OR email=?");
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());

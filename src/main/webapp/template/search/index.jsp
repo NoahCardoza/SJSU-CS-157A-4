@@ -55,9 +55,9 @@
                             <div class="card-body">
                                 <h5 class="card-title">${amenity.name}</h5>
                                 <p class="card-text">${amenity.description}</p>
-                                <a href="/amenities?f=get" class="btn btn-primary">Select</a>
-                                <a href="/amenities?f=edit&id=${amenity.id}" class="btn btn-secondary">Edit</a>
-                                <a href="/amenities?f=delete&id=${amenity.id}" class="btn btn-danger">Delete</a>
+                                <a type="select" href="/amenities?f=get&id=${amenity.id}" class="btn btn-primary">Select</a>
+                                <a type="edit" href="/amenities?f=edit&id=${amenity.id}" class="btn btn-secondary">Edit</a>
+                                <a type="delete" href="/amenities?f=delete&id=${amenity.id}" class="btn btn-danger">Delete</a>
                             </div>
                         </div>
                     </div>

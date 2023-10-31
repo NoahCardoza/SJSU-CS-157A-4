@@ -53,7 +53,7 @@ public class Amenities extends DatabaseHttpServlet {
                     edit(request, response);
                     break;
                 case "delete":
-                    request.getRequestDispatcher("/template/amenity/delete-amenity.jsp").forward(request, response);
+                    delete(request, response);
                     break;
                 case "parentSelect":
                     parentSelect(request, response);
@@ -71,6 +71,25 @@ public class Amenities extends DatabaseHttpServlet {
     }
 
     public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        Long amenityId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (amenityId == null) {
+            response.sendRedirect(request.getContextPath() + "/amenities");
+            return;
+        }
+
+        Optional<Amenity> amenity = AmenityDao.getInstance().get(amenityId);
+
+        if (amenity.isPresent()) {
+            request.setAttribute(
+                    "amenity",
+                    amenity.get()
+            );
+        } else {
+            System.out.println("Amenity not found");
+            response.sendRedirect(request.getContextPath() + "/amenities");
+            return;
+        }
 
         System.out.println("im in the get method");
 
@@ -81,10 +100,10 @@ public class Amenities extends DatabaseHttpServlet {
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         switch (request.getMethod()) {
             case "GET":
-                List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);
+                List<Amenity> amenities = AmenityDao.getInstance().getAmenityTypeId(null);
 
-                request.setAttribute("hasParent", false);
-                request.setAttribute("locations", locations);
+                request.setAttribute("hasAmenityType", false);
+                request.setAttribute("Amenities", amenities);
 
                 request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
                 break;
@@ -107,20 +126,20 @@ public class Amenities extends DatabaseHttpServlet {
                     Validation v = form.validate();
 
                     if (v.isValid()) {
-                        Location location = new Location();
-                        location.setUserId(user.get().getId());
-                        location.setName(form.getName());
-                        location.setDescription(form.getDescription());
-                        location.setParentLocationId(form.getParentId());
+                        Amenity amenity = new Amenity();
+                        amenity.setUserId(user.get().getId());
+                        amenity.setName(form.getName());
+                        amenity.setDescription(form.getDescription());
+                        amenity.setAmenityTypeId(form.getParentId());
                         try {
-                            LocationDao.getInstance().create(location);
+                            AmenityDao.getInstance().create(amenity);
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
                         }
 
                         // TODO: redirect to location page
 
-                        response.sendRedirect(request.getContextPath() + "/locations");
+                        response.sendRedirect(request.getContextPath() + "/amenities");
                         return;
                     } else {
                         request.setAttribute("errors", v.getMessages());
@@ -136,9 +155,42 @@ public class Amenities extends DatabaseHttpServlet {
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
-        System.out.println("I'm in the edit method");
-
         request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
+    }
+
+    public void delete(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        // TODO: Needs to check if user is admin for deletion
+        /*Optional<User> user = UserDao.getInstance().isAdmin();
+        if (!user.isPresent()) {
+            response.setStatus(401);
+            request.setAttribute(
+                    "alert",
+                    new Alert("danger", "You must be an admin to delete an amenity.")
+            );
+            response.sendRedirect(request.getContextPath() + "/search");
+            return;
+        }*/
+
+        Long amenityId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (amenityId == null) {
+            response.sendRedirect(request.getContextPath() + "/amenities");
+            return;
+        }
+
+        Optional<Amenity> amenity = AmenityDao.getInstance().get(amenityId);
+
+        if (amenity.isPresent()) {
+            AmenityDao.getInstance().delete(amenityId);
+        } else {
+            System.out.println("Amenity not found");
+            response.sendRedirect(request.getContextPath() + "/amenities");
+            return;
+        }
+
+
+        request.getRequestDispatcher("/template/search/index.jsp").forward(request, response);
     }
 
 
