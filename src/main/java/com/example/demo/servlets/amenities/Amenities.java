@@ -50,7 +50,7 @@ public class Amenities extends DatabaseHttpServlet {
                     create(request, response);
                     break;
                 case "edit":
-                    request.getRequestDispatcher("/template/amenity/edit-amenity.jsp").forward(request, response);
+                    edit(request, response);
                     break;
                 case "delete":
                     request.getRequestDispatcher("/template/amenity/delete-amenity.jsp").forward(request, response);
@@ -72,39 +72,11 @@ public class Amenities extends DatabaseHttpServlet {
 
     public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
-        Long locationId = Util.parseLongOrNull(request.getParameter("id"));
-
-        if (locationId == null) {
-            response.sendRedirect(request.getContextPath() + "/amenities");
-            return;
-        }
-
-        Optional<Location> location = LocationDao.getInstance().get(locationId);
-
-        if (location.isPresent()) {
-            request.setAttribute(
-                    "amenity",
-                    location.get()
-            );
-        } else {
-            System.out.println("Amenity not found");
-            response.sendRedirect(request.getContextPath() + "/amenities");
-            return;
-        }
-
-        List<AmenityWithImage> amenities = AmenityDao.getInstance().getOfLocationId(locationId);
-
-        request.setAttribute(
-                "amenities",
-                amenities
-        );
+        System.out.println("im in the get method");
 
         request.getRequestDispatcher("template/amenity/view-amenity.jsp").forward(request, response);
     }
 
-    public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-
-    }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         switch (request.getMethod()) {
@@ -160,6 +132,13 @@ public class Amenities extends DatabaseHttpServlet {
                 request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
                 break;
         }
+    }
+
+    public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        System.out.println("I'm in the edit method");
+
+        request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
     }
 
 
@@ -287,9 +266,13 @@ public class Amenities extends DatabaseHttpServlet {
                 amenities
         );
 
+        System.out.println("im in the default method!");
+
         // TODO: change the path later
-        request.getRequestDispatcher("template/amenity/amenityForm.jsp").forward(request, response);
+        request.getRequestDispatcher("template/auth/signup.jsp").forward(request, response);
     }
+
+
 
 
 }

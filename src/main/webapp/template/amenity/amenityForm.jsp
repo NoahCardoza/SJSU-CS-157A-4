@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
-<%--@elvariable id="form" type="List<com.example.demo.beans.forms.LocationForm>"--%>
+<%--@elvariable id="form" type="List<com.example.demo.beans.forms.AmenityForm>"--%>
 
 <!DOCTYPE html>
 <html>
