@@ -21,6 +21,10 @@
                 location.href = '/search';
                 return false;
                 }">
+                </br>
+                <a href="/amenities?f=create" class="btn btn-secondary">Add New Amenity</a>
+                </br>
+                </br>
                 <div class="row mb-2">
                     <label for="amenityType" class="form-label">Amenity Type</label>
                     <select class="form-select" name="amenityTypeId" id="amenityType" onchange="$('#search-form').submit()">
@@ -51,7 +55,9 @@
                             <div class="card-body">
                                 <h5 class="card-title">${amenity.name}</h5>
                                 <p class="card-text">${amenity.description}</p>
-                                <a href="/amenities?id=f=get&id=${amenity.id}" class="btn btn-primary">Select</a>
+                                <a type="select" href="/amenities?f=get&id=${amenity.id}" class="btn btn-primary">Select</a>
+                                <a type="edit" href="/amenities?f=edit&id=${amenity.id}" class="btn btn-secondary">Edit</a>
+                                <a type="delete" href="/amenities?f=delete&id=${amenity.id}" class="btn btn-danger">Delete</a>
                             </div>
                         </div>
                     </div>
