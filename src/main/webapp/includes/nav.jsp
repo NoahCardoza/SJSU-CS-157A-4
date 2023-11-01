@@ -30,6 +30,9 @@
                 <li class="nav-item">
                     <a class="nav-link <%= path.startsWith("/search") ? "active" : "" %>" href="/search">Search</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= path.startsWith("/reviews") ? "active" : "" %>" href="/reviews">Reviews</a>
+                </li>
                 <c:if test="${!isLoggedIn}">
                     <li class="nav-item">
                         <a class="nav-link <%= path.equals("/signup") ? "active" : "" %>" href="signup">Signup</a>

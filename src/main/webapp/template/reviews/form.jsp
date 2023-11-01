@@ -7,16 +7,16 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Locations</title>
+        <title>Reviews</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
-            <h1>New Location Details</h1>
+            <h1>Reviews</h1>
 
-            <form method="POST" class="mt-5" id="new-location-form">
-                Parent Location: <b>
+            <form method="POST" class="mt-5" id="new-review-form">
+                Parent Review: <b>
                     <c:choose>
                         <c:when test="${empty form.parentName}">
                             None
@@ -29,8 +29,8 @@
                 <button
                         class="btn btn-primary float-end"
                         onclick="(function(self) {
-                            const form = document.getElementById('new-location-form');
-                            form.action = '/locations?f=parentSelect';
+                            const form = document.getElementById('new-review-form');
+                            form.action = '/reviews?f=parentSelect';
                             form.submit();
                         })(this)"
                 >Select Parent</button>
@@ -40,9 +40,9 @@
 
                 <input type="text" name="name" value="${form.name}" class="form-control mt-5 mb-3" placeholder="Name" />
                 <textarea name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
-                <input type="text" name="address" value="${form.address}" class="form-control mb-3" placeholder="Address" />
-                <input type="text" name="longitude" value="${form.longitude}" class="form-control mb-3" placeholder="Longitude" />
-                <input type="text" name="latitude" value="${form.latitude}" class="form-control mb-3" placeholder="Latitude" />
+                <input type="text" name="address" value="${form.created_at}" class="form-control mb-3" placeholder="Created at" />
+                <input type="text" name="longitude" value="${form.updated_at}" class="form-control mb-3" placeholder="Updated at" />
+
 
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
             </form>

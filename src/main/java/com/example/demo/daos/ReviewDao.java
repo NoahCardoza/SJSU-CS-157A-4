@@ -2,46 +2,31 @@ package com.example.demo.daos;
 
 import com.example.demo.Database;
 import com.example.demo.beans.entities.Location;
+import com.example.demo.beans.entities.Review;
+import com.example.demo.servlets.reviews.Reviews;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class LocationDao implements Dao<Location> {
-    static LocationDao instance = null;
-    static public LocationDao getInstance() {
+public class ReviewDao implements Dao<Review> {
+
+    static ReviewDao instance = null;
+    static public ReviewDao getInstance() {
         if (instance == null) {
-            instance = new LocationDao();
+            instance = new ReviewDao();
         }
         return instance;
     }
 
-    private LocationDao() {}
+    private ReviewDao() {}
 
-    public List<Location> getAll() throws SQLException {
+
+    public Optional<Review> get(long id) throws SQLException {
         Connection conn = Database.getInstance().getConnection();
 
-        List<Location> results = new ArrayList<>();
-
-        if (conn == null) {
-            return results;
-        }
-
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location");
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            results.add(fromResultSet(resultSet));
-        }
-
-        return results;
-    }
-
-    public Optional<Location> get(long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
-
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location WHERE id = ?");
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Review WHERE id = ?");
         statement.setDouble(1, id);
 
         ResultSet resultSet = statement.executeQuery();
@@ -53,70 +38,45 @@ public class LocationDao implements Dao<Location> {
         return Optional.empty();
     }
 
-    public List<Location> getParentLocationsOf(Long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
-
-        List<Location> results = new ArrayList<>();
-
-        PreparedStatement statement;
-
-        if (id == null) {
-            statement = conn.prepareStatement("SELECT * FROM Location WHERE parent_location_id IS NULL");
-        } else {
-            statement = conn.prepareStatement("SELECT * FROM Location WHERE parent_location_id = ?");
-            statement.setLong(1, id);
-        }
-
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            results.add(fromResultSet(resultSet));
-        }
-
-        return results;
+    @Override
+    public List<Review> getAll() throws SQLException {
+        return null;
     }
 
-    static private Location fromResultSet(ResultSet row) throws SQLException {
-        Location location = new Location();
 
-        location.setId(row.getLong(1));
-        location.setUserId(row.getLong(2));
+    static private Review fromResultSet(ResultSet row) throws SQLException {
+        Review review = new Review();
 
-        location.setParentLocationId(row.getLong(3));
-        if (row.wasNull()) location.setParentLocationId(null);
+        review.setId(row.getLong(1));
+        review.setAmenityId(row.getLong(2));
+        review.setUserId(row.getLong(3));
+        review.setDescription(row.getString(4));
+        review.setName(row.getString(5));
+        review.setHidden(row.getBoolean(6));
+        review.setCreatedAt(row.getString(7));
+        review.setUpdatedAt(row.getString(8));
 
-        location.setLongitude(row.getDouble(4));
-        location.setLatitude(row.getDouble(5));
-        location.setName(row.getString(6));
-        location.setAddress(row.getString(7));
-        location.setDescription(row.getString(8));
-        location.setCreatedAt(row.getString(9));
-        location.setUpdatedAt(row.getString(10));
-
-        return location;
+        return review;
     }
 
-    public Long create(Location location) throws SQLException {
+    public Long create(Review review) throws SQLException {
         Connection conn = Database.getInstance().getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        statement.setLong(1, location.getUserId());
-        if (location.getParentLocationId() == null) {
-            statement.setNull(2, Types.INTEGER);
-        } else {
-            statement.setDouble(2, location.getParentLocationId());
-        }
-        statement.setDouble(3, location.getLongitude());
-        statement.setDouble(4, location.getLatitude());
-        statement.setString(5, location.getName());
-        statement.setString(6, location.getAddress());
-        statement.setString(7, location.getDescription());
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        statement.setLong(1, review.getId());
+        statement.setLong(2, review.getAmenityId());
+        statement.setLong(3, review.getUserId());
+        statement.setString(4, review.getDescription());
+        statement.setString(5, review.getName());
+        statement.setBoolean(6, review.getHidden());
+        statement.setString(7, review.getCreatedAt());
+        statement.setString(8, review.getUpdatedAt());
 
         statement.executeUpdate();
 
-        location.setId(Database.getInstance().getLastInsertedId("Location"));
+        review.setId(Database.getInstance().getLastInsertedId("Location"));
 
-        return location.getId();
+        return review.getId();
 
         // todo: get the id of the newly created location
     }
