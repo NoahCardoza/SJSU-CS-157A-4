@@ -237,7 +237,7 @@ public class Locations extends DatabaseHttpServlet {
 
         Optional<Location> location = LocationDao.getInstance().get(locationId);
 
-        if (location.isEmpty()) {
+        if (location.isPresent()) {
             response.sendRedirect(request.getContextPath() + "/locations");
             return;
         }
