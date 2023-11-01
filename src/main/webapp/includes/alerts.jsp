@@ -6,4 +6,4 @@
     <div class="alert alert-${alert.color}" role="alert">
             ${alert.message}
     </div>
-</c:if>`
+</c:if>

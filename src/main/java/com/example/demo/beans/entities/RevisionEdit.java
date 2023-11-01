@@ -1,12 +1,11 @@
 package com.example.demo.beans.entities;
-import java.sql.Timestamp;
 
 public class RevisionEdit {
     private Long id;
     private Long revisionId;
-    private String table;
+    private String tableName;
     private Long primaryKey;
-    private String column;
+    private String columnName;
     private String previousValue;
     private String newValue;
 
@@ -26,12 +25,12 @@ public class RevisionEdit {
         this.revisionId = revisionId;
     }
 
-    public String getTable() {
-        return table;
+    public String getTableName() {
+        return tableName;
     }
 
-    public void setTable(String table) {
-        this.table = table;
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
     public Long getPrimaryKey() {
@@ -42,12 +41,12 @@ public class RevisionEdit {
         this.primaryKey = primaryKey;
     }
 
-    public String getColumn() {
-        return column;
+    public String getColumnName() {
+        return columnName;
     }
 
-    public void setColumn(String column) {
-        this.column = column;
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
     }
 
     public String getPreviousValue() {
@@ -71,9 +70,9 @@ public class RevisionEdit {
         return "RevisionEdit{" +
                 "id=" + id +
                 ", revisionId=" + revisionId +
-                ", table='" + table + '\'' +
+                ", table='" + tableName + '\'' +
                 ", primaryKey='" + primaryKey + '\'' +
-                ", column='" + column + '\'' +
+                ", column='" + columnName + '\'' +
                 ", previousValue='" + previousValue + '\'' +
                 ", newValue='" + newValue + '\'' +
                 '}';

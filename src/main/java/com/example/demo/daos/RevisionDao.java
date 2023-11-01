@@ -1,8 +1,6 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.MinMax;
-import com.example.demo.beans.entities.AmenityTypeAttribute;
 import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.Revision;
 import com.example.demo.beans.entities.RevisionEdit;
@@ -22,17 +20,31 @@ public class RevisionDao {
     }
 
     private RevisionDao() {}
+    
+    private Revision fromResultSet(ResultSet resultSet) throws SQLException {
+        Revision revision = new Revision();
 
-    private AmenityTypeAttribute fromResultSet(ResultSet resultSet) throws SQLException {
-        AmenityTypeAttribute amenityTypeAttribute = new AmenityTypeAttribute();
+        revision.setId(resultSet.getLong("id"));
+        revision.setUserId(resultSet.getLong("user_id"));
+        revision.setTableName(resultSet.getString("table_name"));
+        revision.setPrimaryKey(resultSet.getLong("primary_key"));
+        revision.setCreatedAt(resultSet.getTimestamp("created_at"));
 
-        amenityTypeAttribute.setId(resultSet.getLong("id"));
-        amenityTypeAttribute.setName(resultSet.getString("name"));
-        amenityTypeAttribute.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
-        amenityTypeAttribute.setIcon(resultSet.getString("icon"));
-        amenityTypeAttribute.setType(resultSet.getString("type"));
+        return revision;
+    }
 
-        return amenityTypeAttribute;
+    public Optional<Revision> get(long id) throws SQLException {
+        PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM Revision WHERE id = ?");
+        ps.setLong(1, id);
+        ResultSet resultSet = ps.executeQuery();
+        if (resultSet.next()) {
+            return Optional.of(fromResultSet(resultSet));
+        }
+        return Optional.empty();
+    }
+
+    public List<Revision> getAll() throws SQLException {
+        return null;
     }
 
     public Long create(Revision revision) throws SQLException {
@@ -56,11 +68,13 @@ public class RevisionDao {
         return revision.getId();
     }
 
-    public ArrayList<Revision> getRevisionsForLocation(Long locationId) throws SQLException {
+    public ArrayList<Revision> getRevisionEdits(String tableName, Long primaryKey) throws SQLException {
         ArrayList<Revision> revisions = new ArrayList<>();
         Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Revision WHERE table_name = 'Location' AND primary_key = ?");
-        statement.setLong(1, locationId);
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Revision WHERE table_name = ? AND primary_key = ?");
+        statement.setString(1, tableName);
+        statement.setLong(2, primaryKey);
+        
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
@@ -77,6 +91,11 @@ public class RevisionDao {
 
         return revisions;
     }
+
+    public ArrayList<Revision> getRevisionsForLocation(Long locationId) throws SQLException {
+        return getRevisionEdits("Location", locationId);
+    }
+
 
     public Long createRevisionForLocationEdit(Long userId, Location prev, Location next) throws SQLException {
         ArrayList<String> columns = new ArrayList<>();
@@ -126,14 +145,41 @@ public class RevisionDao {
         for (int i = 0; i < columns.size(); i++) {
             RevisionEdit edit = new RevisionEdit();
             edit.setRevisionId(revisionId);
-            edit.setTable("Location");
+
+            edit.setTableName("Location");
             edit.setPrimaryKey(prev.getId());
-            edit.setColumn(columns.get(i));
+            edit.setColumnName(columns.get(i));
             edit.setPreviousValue(preValue.get(i));
             edit.setNewValue(nextValue.get(i));
             RevisionEditDao.getInstance().create(edit);
         }
 
         return revisionId;
+    }
+
+    public void vote(Long revisionId, Long id, int value) throws SQLException {
+
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT EXISTS(SELECT 1 FROM RevisionVote WHERE revision_id = ? AND user_id = ?)"
+        );
+        statement.setLong(1, revisionId);
+        statement.setLong(2, id);
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.next();
+        if (resultSet.getBoolean(1)) {
+            statement = conn.prepareStatement("UPDATE RevisionVote SET value = ? WHERE revision_id = ? AND user_id = ?");
+            statement.setInt(1, value);
+            statement.setLong(2, revisionId);
+            statement.setLong(3, id);
+            statement.executeUpdate();
+            return;
+        } else {
+            statement = conn.prepareStatement("INSERT INTO RevisionVote (revision_id, user_id, value) VALUES (?, ?, ?)");
+            statement.setLong(1, revisionId);
+            statement.setLong(2, id);
+            statement.setInt(3, value);
+            statement.executeUpdate();
+        }
     }
 }

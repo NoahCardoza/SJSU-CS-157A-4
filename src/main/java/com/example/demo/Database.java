@@ -7,14 +7,25 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 public class Database {
+    static Connection connection = null;
     static public Connection getConnection() throws SQLException {
         try {
             Context ctx = new InitialContext();
             ctx = (Context) ctx.lookup("java:comp/env");
             DataSource datasource = (DataSource) ctx.lookup("jdbc/hidden_gems");
-            return datasource.getConnection();
+            if (connection == null) {
+                connection = datasource.getConnection();
+            }
+            return connection;
         } catch (NamingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    static public void closeConnection() throws SQLException {
+        if (connection != null) {
+            connection.close();
+            connection = null;
         }
     }
 

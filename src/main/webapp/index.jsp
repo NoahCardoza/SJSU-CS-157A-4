@@ -11,6 +11,7 @@
         <%@include file="includes/nav.jsp" %>
 
         <div class="container mt-5">
+            <%@include file="./includes/alerts.jsp" %>
             <h1>Hidden Gems</h1>
             <p>
                 Welcome to our platform, where community collaboration meets the power of location-based knowledge
@@ -23,29 +24,11 @@
                 love. Join us in creating a global community of location enthusiasts, and let's map the world, one
                 review at a time.
             </p>
-            <%
-
-            Long userId = (Long) session.getAttribute("user_id");
-
-            if(userId != null){
-                Connection conn = Database.getConnection();
-
-                if (conn != null) {
-                    try {
-                        PreparedStatement ps=conn.prepareStatement("select email from user where id=?");
-
-                        ps.setLong(1, userId);
-
-                        ResultSet rs=ps.executeQuery();
-
-                        if (rs.next()){
-                             out.println("You are logged in as " + rs.getString(1));
-                        }
-
-                    } catch (SQLException ignore) {}
-                }
-            }
-            %>
+            <c:if test="${not empty user}">
+                <p>
+                    Welcome, ${user.email}!
+                </p>
+            </c:if>
         </div>
     </body>
 </html>

@@ -8,8 +8,8 @@
         password="${DBMS_PASSWORD}"
         driverClassName="com.mysql.jdbc.Driver"
         url="jdbc:mysql://${DBMS_HOST}:${DBMS_PORT}/${DBMS_SCHEMA}"
-        maxTotal="8"
-        maxIdle="4"
+        maxTotal="16"
+        maxIdle="8"
     />
 
     <Manager
