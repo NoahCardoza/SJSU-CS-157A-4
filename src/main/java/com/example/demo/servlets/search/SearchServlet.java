@@ -4,9 +4,10 @@ import com.example.demo.beans.entities.AmenityType;
 import com.example.demo.beans.entities.AmenityTypeAttribute;
 import com.example.demo.beans.entities.AmenityWithImage;
 import com.example.demo.daos.*;
-import com.example.demo.servlets.DatabaseHttpServlet;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -15,7 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(name = "Search", value = "/search")
-public class SearchServlet extends DatabaseHttpServlet {
+public class SearchServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         doRequest(request, response);
     }

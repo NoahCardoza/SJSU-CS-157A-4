@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class RevisionEditDao implements Dao<RevisionEdit> {
+public class RevisionEditDao {
     static RevisionEditDao instance = null;
     static public RevisionEditDao getInstance() {
         if (instance == null) {
@@ -33,18 +33,8 @@ public class RevisionEditDao implements Dao<RevisionEdit> {
         return edit;
     }
 
-    @Override
-    public Optional<RevisionEdit> get(long id) throws SQLException {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<RevisionEdit> getAll() throws SQLException {
-        return null;
-    }
-
     public ArrayList<RevisionEdit> getAllByRevisionId(Long revisionId) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         ArrayList<RevisionEdit> results = new ArrayList<>();
 
@@ -64,9 +54,8 @@ public class RevisionEditDao implements Dao<RevisionEdit> {
         return results;
     }
 
-    @Override
     public Long create(RevisionEdit edit) throws SQLException {
-        PreparedStatement ps = Database.getInstance().getConnection().prepareStatement(
+        PreparedStatement ps = Database.getConnection().prepareStatement(
                 "INSERT INTO RevisionEdit (revision_id, table_name, primary_key, column_name, previous_value, new_value) VALUES (?, ?, ?, ?, ?, ?)",
                 Statement.RETURN_GENERATED_KEYS
         );

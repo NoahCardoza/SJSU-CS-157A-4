@@ -28,7 +28,7 @@
             Long userId = (Long) session.getAttribute("user_id");
 
             if(userId != null){
-                Connection conn = Database.getInstance().getConnection();
+                Connection conn = Database.getConnection();
 
                 if (conn != null) {
                     try {

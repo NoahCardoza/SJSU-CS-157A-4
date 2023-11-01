@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class LocationDao implements Dao<Location> {
+public class LocationDao {
     static LocationDao instance = null;
     static public LocationDao getInstance() {
         if (instance == null) {
@@ -20,7 +20,7 @@ public class LocationDao implements Dao<Location> {
     private LocationDao() {}
 
     public List<Location> getAll() throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         List<Location> results = new ArrayList<>();
 
@@ -39,7 +39,7 @@ public class LocationDao implements Dao<Location> {
     }
 
     public Optional<Location> get(long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location WHERE id = ?");
         statement.setDouble(1, id);
@@ -54,7 +54,7 @@ public class LocationDao implements Dao<Location> {
     }
 
     public List<Location> getParentLocationsOf(Long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         List<Location> results = new ArrayList<>();
 
@@ -97,7 +97,7 @@ public class LocationDao implements Dao<Location> {
     }
 
     public Long create(Location location) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
         statement.setLong(1, location.getUserId());
@@ -114,7 +114,7 @@ public class LocationDao implements Dao<Location> {
 
         statement.executeUpdate();
 
-        location.setId(Database.getInstance().getLastInsertedId("Location"));
+        location.setId(Database.getLastInsertedId("Location"));
 
         return location.getId();
 
@@ -122,7 +122,7 @@ public class LocationDao implements Dao<Location> {
     }
 
     public void update(Location location) throws SQLException {
-        PreparedStatement ps = Database.getInstance().getConnection().prepareStatement("UPDATE Location SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
+        PreparedStatement ps = Database.getConnection().prepareStatement("UPDATE Location SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
 
         ps.setLong(1, location.getUserId());
 

@@ -5,9 +5,10 @@ import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.User;
 import com.example.demo.beans.forms.SignupForm;
 import com.example.demo.daos.UserDao;
-import com.example.demo.servlets.DatabaseHttpServlet;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet(name = "Signup", value = "/signup")
-public class Signup extends DatabaseHttpServlet {
+public class SignupServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher("/template/auth/signup.jsp").forward(request, response);
     }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class RevisionDao implements Dao<Revision> {
+public class RevisionDao {
     static RevisionDao instance = null;
     static public RevisionDao getInstance() {
         if (instance == null) {
@@ -35,19 +35,8 @@ public class RevisionDao implements Dao<Revision> {
         return amenityTypeAttribute;
     }
 
-    @Override
-    public Optional<Revision> get(long id) throws SQLException {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Revision> getAll() throws SQLException {
-        return null;
-    }
-
-    @Override
     public Long create(Revision revision) throws SQLException {
-        PreparedStatement ps = Database.getInstance().getConnection().prepareStatement(
+        PreparedStatement ps = Database.getConnection().prepareStatement(
                 "INSERT INTO Revision (user_id, table_name, primary_key) VALUES (?, ?, ?)",
                 PreparedStatement.RETURN_GENERATED_KEYS
         );
@@ -69,7 +58,7 @@ public class RevisionDao implements Dao<Revision> {
 
     public ArrayList<Revision> getRevisionsForLocation(Long locationId) throws SQLException {
         ArrayList<Revision> revisions = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Revision WHERE table_name = 'Location' AND primary_key = ?");
         statement.setLong(1, locationId);
         ResultSet resultSet = statement.executeQuery();

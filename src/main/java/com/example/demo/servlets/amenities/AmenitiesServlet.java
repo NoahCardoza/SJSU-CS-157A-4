@@ -1,9 +1,9 @@
 package com.example.demo.servlets.amenities;
 
+
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.*;
-import com.example.demo.beans.entities.AmenityWithImage;
 import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.User;
 import com.example.demo.beans.entities.Amenity;
@@ -13,9 +13,10 @@ import com.example.demo.daos.AmenityDao;
 import com.example.demo.daos.AmenityTypeDao;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.UserDao;
-import com.example.demo.servlets.DatabaseHttpServlet;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -25,8 +26,8 @@ import java.util.List;
 import java.util.Optional;
 
 @WebServlet(name = "Amenities", value = "/amenities")
-public class Amenities extends DatabaseHttpServlet {
 
+public class AmenitiesServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         doRequest(request, response);
     }
@@ -323,10 +324,6 @@ public class Amenities extends DatabaseHttpServlet {
         // TODO: change the path later
         request.getRequestDispatcher("template/auth/signup.jsp").forward(request, response);
     }
-
-
-
-
 }
 
 
