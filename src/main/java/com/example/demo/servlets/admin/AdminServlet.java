@@ -3,11 +3,13 @@ package com.example.demo.servlets.admin;
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.Alert;
+import com.example.demo.beans.entities.AmenityType;
 import com.example.demo.beans.entities.AmenityWithImage;
 import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.User;
 import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.AmenityDao;
+import com.example.demo.daos.AmenityTypeDao;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.UserDao;
 import jakarta.servlet.ServletException;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @WebServlet(name = "Admin", value = "/admin")
-public class Locations extends HttpServlet {
+public class AdminServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         doRequest(request, response);
     }
@@ -39,37 +41,44 @@ public class Locations extends HttpServlet {
         }
 
         try {
-            response.getWriter().println("Hello World");
-        } catch (IOException e) {
+            switch (function) {
+                // TODO: amenityTypeNew
+                case "amenityTypeEdit":
+                    amenityTypeEdit(request, response);
+                    break;
+                case "amenityTypeDelete":
+                    amenityTypeDelete(request, response);
+                    break;
+                default:
+                    index(request, response);
+                    break;
+            }
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        response.setStatus(200);
+    }
 
-        return;
+    private void amenityTypeDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (!request.getMethod().equals("POST")) {
+            response.sendRedirect(request.getContextPath() + "/admin");
+            return;
+        }
 
-//        try {
-//            switch (function) {
-//                case "get":
-//                    get(request, response);
-//                case "create":
-//                    create(request, response);
-//                    break;
-//                case "edit":
-//                    request.getRequestDispatcher("/template/locations/edit-location.jsp").forward(request, response);
-//                    break;
-//                case "parentSelect":
-//                    parentSelect(request, response);
-//                    break;
-//                case "delete":
-//                    request.getRequestDispatcher("/template/locations/delete-location.jsp").forward(request, response);
-//                    break;
-//                default:
-//                    getAll(request, response);
-//                    break;
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
+        Long amenityTypeId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (amenityTypeId == null) {
+            response.sendRedirect(request.getContextPath() + "/admin");
+            return;
+        }
+
+        try {
+            AmenityTypeDao.getInstance().delete(amenityTypeId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("alert", new Alert("danger", "Failed to delete amenity type."));
+        }
+
+        response.sendRedirect(request.getContextPath() + "/admin");
     }
 
     public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -94,7 +103,7 @@ public class Locations extends HttpServlet {
             return;
         }
 
-        List<AmenityWithImage> amenities = AmenityDao.getInstance().getOfLocationId(locationId);
+        List<AmenityWithImage> amenities = AmenityDao.getInstance().getFromLocationId(locationId);
 
         request.setAttribute(
                 "amenities",
@@ -102,66 +111,6 @@ public class Locations extends HttpServlet {
         );
 
         request.getRequestDispatcher("template/locations/get.jsp").forward(request, response);
-    }
-    public void parentSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        LocationForm form = new LocationForm(request);
-
-        // if parent id is 0, it means that the user has selected "None"
-        if (form.getParentId() != null && form.getParentId() == 0) {
-            form.setParentId(null);
-        }
-
-        String action = request.getParameter("action");
-
-        // if the user clicks the back button, we need to get the parent of the current parent
-        if (action != null && action.equals("back") && form.getParentId() != null) {
-            Optional<Location> parentLocationOpt = LocationDao.getInstance().get(form.getParentId());
-            if (parentLocationOpt.isPresent()) {
-                form.setParentId(parentLocationOpt.get().getParentLocationId());
-                if (parentLocationOpt.get().getParentLocationId() == null) {
-                    // if the parent of the parent is null, it means that the parent is the root
-                    form.setParentName("None");
-                } else {
-                    // get the name of the parent
-                    parentLocationOpt = LocationDao.getInstance().get(parentLocationOpt.get().getParentLocationId());
-                    if (parentLocationOpt.isPresent()) {
-                        form.setParentName(parentLocationOpt.get().getName());
-                    } else {
-                        // just to be safe, this shouldn't happen unless something is removed
-                        // from the database while the user is using the app
-                        form.setParentId(null);
-                        form.setParentName("None");
-                    }
-                }
-            }
-
-        }
-
-        List<Location> locations = LocationDao.getInstance().getParentLocationsOf(form.getParentId());
-
-        // if a parent is selected, add it to the list of locations
-        // so the user can see it
-        if (form.getParentId() != null) {
-            Location selected = new Location();
-
-            selected.setId(form.getParentId());
-            selected.setName(form.getParentName());
-
-            locations.add(0, selected);
-        }
-
-        request.setAttribute(
-                "locations",
-                locations
-        );
-
-        request.setAttribute("form", form);
-
-        request.getRequestDispatcher("/template/locations/parent-select.jsp").forward(request, response);
-    }
-
-    public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -222,15 +171,69 @@ public class Locations extends HttpServlet {
                 break;
         }
     }
+    public void amenityTypeEdit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        switch (request.getMethod()) {
+            case "GET":
+                amenityTypeEditGet(request, response);
+                break;
+            case "POST":
+                amenityTypeEditPost(request, response);
+                break;
+        }
+    }
 
-    public void getAll(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        List<Location> locations = LocationDao.getInstance().getAll();
+    private void amenityTypeEditPost(HttpServletRequest request, HttpServletResponse response) {
+        AmenityType amenityType = new AmenityType();
+        amenityType.setId(Util.parseLongOrNull(request.getParameter("id")));
+        amenityType.setParentAmenityTypeId(Util.parseLongOrNull(request.getParameter("parentAmenityTypeId")));
+        amenityType.setName(request.getParameter("name"));
+        amenityType.setDescription(request.getParameter("description"));
+        amenityType.setIcon(request.getParameter("icon"));
+
+        // TODO: validate
+
+        try {
+            AmenityTypeDao.getInstance().update(amenityType);
+            response.sendRedirect(request.getContextPath() + "/admin");
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+            request.setAttribute("amenityType", amenityType);
+            request.setAttribute("alert", new Alert("danger", "Failed to update amenity type."));
+        }
+    }
+
+    private void amenityTypeEditGet(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, ServletException {
+        Long amenityTypeId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (amenityTypeId == null) {
+            response.sendRedirect(request.getContextPath() + "/admin");
+            return;
+        }
+
+        Optional<AmenityType> amenityType = AmenityTypeDao.getInstance().get(amenityTypeId);
+
+        if (amenityType.isPresent()) {
+            request.setAttribute(
+                    "amenityType",
+                    amenityType.get()
+            );
+        } else {
+            System.out.println("Amenity type not found");
+            response.sendRedirect(request.getContextPath() + "/admin");
+            return;
+        }
+
+        request.getRequestDispatcher("/template/admin/amenityTypeEdit.jsp").forward(request, response);
+    }
+
+    public void index(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
 
         request.setAttribute(
-                "locations",
-                locations
+                "amenityTypes",
+                amenityTypes
         );
 
-        request.getRequestDispatcher("template/locations/index.jsp").forward(request, response);
+        request.getRequestDispatcher("template/admin/index.jsp").forward(request, response);
     }
 }

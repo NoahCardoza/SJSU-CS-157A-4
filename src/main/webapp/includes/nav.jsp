@@ -1,5 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
+<%--@elvariable id="user" type="com.example.demo.beans.entities.User"--%>
 <%
     Boolean isLoggedIn = session.getAttribute("user_id") != null;
     request.setAttribute("isLoggedIn", isLoggedIn);
@@ -33,16 +33,22 @@
                 <li class="nav-item">
                     <a class="nav-link <%= path.startsWith("/reviews") ? "active" : "" %>" href="/reviews">Reviews</a>
                 </li>
+                <c:if test="${user.administrator}">
+                    <li class="nav-item">
+                        <a class="nav-link <%= path.startsWith("/admin") ? "active" : "" %>" href="/admin">Admin</a>
+                    </li>
+                </c:if>
+                <c:if test="${user.administrator || user.moderator}">
+                    <li class="nav-item">
+                        <a class="nav-link <%= path.startsWith("/moderator") ? "active" : "" %>" href="/moderation">Moderation</a>
+                    </li>
+                </c:if>
                 <c:if test="${!isLoggedIn}">
                     <li class="nav-item">
                         <a class="nav-link <%= path.equals("/signup") ? "active" : "" %>" href="signup">Signup</a>
                     </li>
                 </c:if>
             </ul>
-<%--            <form class="d-flex mb-0" action="search.jsp" method="get">--%>
-<%--                <input class="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search">--%>
-<%--                <button class="btn btn-outline-success" type="submit">Search</button>--%>
-<%--            </form>--%>
         </div>
     </div>
 </nav>

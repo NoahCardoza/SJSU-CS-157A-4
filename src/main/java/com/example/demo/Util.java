@@ -2,6 +2,7 @@ package com.example.demo;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,5 +91,25 @@ public class Util {
         }
 
         return postParams;
+    }
+
+    public static Integer parseIntOrDefault(String s, int i) {
+        Integer parsed = parseIntOrNull(s);
+
+        if (parsed == null) {
+            return i;
+        }
+
+        return parsed;
+    }
+
+    public static String getPathWithQueryString(HttpServletRequest request) {
+        String queryString = request.getQueryString();
+
+        if (queryString != null) {
+            return request.getRequestURI() + "?" + queryString;
+        }
+
+        return request.getRequestURI();
     }
 }

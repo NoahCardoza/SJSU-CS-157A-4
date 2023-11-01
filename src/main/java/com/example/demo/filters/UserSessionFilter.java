@@ -1,6 +1,7 @@
 package com.example.demo.filters;
 
 import com.example.demo.Util;
+import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.User;
 import com.example.demo.daos.UserDao;
 import jakarta.servlet.*;
@@ -15,10 +16,17 @@ public class UserSessionFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        var session = req.getSession();
+        var session = req.getSession(false);
+
+        request.setAttribute("pathWithQueryString", Util.getPathWithQueryString(req));
 
         if (session != null) {
+            // If there is an alert in the session, add it to the request and remove it from the session
+            if (session.getAttribute("alert") != null) {
+                request.setAttribute("alert", session.getAttribute("alert"));
+                session.removeAttribute("alert");
+            }
+
             Long userId = (Long)session.getAttribute("user_id");
             if (userId != null) {
                 try {

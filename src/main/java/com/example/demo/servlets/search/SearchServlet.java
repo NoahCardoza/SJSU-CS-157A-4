@@ -1,6 +1,5 @@
 package com.example.demo.servlets.search;
 
-import com.example.demo.Util;
 import com.example.demo.beans.entities.AmenityType;
 import com.example.demo.beans.entities.AmenityTypeAttribute;
 import com.example.demo.beans.entities.AmenityWithImage;
@@ -13,11 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "Search", value = "/search")
-public class Search extends DatabaseHttpServlet {
+public class SearchServlet extends DatabaseHttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         doRequest(request, response);
     }

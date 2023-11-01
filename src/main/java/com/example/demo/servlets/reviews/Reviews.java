@@ -62,32 +62,32 @@ public class Reviews extends DatabaseHttpServlet {
 
     public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
-        Long locationId = Util.parseLongOrNull(request.getParameter("id"));
-
-        if (locationId == null) {
-            response.sendRedirect(request.getContextPath() + "/reviews");
-            return;
-        }
-
-        Optional<Location> location = LocationDao.getInstance().get(locationId);
-
-        if (location.isPresent()) {
-            request.setAttribute(
-                    "review",
-                    location.get()
-            );
-        } else {
-            System.out.println("Review not found");
-            response.sendRedirect(request.getContextPath() + "/reviews");
-            return;
-        }
-
-        List<AmenityWithImage> amenities = AmenityDao.getInstance().getOfLocationId(locationId);
-
-        request.setAttribute(
-                "amenities",
-                amenities
-        );
+//        Long locationId = Util.parseLongOrNull(request.getParameter("id"));
+//
+//        if (locationId == null) {
+//            response.sendRedirect(request.getContextPath() + "/reviews");
+//            return;
+//        }
+//
+//        Optional<Location> location = LocationDao.getInstance().get(locationId);
+//
+//        if (location.isPresent()) {
+//            request.setAttribute(
+//                    "review",
+//                    location.get()
+//            );
+//        } else {
+//            System.out.println("Review not found");
+//            response.sendRedirect(request.getContextPath() + "/reviews");
+//            return;
+//        }
+//
+//        List<AmenityWithImage> amenities = AmenityDao.getInstance().getOfLocationId(locationId);
+//
+//        request.setAttribute(
+//                "amenities",
+//                amenities
+//        );
 
         request.getRequestDispatcher("/template/reviews/get.jsp").forward(request, response);
     }
