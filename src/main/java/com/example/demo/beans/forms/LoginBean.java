@@ -33,7 +33,7 @@ public class LoginBean {
     }
 
     public Long validate() throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement ps = conn.prepareStatement("SELECT id FROM User WHERE email=? AND password=?");
 

@@ -3,13 +3,14 @@ package com.example.demo.daos;
 import com.example.demo.Database;
 import com.example.demo.beans.entities.Amenity;
 import com.example.demo.beans.entities.AmenityWithImage;
+import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.ReviewImage;
 import com.example.demo.servlets.search.AmenityFilter;
 
 import java.sql.*;
 import java.util.*;
 
-public class AmenityDao implements Dao<Amenity> {
+public class AmenityDao {
     static AmenityDao instance = null;
     static public AmenityDao getInstance() {
         if (instance == null) {
@@ -36,15 +37,32 @@ public class AmenityDao implements Dao<Amenity> {
         return amenity;
     }
 
-    @Override
-    public Optional get(long id) throws SQLException {
+    public Optional<Amenity> get(long id) throws SQLException {
+        Connection conn = Database.getConnection();
+
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity WHERE id = ?");
+        statement.setDouble(1, id);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            return Optional.of(fromResultSet(resultSet));
+        }
+
         return Optional.empty();
     }
 
-    @Override
+
+    public void delete(long id) throws SQLException {
+        Connection conn = Database.getConnection();
+
+        PreparedStatement statement = conn.prepareStatement("DELETE FROM Amenity WHERE id = ?");
+        statement.setDouble(1, id);
+    }
+
     public List<Amenity> getAll() throws SQLException {
         ArrayList<Amenity> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity");
         ResultSet resultSet = statement.executeQuery();
 
@@ -55,16 +73,13 @@ public class AmenityDao implements Dao<Amenity> {
         return amenityTypes;
     }
 
-
-
-    @Override
     public Long create(Amenity amenityType) throws SQLException {
         return null;
     }
 
     public List<AmenityWithImage> getWithFilter(AmenityFilter filter) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement stmt ;
         ResultSet resultSet;
@@ -171,7 +186,7 @@ public class AmenityDao implements Dao<Amenity> {
 
     public List<AmenityWithImage> getFromLocationId(Long locationId) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement;
         ResultSet resultSet;
@@ -224,5 +239,28 @@ public class AmenityDao implements Dao<Amenity> {
         System.out.println(amenityTypes);
 
         return amenityTypes;
+    }
+
+    public List<Amenity> getAmenityTypeId(Long id) throws SQLException {
+        Connection conn = Database.getConnection();
+
+        List<Amenity> results = new ArrayList<>();
+
+        PreparedStatement statement;
+
+        if (id == null) {
+            statement = conn.prepareStatement("SELECT * FROM Amenity WHERE amenity_type_id IS NULL");
+        } else {
+            statement = conn.prepareStatement("SELECT * FROM Amenity WHERE amenity_type_id = ?");
+            statement.setLong(1, id);
+        }
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            results.add(fromResultSet(resultSet));
+        }
+
+        return results;
     }
 }

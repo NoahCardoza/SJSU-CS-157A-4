@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
+public class AmenityTypeAttributeDao {
     static public String TYPE_NUMBER_ID_PREFIX = "amenityTypeNumberAttribute-";
     static public String TYPE_TEXT_ID_PREFIX = "amenityTypeTextAttribute-";
     static public String TYPE_BOOLEAN_ID = "amenityTypeBooleanAttributes";
@@ -38,15 +38,13 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
         return amenityTypeAttribute;
     }
 
-    @Override
     public Optional get(long id) throws SQLException {
         return Optional.empty();
     }
 
-    @Override
     public List<AmenityTypeAttribute> getAll() throws SQLException {
         ArrayList<AmenityTypeAttribute> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM AmenityType");
         ResultSet resultSet = statement.executeQuery();
 
@@ -57,7 +55,6 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
         return amenityTypes;
     }
 
-    @Override
     public Long create(AmenityTypeAttribute amenityTypeAttribute) throws SQLException {
         return null;
     }
@@ -65,7 +62,7 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
     public List<AmenityTypeAttribute> getAllByAmenityType(Long amenityTypeId) throws SQLException {
         ArrayList<AmenityTypeAttribute> amenityTypes = new ArrayList<>();
 
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM AmenityTypeAttribute WHERE amenity_type_id = ?"
         );
@@ -84,7 +81,7 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
     public List<String> getAllTextValuesForAttribute(Long attributeId) throws SQLException {
         ArrayList<String> attributeValues = new ArrayList<>();
 
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
                 "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
         );
@@ -101,7 +98,7 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
     }
 
     public Optional<MinMax> getMinMaxIntValuesForAttribute(Long attributeId) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
                 "SELECT MIN(value), MAX(value) FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
         );

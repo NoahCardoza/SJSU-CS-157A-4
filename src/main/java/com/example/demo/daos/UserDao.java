@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-public class UserDao implements Dao<User> {
+public class UserDao {
     static UserDao instance = null;
     static public UserDao getInstance() {
         if (instance == null) {
@@ -20,7 +20,7 @@ public class UserDao implements Dao<User> {
     private UserDao() {}
 
     public Optional<User> get(Long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM User WHERE id = ?");
         statement.setDouble(1, id);
@@ -60,8 +60,9 @@ public class UserDao implements Dao<User> {
         return get((Long) session.getAttribute("user_id"));
     }
 
+
     public Long create(User user) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password) VALUES (?, ?, ?, ?)");
         statement.setString(1, user.getUsername());
@@ -71,13 +72,13 @@ public class UserDao implements Dao<User> {
 
         statement.executeUpdate();
 
-        user.setId(Database.getInstance().getLastInsertedId("User"));
+        user.setId(Database.getLastInsertedId("User"));
         // get the id of the newly created user
         return user.getId();
     }
 
     public boolean isUnique(User user) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement ps;
 
@@ -100,13 +101,27 @@ public class UserDao implements Dao<User> {
         return false;
     }
 
-    @Override
-    public Optional get(long id) throws SQLException {
-        return Optional.empty();
-    }
+    public boolean isAdmin(User user) throws SQLException {
+        Connection conn = Database.getConnection();
 
-    @Override
-    public List getAll() throws SQLException {
-        return null;
+        PreparedStatement ps;
+
+        try {
+            ps = conn.prepareStatement("SELECT administrator FROM User WHERE username=? OR email=?");
+
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getEmail());
+
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()){
+                return true;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return false;
     }
 }

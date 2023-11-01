@@ -5,14 +5,16 @@ import com.example.demo.Validation;
 import com.example.demo.beans.*;
 import com.example.demo.beans.entities.AmenityWithImage;
 import com.example.demo.beans.entities.Location;
+import com.example.demo.beans.entities.Revision;
 import com.example.demo.beans.entities.User;
 import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.AmenityDao;
 import com.example.demo.daos.LocationDao;
+import com.example.demo.daos.RevisionDao;
 import com.example.demo.daos.UserDao;
-import com.example.demo.servlets.DatabaseHttpServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -26,7 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "Locations", value = "/locations")
-public class Locations extends DatabaseHttpServlet {
+public class LocationsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         doRequest(request, response);
     }
@@ -136,6 +138,13 @@ public class Locations extends DatabaseHttpServlet {
             response.sendRedirect(request.getContextPath() + "/locations");
             return;
         }
+
+        List<Revision> revisions = RevisionDao.getInstance().getRevisionsForLocation(locationId);
+
+        request.setAttribute(
+                "revisions",
+                revisions
+        );
 
         List<AmenityWithImage> amenities = AmenityDao.getInstance().getFromLocationId(locationId);
 
@@ -274,6 +283,9 @@ public class Locations extends DatabaseHttpServlet {
                     // TODO: implement diff and track changes
                     LocationDao.getInstance().update(newLocation);
 
+                    RevisionDao.getInstance().createRevisionForLocationEdit(user.get().getId(), location.get(), newLocation);
+
+
                     response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + locationId);
                     return;
                 } else {
@@ -334,6 +346,7 @@ public class Locations extends DatabaseHttpServlet {
                         try {
                             LocationDao.getInstance().create(location);
                         } catch (SQLException e) {
+                            request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
                             throw new RuntimeException(e);
                         }
 
