@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
+public class AmenityTypeAttributeDao {
     static public String TYPE_NUMBER_ID_PREFIX = "amenityTypeNumberAttribute-";
     static public String TYPE_TEXT_ID_PREFIX = "amenityTypeTextAttribute-";
     static public String TYPE_BOOLEAN_ID = "amenityTypeBooleanAttributes";
@@ -38,12 +38,10 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
         return amenityTypeAttribute;
     }
 
-    @Override
     public Optional get(long id) throws SQLException {
         return Optional.empty();
     }
 
-    @Override
     public List<AmenityTypeAttribute> getAll() throws SQLException {
         ArrayList<AmenityTypeAttribute> amenityTypes = new ArrayList<>();
         Connection conn = Database.getConnection();
@@ -57,7 +55,6 @@ public class AmenityTypeAttributeDao implements Dao<AmenityTypeAttribute> {
         return amenityTypes;
     }
 
-    @Override
     public Long create(AmenityTypeAttribute amenityTypeAttribute) throws SQLException {
         return null;
     }

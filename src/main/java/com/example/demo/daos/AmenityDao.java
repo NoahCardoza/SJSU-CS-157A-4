@@ -10,7 +10,7 @@ import com.example.demo.servlets.search.AmenityFilter;
 import java.sql.*;
 import java.util.*;
 
-public class AmenityDao implements Dao<Amenity> {
+public class AmenityDao {
     static AmenityDao instance = null;
     static public AmenityDao getInstance() {
         if (instance == null) {
@@ -37,9 +37,8 @@ public class AmenityDao implements Dao<Amenity> {
         return amenity;
     }
 
-    @Override
     public Optional<Amenity> get(long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity WHERE id = ?");
         statement.setDouble(1, id);
@@ -55,13 +54,12 @@ public class AmenityDao implements Dao<Amenity> {
 
 
     public void delete(long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("DELETE FROM Amenity WHERE id = ?");
         statement.setDouble(1, id);
     }
 
-    @Override
     public List<Amenity> getAll() throws SQLException {
         ArrayList<Amenity> amenityTypes = new ArrayList<>();
         Connection conn = Database.getConnection();
@@ -75,9 +73,6 @@ public class AmenityDao implements Dao<Amenity> {
         return amenityTypes;
     }
 
-
-
-    @Override
     public Long create(Amenity amenityType) throws SQLException {
         return null;
     }
@@ -247,7 +242,7 @@ public class AmenityDao implements Dao<Amenity> {
     }
 
     public List<Amenity> getAmenityTypeId(Long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         List<Amenity> results = new ArrayList<>();
 

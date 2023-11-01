@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class LocationDao implements Dao<Location> {
+public class LocationDao {
     static LocationDao instance = null;
     static public LocationDao getInstance() {
         if (instance == null) {
@@ -122,7 +122,7 @@ public class LocationDao implements Dao<Location> {
     }
 
     public void update(Location location) throws SQLException {
-        PreparedStatement ps = Database.getInstance().getConnection().prepareStatement("UPDATE Location SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
+        PreparedStatement ps = Database.getConnection().prepareStatement("UPDATE Location SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
 
         ps.setLong(1, location.getUserId());
 

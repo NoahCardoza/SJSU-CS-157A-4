@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-public class UserDao implements Dao<User> {
+public class UserDao {
     static UserDao instance = null;
     static public UserDao getInstance() {
         if (instance == null) {
@@ -102,7 +102,7 @@ public class UserDao implements Dao<User> {
     }
 
     public boolean isAdmin(User user) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement ps;
 
@@ -123,15 +123,5 @@ public class UserDao implements Dao<User> {
         }
 
         return false;
-    }
-
-    @Override
-    public Optional get(long id) throws SQLException {
-        return Optional.empty();
-    }
-
-    @Override
-    public List getAll() throws SQLException {
-        return null;
     }
 }

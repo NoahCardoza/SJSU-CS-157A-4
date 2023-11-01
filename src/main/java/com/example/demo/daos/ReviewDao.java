@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-public class ReviewDao implements Dao<Review> {
+public class ReviewDao {
 
     static ReviewDao instance = null;
     static public ReviewDao getInstance() {
@@ -21,7 +21,7 @@ public class ReviewDao implements Dao<Review> {
 
 
     public Optional<Review> get(long id) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Review WHERE id = ?");
         statement.setDouble(1, id);
@@ -35,7 +35,6 @@ public class ReviewDao implements Dao<Review> {
         return Optional.empty();
     }
 
-    @Override
     public List<Review> getAll() throws SQLException {
         return null;
     }
@@ -57,7 +56,7 @@ public class ReviewDao implements Dao<Review> {
     }
 
     public Long create(Review review) throws SQLException {
-        Connection conn = Database.getInstance().getConnection();
+        Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
         statement.setLong(1, review.getId());
@@ -71,7 +70,7 @@ public class ReviewDao implements Dao<Review> {
 
         statement.executeUpdate();
 
-        review.setId(Database.getInstance().getLastInsertedId("Location"));
+        review.setId(Database.getLastInsertedId("Location"));
 
         return review.getId();
 
