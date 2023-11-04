@@ -55,22 +55,19 @@ public class ReviewDao {
         return review;
     }
 
-    public Long create(Review review) throws SQLException {
+    public static Long create(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        statement.setLong(1, review.getId());
-        statement.setLong(2, review.getAmenityId());
-        statement.setLong(3, review.getUserId());
-        statement.setString(4, review.getDescription());
-        statement.setString(5, review.getName());
-        statement.setBoolean(6, review.getHidden());
-        statement.setString(7, review.getCreatedAt());
-        statement.setString(8, review.getUpdatedAt());
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (amenity_id,user_id, description,name) VALUES (?, ?, ?, ?)");
+
+        statement.setLong(1, review.getAmenityId());
+        statement.setLong(2, review.getUserId());
+        statement.setString(3, review.getDescription());
+        statement.setString(4, review.getName());
 
         statement.executeUpdate();
 
-        review.setId(Database.getLastInsertedId("Location"));
+        review.setId(Database.getLastInsertedId("Review"));
 
         return review.getId();
 

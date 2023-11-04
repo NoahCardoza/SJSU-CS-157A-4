@@ -44,7 +44,7 @@
                 <input type="text" name="longitude" value="${form.updated_at}" class="form-control mb-3" placeholder="Updated at" />
 
 
-                <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
+                <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create Review</button>
             </form>
         </div>
     </body>

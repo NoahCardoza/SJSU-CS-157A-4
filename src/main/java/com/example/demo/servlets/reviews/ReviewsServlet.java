@@ -1,12 +1,11 @@
 package com.example.demo.servlets.reviews;
 
+import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.Alert;
-import com.example.demo.beans.entities.Location;
-import com.example.demo.beans.entities.User;
+import com.example.demo.beans.entities.*;
 import com.example.demo.beans.forms.LocationForm;
-import com.example.demo.daos.LocationDao;
-import com.example.demo.daos.UserDao;
+import com.example.demo.daos.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -94,71 +93,85 @@ public class ReviewsServlet extends HttpServlet {
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        switch (request.getMethod()) {
-            case "GET":
-                List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);
-
-                request.setAttribute("hasParent", false);
-                request.setAttribute("locations", locations);
-
-                request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
-                break;
-            case "POST":
-                LocationForm form = new LocationForm(request);
-
-                String action = request.getParameter("action");
-
-                if (action != null && action.equals("submit")) {
-                    Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
-                    if (!user.isPresent()) {
-                        response.setStatus(401);
-                        request.setAttribute(
-                                "alert",
-                                new Alert("danger", "You must be logged in to create a location.")
-                        );
-                        response.sendRedirect(request.getContextPath() + "/login");
-                        return;
-                    }
-                    Validation v = form.validate();
-
-                    if (v.isValid()) {
-                        Location location = new Location();
-                        location.setUserId(user.get().getId());
-                        location.setName(form.getName());
-                        location.setDescription(form.getDescription());
-                        location.setAddress(form.getAddress());
-                        location.setLatitude(form.getLatitude());
-                        location.setLongitude(form.getLongitude());
-                        location.setParentLocationId(form.getParentId());
-                        try {
-                            LocationDao.getInstance().create(location);
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        // TODO: redirect to location page
-
-                        response.sendRedirect(request.getContextPath() + "/reviews");
-                        return;
-                    } else {
-                        request.setAttribute("errors", v.getMessages());
-                    }
-                }
-
-                request.setAttribute("form", form);
-
-                request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
-                break;
-        }
+//        switch (request.getMethod()) {
+//            case "GET":
+//                List<Review> reviews = ReviewDao.getInstance().getParentLocationsOf(null);
+//
+//                request.setAttribute("hasParent", false);
+//                request.setAttribute("reviews", reviews);
+//
+//                request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
+//                break;
+//            case "POST":
+//                ReviewForm form = new ReviewForm(request);
+//
+//                String action = request.getParameter("action");
+//
+//                if (action != null && action.equals("submit")) {
+//                    Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
+//                    if (!user.isPresent()) {
+//                        response.setStatus(401);
+//                        request.setAttribute(
+//                                "alert",
+//                                new Alert("danger", "You must be logged in to create a review.")
+//                        );
+//                        response.sendRedirect(request.getContextPath() + "/login");
+//                        return;
+//                    }
+//                    Validation v = form.validate();
+//
+//                    if (v.isValid()) {
+//                        Review reviews = new Review();
+//                        reviews.setUserId(user.get().getId());
+//                        reviews.setName(form.getName());
+//                        reviews.setDescription(form.getDescription());
+//                        try {
+//                            ReviewDao.getInstance().create(reviews);
+//                        } catch (SQLException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//
+//                        // TODO: redirect to location page
+//
+//                        response.sendRedirect(request.getContextPath() + "/reviews");
+//                        return;
+//                    } else {
+//                        request.setAttribute("errors", v.getMessages());
+//                    }
+//                }
+//
+//                request.setAttribute("form", form);
+//
+//                request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
+//                break;
+//        }
     }
 
     public void getAll(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        List<Location> locations = LocationDao.getInstance().getAll();
+        User user = (User) request.getAttribute( "user");
 
-        request.setAttribute(
-                "reviews",
-                locations
-        );
+        Long amenityId = Util.parseLongOrNull(request.getParameter("amenityId"));
+
+        if (request.getMethod().equals("POST")) {
+            Review review = new Review();
+            review.setUserId(user.getId());
+
+            review.setAmenityId(amenityId);
+
+            review.setName(request.getParameter("title"));
+            review.setDescription(request.getParameter("description"));
+
+            ReviewDao.create(review);
+
+        }
+
+        Optional<Amenity> amenity = AmenityDao.getInstance().get(amenityId);
+
+        if (amenity.isPresent()){
+
+            AmenityTypeMetricDao.getInstance().getAllByAmenityType(amenity.get().getAmenityTypeId());
+
+        }
 
         request.getRequestDispatcher("/template/reviews/index.jsp").forward(request, response);
     }

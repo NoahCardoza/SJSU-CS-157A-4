@@ -20,38 +20,38 @@
         <div class="panel-heading">
             <h1 class="panel-title">COMMENT BOX USING AJAX THROUGH JSP</h1>
         </div>
+        <form method="post">
         <div class="panel-body">
             <div class="form-group col-md-4">
-                <label>Name</label>
-                <input class ="form-control" type="text" id="username">
+                <label>Title</label>
+                <input class ="form-control" type="text" id="username" name="title">
             </div>
             <div class="clearfix"></div>
             <div class="form-group col-md-4">
                 <label>Review</label>
-                <textarea class="form-control" rows="8" id="comment" required="required"></textarea>
+                <textarea class="form-control" rows="8" id="comment" required="required" name="description"></textarea>
             </div>
             <div class="clearfix"></div>
             <div class="form-group col-md-6">
-                <button class="btn btn-primary" type="button" onclick="loadAjax()">POST</button>
+                <button class="btn btn-primary" type="submit">POST</button>
             </div>
         </div>
+        </form>
     </div>
     <p id="print"></p>
 </div>
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.js"></script>
 <script type="text/javascript">
 
     function loadAjax(){
-        var username= document.getElementById("username").value;
+        var user_id= document.getElementById("user_id").value;
         var description= document.getElementById("description").value;
-        if(username.trim() =="" || description.trim()==""){
+        if(user_id.trim() =="" || description.trim()==""){
             alert("All fields are Required");
             return false;
         }
 
 
-        var url="ajaxrequestPage.jsp?username="+username +"&description="+description;
+        var url="/reviews?user_id="+user_id +"&description="+description;
 
 
 

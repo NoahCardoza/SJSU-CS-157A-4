@@ -1,5 +1,8 @@
 package com.example.demo.beans.entities;
 
+import java.sql.*;
+
+
 public class Review {
     private Long id;
     private Long amenityId;

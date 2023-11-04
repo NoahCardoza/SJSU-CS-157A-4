@@ -7,6 +7,8 @@
 --%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1" import ="java.sql.*"%>
+<%@ page import="com.example.demo.Database" %>
+<%@ page import="com.example.demo.beans.entities.User" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -17,8 +19,8 @@
 <body>
 <div class="container-fluid">
     <%
-        String username =request.getParameter("username");
-        String comment =request.getParameter("description");
+        String user_Id =request.getParameter("user_id");
+        String description =request.getParameter("description");
     %>
     <div class="panel-primary">
         <div class="panel-heading">
@@ -28,11 +30,11 @@
             <%
                 String message="";
                 try {
-                    Class.forName("com.mysql.jdbc.Driver");
-                    Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/MYDB","root","new_password");
-                    PreparedStatement ps = con.prepareStatement("INSERT INTO reviews VALUES(?,?);");
-                    ps.setString(1, username);
-                    ps.setString(2, description);
+                    Connection conn = Database.getConnection();
+                    PreparedStatement ps = conn.prepareStatement("SELECT id FROM reviews WHERE user_id=? AND descirption=?");
+                    ps.setString(1, request.getAttribute());
+                    User user = (User) request.getAttribute("user");
+                    ps.setString(2, getDescription());
                     ps.executeUpdate();
             %>
             <strong><big>USER NAME IS : <%=username %><br>
