@@ -4,16 +4,16 @@ package com.example.demo.servlets.amenities;
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.*;
+import com.example.demo.beans.entities.*;
 import com.example.demo.beans.entities.Location;
-import com.example.demo.beans.entities.User;
-import com.example.demo.beans.entities.Amenity;
 import com.example.demo.beans.entities.AmenityType;
 import com.example.demo.beans.forms.AmenityForm;
-import com.example.demo.daos.AmenityDao;
-import com.example.demo.daos.AmenityTypeDao;
+import com.example.demo.daos.*;
 import com.example.demo.daos.LocationDao;
-import com.example.demo.daos.UserDao;
+import com.example.demo.daos.AmenityDao;
 
+import com.example.demo.servlets.search.AmenityFilter;
+import com.example.demo.servlets.search.AmenityTypeAttributeGrouper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -99,10 +99,41 @@ public class AmenitiesServlet extends HttpServlet {
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         switch (request.getMethod()) {
             case "GET":
-                List<Amenity> amenities = AmenityDao.getInstance().getAmenityTypeId(null);
 
-                request.setAttribute("hasAmenityType", false);
-                request.setAttribute("Amenities", amenities);
+                List<Location> locations = LocationDao.getInstance().getAll();
+
+                request.setAttribute(
+                        "locations",
+                        locations
+                );
+
+                List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
+
+                request.setAttribute(
+                        "amenityTypes",
+                        amenityTypes
+                );
+
+                AmenityFilter amenityFilter = new AmenityFilter(request);
+
+                if (amenityFilter.getAmenityTypeId() != null) {
+                    List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenityFilter.getAmenityTypeId());
+
+                    var amenityTypeAttributeGrouper = new AmenityTypeAttributeGrouper(request, amenityTypeAttributes);
+
+                    request.setAttribute(
+                            "amenityTypeAttributes",
+                            amenityTypeAttributeGrouper
+                    );
+                }
+
+
+                List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityFilter);
+
+                request.setAttribute(
+                        "amenities",
+                        amenities
+                );
 
                 request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
                 break;

@@ -27,21 +27,13 @@
                     <label for="location" class="form-label">Location</label>
                     <select class="form-select" name="locationID" id="location" onchange="$('#search-form').submit()">
                         <option value="0">All</option>
-                        <c:forEach var="location" items="${location}">
+                        <c:forEach var="location" items="${locations}">
                             <option ${param.get('locationID') == amenityType.id ? 'selected' : ''} value="${location.id}"
                             >${location.name}</option>
                         </c:forEach>
                     </select>
                 </div>
 
-                <c:if test="${not empty locations}">
-                    ${amenityTypeAttributes.textAttributes}
-                    ${amenityTypeAttributes.booleanAttributes}
-                    ${amenityTypeAttributes.numberAttributes}
-                </c:if>
-
-                 </br>
-                 </br>
                  </br>
 
                 <div class="row mb-2">
@@ -55,6 +47,7 @@
                     </select>
                 </div>
 
+                <!-- CURRENTLY NOT SHOWING UP -->
                 <c:if test="${not empty amenityTypeAttributes}">
                     ${amenityTypeAttributes.textAttributes}
                     ${amenityTypeAttributes.booleanAttributes}
@@ -66,20 +59,6 @@
 
                 <input type="text" name="name" value="${form.name}" class="form-control mt-5 mb-3" placeholder="Name" />
                 <textarea name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
-
-                <%-- TODO: dynamically display attribute inputs
-                <% int attributeTypeId = ${form.parentName}%>
-
-                <% if (attributeTypeId == ) { %>
-                    <!-- Display text inputs when the condition is met -->
-                    <label for="textInput1">Text Input 1:</label>
-                    <input type="text" name="textInput1" id="textInput1">
-                    <br>
-                    <label for="textInput2">Text Input 2:</label>
-                    <input type="text" name="textInput2" id="textInput2">
-                <% } %>
-                --%>
-
 
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
             </form>

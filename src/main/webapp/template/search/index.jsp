@@ -22,7 +22,7 @@
                 return false;
                 }">
                 </br>
-                <a href="/amenities?f=create" class="btn btn-secondary">Add New Amenity</a>
+                <a href="/amenities?f=create" class="btn btn-secondary">Create Amenity</a>
                 </br>
                 </br>
                 <div class="row mb-2">
