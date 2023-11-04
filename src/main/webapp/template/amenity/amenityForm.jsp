@@ -1,7 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib uri="/WEB-INF/custom-functions.tld" prefix="cfn" %>
 
 <%--@elvariable id="form" type="List<com.example.demo.beans.forms.AmenityForm>"--%>
+<%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
+<%--@elvariable id="amenityTypeAttributes" type="com.example.demo.servlets.search.AmenityTypeAttributeGrouper"--%>
 
 <!DOCTYPE html>
 <html>
@@ -14,46 +18,48 @@
         <div class="container mt-5">
             <h1>Add an Amenity</h1>
 
-            <form method="POST" class="mt-5" id="new-amenity-form">
-                Location : <b>
-                    <c:choose>
-                        <c:when test="${empty form.parentName}">
-                            None
-                        </c:when>
-                        <c:otherwise>
-                            ${form.parentName}
-                        </c:otherwise>
-                    </c:choose>
-                </b>
-                <button
-                        class="btn btn-primary float-end"
-                        onclick="(function(self) {
-                            const form = document.getElementById('new-amenity-form');
-                            form.action = '/amenities?f=locationSelect';
-                            form.submit();
-                        })(this)"
-                >Select Location</button>
+            <form method="POST" class="mt-5" id="new-amenity-form" class="col-4" onsubmit="if ($('#amenityType').val() === '0') {
+                location.href = '/amenities?f=create';
+                return false;
+                }">
+
+                <div class="row mb-2">
+                    <label for="location" class="form-label">Location</label>
+                    <select class="form-select" name="locationID" id="location" onchange="$('#search-form').submit()">
+                        <option value="0">All</option>
+                        <c:forEach var="location" items="${location}">
+                            <option ${param.get('locationID') == amenityType.id ? 'selected' : ''} value="${location.id}"
+                            >${location.name}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+
+                <c:if test="${not empty locations}">
+                    ${amenityTypeAttributes.textAttributes}
+                    ${amenityTypeAttributes.booleanAttributes}
+                    ${amenityTypeAttributes.numberAttributes}
+                </c:if>
+
                  </br>
                  </br>
                  </br>
-                Category : <b>
-                   <c:choose>
-                        <c:when test="${empty form.parentName}">
-                            None
-                        </c:when>
-                        <c:otherwise>
-                              ${form.parentName}
-                        </c:otherwise>
-                   </c:choose>
-                </b>
-                <button
-                        class="btn btn-primary float-end"
-                        onclick="(function(self) {
-                            const form = document.getElementById('new-amenity-form');
-                            form.action = '/amenities?f=parentSelect';
-                            form.submit();
-                        })(this)"
-                   >Select Amenity Category</button>
+
+                <div class="row mb-2">
+                    <label for="amenityType" class="form-label">Amenity Type</label>
+                    <select class="form-select" name="amenityTypeId" id="amenityType" onchange="$('#search-form').submit()">
+                        <option value="0">All</option>
+                        <c:forEach var="amenityType" items="${amenityTypes}">
+                            <option ${param.get('amenityTypeId') == amenityType.id ? 'selected' : ''} value="${amenityType.id}"
+                            >${amenityType.name}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+
+                <c:if test="${not empty amenityTypeAttributes}">
+                    ${amenityTypeAttributes.textAttributes}
+                    ${amenityTypeAttributes.booleanAttributes}
+                    ${amenityTypeAttributes.numberAttributes}
+                </c:if>
 
                 <input type="hidden" name="parentId" id="parentId" value="${form.parentId}">
                 <input type="hidden" name="parentName" id="parentName" value="${form.parentName}">

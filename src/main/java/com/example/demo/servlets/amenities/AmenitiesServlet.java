@@ -92,8 +92,6 @@ public class AmenitiesServlet extends HttpServlet {
             return;
         }
 
-        System.out.println("im in the get method");
-
         request.getRequestDispatcher("template/amenity/view-amenity.jsp").forward(request, response);
     }
 
