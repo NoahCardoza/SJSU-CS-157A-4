@@ -18,14 +18,14 @@
         <div class="container mt-5">
             <h1>Add an Amenity</h1>
 
-            <form method="POST" class="mt-5" id="new-amenity-form" class="col-4" onsubmit="if ($('#amenityType').val() === '0') {
+            <form method="POST" class="mt-5" id="amenity-form" class="col-4" onsubmit="if ($('#amenityType').val() === '0') {
                 location.href = '/amenities?f=create';
                 return false;
                 }">
 
                 <div class="row mb-2">
                     <label for="location" class="form-label">Location</label>
-                    <select class="form-select" name="locationID" id="location" onchange="$('#search-form').submit()">
+                    <select class="form-select" name="locationID" id="location">
                         <option value="0">All</option>
                         <c:forEach var="location" items="${locations}">
                             <option ${param.get('locationID') == amenityType.id ? 'selected' : ''} value="${location.id}"
@@ -38,7 +38,7 @@
 
                 <div class="row mb-2">
                     <label for="amenityType" class="form-label">Amenity Type</label>
-                    <select class="form-select" name="amenityTypeId" id="amenityType" onchange="$('#search-form').submit()">
+                    <select class="form-select" name="amenityTypeId" id="amenityType">
                         <option value="0">All</option>
                         <c:forEach var="amenityType" items="${amenityTypes}">
                             <option ${param.get('amenityTypeId') == amenityType.id ? 'selected' : ''} value="${amenityType.id}"
@@ -53,9 +53,6 @@
                     ${amenityTypeAttributes.booleanAttributes}
                     ${amenityTypeAttributes.numberAttributes}
                 </c:if>
-
-                <input type="hidden" name="parentId" id="parentId" value="${form.parentId}">
-                <input type="hidden" name="parentName" id="parentName" value="${form.parentName}">
 
                 <input type="text" name="name" value="${form.name}" class="form-control mt-5 mb-3" placeholder="Name" />
                 <textarea name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
