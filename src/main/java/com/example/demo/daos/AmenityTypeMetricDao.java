@@ -4,6 +4,7 @@ import com.example.demo.Database;
 import com.example.demo.beans.MinMax;
 import com.example.demo.beans.entities.AmenityTypeAttribute;
 import com.example.demo.beans.entities.AmenityTypeMetric;
+import com.example.demo.beans.entities.AmenityTypeMetricRecord;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,16 +32,12 @@ public class AmenityTypeMetricDao {
         AmenityTypeMetric amenityTypeMetric = new AmenityTypeMetric();
 
         amenityTypeMetric.setId(resultSet.getLong("id"));
-        amenityTypeMetric.setName(resultSet.getString("name"));
         amenityTypeMetric.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
+        amenityTypeMetric.setName(resultSet.getString("name"));
         amenityTypeMetric.setIcon(resultSet.getString("icon"));
         amenityTypeMetric.setType(resultSet.getString("type"));
 
         return amenityTypeMetric;
-    }
-
-    public Optional get(long id) throws SQLException {
-        return Optional.empty();
     }
 
 
