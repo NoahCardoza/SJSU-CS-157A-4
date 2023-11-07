@@ -77,6 +77,29 @@ public class AmenityDao {
         return null;
     }
 
+    //TODO: need to update this statement with amenity
+    public void update(Amenity amenity) throws SQLException {
+
+        /*PreparedStatement ps = Database.getConnection().prepareStatement("UPDATE Amenity SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
+
+        ps.setLong(1, location.getUserId());
+
+        if (location.getParentLocationId() == null) {
+            ps.setNull(2, Types.INTEGER);
+        } else {
+            ps.setDouble(2, location.getParentLocationId());
+        }
+        ps.setDouble(3, location.getLongitude());
+        ps.setDouble(4, location.getLatitude());
+        ps.setString(5, location.getName());
+        ps.setString(6, location.getAddress());
+        ps.setString(7, location.getDescription());
+        ps.setLong(8, location.getId());
+
+        ps.executeUpdate();*/
+
+    }
+
     public List<AmenityWithImage> getWithFilter(AmenityFilter filter) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
         Connection conn = Database.getConnection();
@@ -241,26 +264,5 @@ public class AmenityDao {
         return amenityTypes;
     }
 
-    public List<Amenity> getAmenityTypeId(Long id) throws SQLException {
-        Connection conn = Database.getConnection();
 
-        List<Amenity> results = new ArrayList<>();
-
-        PreparedStatement statement;
-
-        if (id == null) {
-            statement = conn.prepareStatement("SELECT * FROM Amenity WHERE amenity_type_id IS NULL");
-        } else {
-            statement = conn.prepareStatement("SELECT * FROM Amenity WHERE amenity_type_id = ?");
-            statement.setLong(1, id);
-        }
-
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            results.add(fromResultSet(resultSet));
-        }
-
-        return results;
-    }
 }

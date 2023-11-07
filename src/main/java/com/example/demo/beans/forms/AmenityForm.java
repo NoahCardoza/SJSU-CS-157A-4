@@ -2,6 +2,7 @@ package com.example.demo.beans.forms;
 
 import com.example.demo.Util;
 import com.example.demo.Validation;
+import com.example.demo.beans.entities.Amenity;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class AmenityForm {
@@ -20,6 +21,12 @@ public class AmenityForm {
         this.parentName = request.getParameter("parentName");
         this.name = request.getParameter("name");
         this.description = request.getParameter("description");
+    }
+
+    public AmenityForm(Amenity amenity) {
+        this.parentId = amenity.getAmenityTypeId();
+        this.name = amenity.getName();
+        this.description = amenity.getDescription();
     }
 
     public Validation validate() {
