@@ -14,7 +14,7 @@
 <div class="container mt-5">
     <div class="panel-primary">
         <div class="panel-heading">
-            <h1 class="panel-title">COMMENT BOX USING AJAX THROUGH JSP</h1>
+            <h1 class="panel-title">Create Review</h1>
         </div>
         <form method="post">
             <%@include file="../../includes/alerts.jsp" %>
@@ -30,9 +30,10 @@
                         <label for="comment">Review</label>
                         <textarea class="form-control" rows="8" id="comment" required="required" name="description"></textarea>
                     </div>
-                    <p>Metrics</p>
+
                 </div>
                 <div class="form-group col-md-6">
+                    <p>Metrics</p>
                     <c:forEach var="metric" items="${metrics}">
                         <div class="form-group">
                             <label for="metric-${metric.id}">${metric.name}</label>

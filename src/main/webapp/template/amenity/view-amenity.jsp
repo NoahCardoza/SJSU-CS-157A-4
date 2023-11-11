@@ -26,6 +26,7 @@
             </div>
             <a class="btn btn-secondary" href="/amenities?f=edit&id=${location.id}">Edit</a>
             <a class="btn btn-warning" href="/revisions?f=list&type=Location&id=${location.id}">Revision</a>
+            <a class = "btn btn-secondary" href="/reviews?f=create&amenityId=${amenity.id}">Create Review</a>
         </div>
     </body>
 </html>
