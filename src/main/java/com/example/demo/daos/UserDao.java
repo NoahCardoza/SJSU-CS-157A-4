@@ -83,33 +83,10 @@ public class UserDao {
         PreparedStatement ps;
 
         try {
-            ps = conn.prepareStatement("SELECT * FROM User WHERE username=? OR email=?");
+            ps = conn.prepareStatement("SELECT * FROM User WHERE username=? OR email=? OR normalized_email=?");
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-
-            ResultSet rs = ps.executeQuery();
-
-            if (!rs.next()){
-                return true;
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return false;
-    }
-
-    public boolean isAdmin(User user) throws SQLException {
-        Connection conn = Database.getConnection();
-
-        PreparedStatement ps;
-
-        try {
-            ps = conn.prepareStatement("SELECT administrator FROM User WHERE username=? OR email=?");
-
-            ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
 
             ResultSet rs = ps.executeQuery();

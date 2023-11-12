@@ -146,9 +146,15 @@ public class RevisionsServlet extends HttpServlet {
             return;
         }
 
-        String method = request.getParameter("method");
+        String action = request.getParameter("action");
 
-        int vote = switch (method) {
+        if (action == null) {
+            session.setAttribute("alert", new Alert("danger", "Invalid vote method"));
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        int vote = switch (action) {
             case "up" -> 1;
             case "down" -> -1;
             default -> 0;
@@ -164,7 +170,7 @@ public class RevisionsServlet extends HttpServlet {
 
 
         session.setAttribute("alert", new Alert("success", "Vote successful!"));
-        response.sendRedirect(request.getContextPath() + "/revisions/list?type=" + revision.get().getTableName() + "&id=" + revision.get().getPrimaryKey());
+        response.sendRedirect(request.getContextPath() + "/revisions?f=list&type=" + revision.get().getTableName() + "&id=" + revision.get().getPrimaryKey());
     }
 
 
@@ -177,7 +183,7 @@ public class RevisionsServlet extends HttpServlet {
             return;
         }
 
-        List<Revision> revisions = RevisionDao.getInstance().getEntityRevisions(tableName, primaryKey);
+        List<Revision> revisions = RevisionDao.getInstance().getEntityRevisions(tableName, primaryKey, (Long) request.getAttribute("user_id"));
 
         for (Revision revision : revisions) {
             RevisionDao.getInstance().getUserForRevision(revision);

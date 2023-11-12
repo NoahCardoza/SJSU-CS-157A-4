@@ -57,22 +57,6 @@ public class LocationsServlet extends HttpServlet {
             function = "index";
         }
 
-//        ResultSet rs = Database.getConnection().prepareStatement("SELECT id, password FROM User").executeQuery();
-//        while (rs.next()) {
-//            String hashed = rs.getString("password");
-////            System.out.println("UPDATE User SET password = '" + SCryptUtil.scrypt(hashed, 16384, 8, 1) + "' WHERE id = " + rs.getLong("id") + ";");
-//
-//            //            String passwd = rs.getString("password");
-////            if (SCryptUtil.check(passwd, hashed)) {
-////                System.out.println("It matches");
-////            } else {
-////                System.out.println("It does not match");
-////            }
-//
-//        }
-////        SCryptUtil.scrypt(passwd, N, r, p)
-////        SCryptUtil.check(passwd, hashed)
-
         try {
             switch (function) {
                 case "get":
@@ -168,7 +152,10 @@ public class LocationsServlet extends HttpServlet {
             return;
         }
 
-        List<Revision> revisions = RevisionDao.getInstance().getRevisionsForLocation(locationId);
+        List<Revision> revisions = RevisionDao.getInstance().getRevisionsForLocation(
+                locationId,
+                (Long) request.getSession().getAttribute("userId")
+        );
 
         request.setAttribute(
                 "revisions",

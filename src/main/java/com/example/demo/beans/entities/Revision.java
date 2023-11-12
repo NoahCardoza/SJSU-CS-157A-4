@@ -14,6 +14,13 @@ public class Revision {
     // utility field
     private List<RevisionEdit> edits;
     private User user;
+    private Integer votes;
+    /**
+     * 0: not voted
+     * 1: upvoted
+     * -1: downvoted
+     */
+    private Integer voted;
 
     public Revision() {
         this.edits = new ArrayList<>();
@@ -92,5 +99,21 @@ public class Revision {
                 ", createdAt=" + createdAt +
                 ", edits=" + edits +
                 '}';
+    }
+
+    public void setVotes(int votes) {
+        this.votes = votes;
+    }
+
+    public int getVotes() {
+        return votes;
+    }
+
+    public void setVoted(int voted) {
+        this.votes = voted;
+    }
+
+    public int getVoted() {
+        return votes;
     }
 }

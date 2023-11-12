@@ -19,6 +19,7 @@
                         <th scope="col">Date</th>
                         <th scope="col">User</th>
                         <th>Changes</th>
+                        <th>Votes</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -28,12 +29,13 @@
                                     <td>${revision.createdAt}</td>
                                     <td><a href="/users?f=get&id=${revision.user.id}">${revision.user.username}</a></td>
                                     <td>${revision.edits.size()}</td>
+                                    <td>${revision.votes}</td>
                                     <td>
                                         <a href="/revisions?f=get&id=${revision.id}" class="btn btn-primary">View</a>
                                         <form action="/revisions?f=vote" class="d-inline" method="post">
                                             <input type="hidden" name="id" value="${revision.id}">
-                                            <button type="submit" name="action" value="up" class="btn btn-primary">Up Vote</button>
-                                            <button type="submit" name="action" value="down" class="btn btn-primary">Down Vote</button>
+                                            <button type="submit" name="action" value="up" class="btn btn-${revision.voted == 1 ? 'outline-' : ''}success">Up Vote</button>
+                                            <button type="submit" name="action" value="down" class="btn btn-${revision.voted == -1 ? 'outline-' : ''}danger">Down Vote</button>
                                         </form>
 
                                         <c:if test="${(user.administrator || user.moderator) && !revision.isReverted()}">
