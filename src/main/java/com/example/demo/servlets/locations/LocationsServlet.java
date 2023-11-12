@@ -1,39 +1,39 @@
 package com.example.demo.servlets.locations;
 
+import com.example.demo.CopyPrintWriter;
 import com.example.demo.Database;
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.*;
-import com.example.demo.beans.entities.AmenityWithImage;
-import com.example.demo.beans.entities.Location;
-import com.example.demo.beans.entities.Revision;
-import com.example.demo.beans.entities.User;
+import com.example.demo.beans.entities.*;
 import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.AmenityDao;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.RevisionDao;
 import com.example.demo.daos.UserDao;
+import com.example.demo.servlets.search.SearchServlet;
 import com.google.gson.Gson;
 import com.lambdaworks.crypto.SCryptUtil;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.json.JSONArray;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "Locations", value = "/locations")
+@MultipartConfig
 public class LocationsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         try {
@@ -71,6 +71,7 @@ public class LocationsServlet extends HttpServlet {
                     ajax(request, response);
                     break;
                 case "map":
+                    SearchServlet.setSearchAttributes(request, null);
                     request.getRequestDispatcher("/template/locations/map.jsp").forward(request, response);
                     break;
                 case "mapImage":
@@ -94,7 +95,13 @@ public class LocationsServlet extends HttpServlet {
         }
     }
 
-    private void ajax(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    private void ajax(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        if (!request.getMethod().equals("POST")) {
+            response.setStatus(400);
+            response.getWriter().write("Only POST requests are allowed");
+            return;
+        }
+
         Double longitude = Util.parseDoubleOrNull(request.getParameter("longitude"));
         Double latitude = Util.parseDoubleOrNull(request.getParameter("latitude"));
         Integer radius = Util.parseIntOrDefault(request.getParameter("radius"), 1000);
@@ -104,15 +111,50 @@ public class LocationsServlet extends HttpServlet {
             return;
         }
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream ps = new PrintStream(baos);
+        final PrintWriter writer = new PrintWriter(ps);
+        List<Location> locations = LocationDao.getInstance().search(longitude, latitude, radius);
+        HttpServletResponseWrapper wrapper = new HttpServletResponseWrapper((HttpServletResponse) response) {
+            @Override public PrintWriter getWriter() {
+                return writer;
+            }
+        };
+        SearchServlet.setSearchAttributes(request, locations);
+        request.getRequestDispatcher("/template/locations/ajaxForm.jsp").forward(request, wrapper);
 
-        ArrayList<Location> locations = LocationDao.getInstance().search(longitude, latitude, radius);
+        List<Amenity> amenities = (List<Amenity>) request.getAttribute("amenities");
+
+        // group amenities by location id
+        HashMap<Long, List<Amenity>> locationIds = new HashMap<>();
+        for (Amenity amenity : amenities) {
+            if (!locationIds.containsKey(amenity.getLocationId())) {
+                locationIds.put(amenity.getLocationId(), new ArrayList<>());
+            }
+            locationIds.get(amenity.getLocationId()).add(amenity);
+        }
+
+        // get the location ids
+        locations = locations.stream().filter((location) -> {
+            if (locationIds.containsKey(location.getId())) {
+                location.setAmenities(locationIds.get(location.getId()));
+                return true;
+            }
+            return false;
+        }).collect(Collectors.toList());
 
         Gson gson = new Gson();
-        String json = gson.toJson(locations);
+        String json = gson.toJson(new LocationSearchAjaxResponse(
+                baos.toString(),
+                locations
+//                amenities
+        ));
 
         response.getWriter().write(json);
         response.setStatus(200);
     }
+
+
 
     protected void mapImage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -140,11 +182,13 @@ public class LocationsServlet extends HttpServlet {
             URL url = new URL("https://maps.geoapify.com/v1/staticmap?style=osm-carto&" +
                     "width=" + width +
                     "&height=" + height +
-                    "&center=lonlat:" + location.getLatitude() + "," + location.getLongitude() +
-                    "&marker=lonlat:" + location.getLatitude() + "," + location.getLongitude() + ";" +
+                    "&center=lonlat:" + location.getLongitude() + "," + location.getLatitude() +
+                    "&marker=lonlat:" + location.getLongitude() + "," + location.getLatitude() + ";" +
                     "color:%23ff0000;size:medium&zoom=14&" +
                     "apiKey=" + apiKey
             );
+
+            response.setHeader("Cache-Control", "max-age=86400");
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -268,7 +312,6 @@ public class LocationsServlet extends HttpServlet {
         );
 
         request.setAttribute("form", form);
-        System.out.println(form);
 
         request.getRequestDispatcher("/template/locations/parent-select.jsp").forward(request, response);
     }

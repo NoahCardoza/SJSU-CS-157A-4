@@ -30,7 +30,7 @@ public class AmenityTypeAttributeBooleanGroup {
         String selected;
         StringJoiner joiner = new StringJoiner("");
         joiner.add(
-                "<div class=\"row mb-2\">\n" +
+                "<div class=\"form-control mb-2\">\n" +
                 "   <label for=\""+TYPE_BOOLEAN_ID+"\" class=\"form-label\">Amenity Type</label>\n" +
                 "       <select class=\"form-select\" name=\""+TYPE_BOOLEAN_ID+"\" id=\""+TYPE_BOOLEAN_ID+"\" multiple>\n");
 

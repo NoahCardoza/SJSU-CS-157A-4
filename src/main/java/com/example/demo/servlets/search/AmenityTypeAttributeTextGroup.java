@@ -40,7 +40,7 @@ public class AmenityTypeAttributeTextGroup {
                 String formId = TYPE_TEXT_ID_PREFIX + attribute.getId();
                 List<String> values = AmenityTypeAttributeDao.getInstance().getAllTextValuesForAttribute(attribute.getId());
                 joiner.add(
-                        "<div class=\"row mb-2\">\n" +
+                        "<div class=\"form-control mb-2\">\n" +
                         "   <label for=\"" + formId + "\" class=\"form-label\">" + attribute.getName() + "</label>\n" +
                         "       <select class=\"form-select\" name=\"" + formId + "\" id=\"" + formId + "\">\n" +
                                 "<option value=\"0\">All</option>");

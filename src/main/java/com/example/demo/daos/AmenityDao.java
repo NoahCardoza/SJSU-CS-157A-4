@@ -100,7 +100,7 @@ public class AmenityDao {
 
     }
 
-    public List<AmenityWithImage> getWithFilter(AmenityFilter filter) throws SQLException {
+    public List<AmenityWithImage> getWithFilter(AmenityFilter filter, List<Location> locations) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
         Connection conn = Database.getConnection();
 
@@ -109,9 +109,23 @@ public class AmenityDao {
         ArrayList<String> params = new ArrayList<>();
         String filterSubQuery = "";
         String statement = "SELECT *, (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image FROM Amenity\n";
+        boolean whereAdded = false;
+        if (locations != null) {
+            StringJoiner locationIds = new StringJoiner(",");
+            for (Location location : locations) {
+                locationIds.add(location.getId().toString());
+            }
+            statement = statement + "WHERE location_id IN (" + locationIds + ")\n";
+            whereAdded = true;
+        }
         if (filter.getAmenityTypeId() != null) {
+            if (!whereAdded) {
+                statement = statement + "WHERE\n";
+                whereAdded = true;
+            } else {
+                statement = statement + "AND\n";
+            }
             statement = statement +
-                    "WHERE\n" +
                     "    Amenity.amenity_type_id IN (\n" +
                     "    WITH RECURSIVE amenity_type_hierarchy AS (\n" +
                     "        SELECT    id,\n" +

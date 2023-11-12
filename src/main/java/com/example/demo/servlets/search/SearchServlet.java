@@ -3,6 +3,7 @@ package com.example.demo.servlets.search;
 import com.example.demo.beans.entities.AmenityType;
 import com.example.demo.beans.entities.AmenityTypeAttribute;
 import com.example.demo.beans.entities.AmenityWithImage;
+import com.example.demo.beans.entities.Location;
 import com.example.demo.daos.*;
 
 import jakarta.servlet.ServletException;
@@ -13,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "Search", value = "/search")
@@ -33,7 +35,7 @@ public class SearchServlet extends HttpServlet {
         }
     }
 
-    public void search(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+    static public void setSearchAttributes(HttpServletRequest request, List<Location> locations) throws SQLException {
         List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
 
         request.setAttribute(
@@ -55,13 +57,16 @@ public class SearchServlet extends HttpServlet {
         }
 
 
-        List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityFilter);
+        List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityFilter, locations);
 
         request.setAttribute(
                 "amenities",
                 amenities
         );
+    }
 
+    public void search(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        setSearchAttributes(request, null);
         request.getRequestDispatcher("template/search/index.jsp").forward(request, response);
     }
 }

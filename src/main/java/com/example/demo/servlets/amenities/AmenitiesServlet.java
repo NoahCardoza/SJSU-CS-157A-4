@@ -141,7 +141,7 @@ public class AmenitiesServlet extends HttpServlet {
                     );
                 }
 
-                List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityFilter);
+                List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityFilter, null);
 
                 request.setAttribute(
                         "amenities",

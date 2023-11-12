@@ -45,7 +45,7 @@ public class AmenityTypeAttributeNumberGroup {
                 String currentValue = request.getParameter(formId) == null ? "" : request.getParameter(formId);
 
                 joiner.add(
-                        "<div class=\"row mb-2\">\n" +
+                        "<div class=\"form-control mb-2\">\n" +
                                 "   <label for=\"" + formId + "\" class=\"form-label\">" + attribute.getName() + "</label>\n" +
                                 "       <select class=\"form-select\" name=\"" + formId + "\" id=\"" + formId + "\">\n" +
                                 "<option value=\"0\">All</option>");
