@@ -1,16 +1,38 @@
 package com.example.demo;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.sql.*;
+
 public class Database {
-    static public Connection getConnection() {
+    static Connection connection = null;
+    static public Connection getConnection() throws SQLException {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-
-            String url = "jdbc:mysql://" + System.getProperty("DBMS_HOST", "localhost") +":" + System.getProperty("DBMS_PORT", "3306") + "/" + System.getProperty("DBMS_SCHEMA");
-
-            return DriverManager.getConnection(url, System.getProperty("DBMS_USERNAME"), System.getProperty("DBMS_PASSWORD"));
-        }catch(Exception e){
-            return null;
+            Context ctx = new InitialContext();
+            ctx = (Context) ctx.lookup("java:comp/env");
+            DataSource datasource = (DataSource) ctx.lookup("jdbc/hidden_gems");
+            if (connection == null) {
+                connection = datasource.getConnection();
+            }
+            return connection;
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    static public void closeConnection() throws SQLException {
+        if (connection != null) {
+            connection.close();
+            connection = null;
+        }
+    }
+
+    static public Long getLastInsertedId(String table) throws SQLException {
+        PreparedStatement ps = getConnection().prepareStatement("SELECT last_insert_id() FROM " + table + ";");
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getLong(1);
     }
 }
