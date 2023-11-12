@@ -13,12 +13,14 @@ import com.example.demo.daos.AmenityDao;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.RevisionDao;
 import com.example.demo.daos.UserDao;
+import com.google.gson.Gson;
 import com.lambdaworks.crypto.SCryptUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,8 +67,14 @@ public class LocationsServlet extends HttpServlet {
                 case "create":
                     create(request, response);
                     break;
+                case "ajax":
+                    ajax(request, response);
+                    break;
                 case "map":
-                    map(request, response);
+                    request.getRequestDispatcher("/template/locations/map.jsp").forward(request, response);
+                    break;
+                case "mapImage":
+                    mapImage(request, response);
                     break;
                 case "edit":
                     edit(request, response);
@@ -85,7 +94,27 @@ public class LocationsServlet extends HttpServlet {
         }
     }
 
-    protected void map(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void ajax(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+        Double longitude = Util.parseDoubleOrNull(request.getParameter("longitude"));
+        Double latitude = Util.parseDoubleOrNull(request.getParameter("latitude"));
+        Integer radius = Util.parseIntOrDefault(request.getParameter("radius"), 1000);
+
+        if (longitude == null || latitude == null) {
+            response.setStatus(400);
+            return;
+        }
+
+
+        ArrayList<Location> locations = LocationDao.getInstance().search(longitude, latitude, radius);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(locations);
+
+        response.getWriter().write(json);
+        response.setStatus(200);
+    }
+
+    protected void mapImage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             Long locationId = Util.parseLongOrNull(request.getParameter("id"));
             if (locationId == null) {

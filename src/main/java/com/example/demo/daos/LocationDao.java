@@ -121,6 +121,7 @@ public class LocationDao {
         // todo: get the id of the newly created location
     }
 
+
     public void update(Location location) throws SQLException {
         PreparedStatement ps = Database.getConnection().prepareStatement("UPDATE Location SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
 
@@ -140,5 +141,22 @@ public class LocationDao {
 
         ps.executeUpdate();
 
+    }
+
+    public ArrayList<Location> search(Double longitude, Double latitude, Integer radius) throws SQLException {
+        PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM Location WHERE ST_Distance_Sphere(point(longitude, latitude), point(?, ?)) <= ?");
+        ps.setDouble(1, longitude);
+        ps.setDouble(2, latitude);
+        ps.setDouble(3, radius);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Location> locations = new ArrayList<>();
+
+        while (rs.next()) {
+            locations.add(fromResultSet(rs));
+        }
+
+        return locations;
     }
 }

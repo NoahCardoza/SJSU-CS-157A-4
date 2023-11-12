@@ -13,7 +13,7 @@
         <div class="container mt-5">
             <h1 class="mb-2">${location.name}</h1>
             <div class="col">
-                <img width="200" height="200" src="/locations?f=map&id=${location.id}">
+                <img width="200" height="200" src="/locations?f=mapImage&id=${location.id}">
             </div>
             <div class="col">
                 <p>${location.description}</p>
