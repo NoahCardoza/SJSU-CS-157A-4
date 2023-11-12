@@ -1,6 +1,7 @@
 package com.example.demo.beans.forms;
 
 import com.example.demo.Database;
+import com.example.demo.Security;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,15 +36,16 @@ public class LoginBean {
     public Long validate() throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement ps = conn.prepareStatement("SELECT id FROM User WHERE email=? AND password=?");
+        PreparedStatement ps = conn.prepareStatement("SELECT id, password FROM User WHERE email=?");
 
         ps.setString(1, getEmail());
-        ps.setString(2, getPassword());
 
         ResultSet rs = ps.executeQuery();
 
         if (rs.next()){
-            return rs.getLong(1);
+            if (Security.checkPassword(getPassword(), rs.getString("password"))) {
+                return rs.getLong(1);
+            }
         }
 
         return null;

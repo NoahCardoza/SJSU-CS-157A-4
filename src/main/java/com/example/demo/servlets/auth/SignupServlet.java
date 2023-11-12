@@ -1,6 +1,7 @@
 package com.example.demo.servlets.auth;
 
 import com.example.demo.Validation;
+import com.example.demo.Security;
 import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.User;
 import com.example.demo.beans.forms.SignupForm;
@@ -34,7 +35,7 @@ public class SignupServlet extends HttpServlet {
                 User user = new User();
 
                 user.setUsername(form.getUsername());
-                user.setPassword(form.getPassword());
+                user.setPassword(Security.hashPassword(form.getPassword()));
                 user.setEmail(form.getEmail());
 
                 try {

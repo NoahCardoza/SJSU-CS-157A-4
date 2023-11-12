@@ -1,5 +1,6 @@
 package com.example.demo.servlets.locations;
 
+import com.example.demo.Database;
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.*;
@@ -12,6 +13,7 @@ import com.example.demo.daos.AmenityDao;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.RevisionDao;
 import com.example.demo.daos.UserDao;
+import com.lambdaworks.crypto.SCryptUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -30,19 +33,45 @@ import java.util.stream.Collectors;
 @WebServlet(name = "Locations", value = "/locations")
 public class LocationsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
-        doRequest(request, response);
+        try {
+            doRequest(request, response);
+        } catch (SQLException e) {
+            response.setStatus(500);
+            throw new RuntimeException(e);
+        }
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)  {
-        doRequest(request, response);
+        try {
+            doRequest(request, response);
+        } catch (SQLException e) {
+            response.setStatus(500);
+            throw new RuntimeException(e);
+        }
     }
 
-    public void doRequest(HttpServletRequest request, HttpServletResponse response) {
+    public void doRequest(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         String function = request.getParameter("f");
 
         if (function == null) {
             function = "index";
         }
+
+//        ResultSet rs = Database.getConnection().prepareStatement("SELECT id, password FROM User").executeQuery();
+//        while (rs.next()) {
+//            String hashed = rs.getString("password");
+////            System.out.println("UPDATE User SET password = '" + SCryptUtil.scrypt(hashed, 16384, 8, 1) + "' WHERE id = " + rs.getLong("id") + ";");
+//
+//            //            String passwd = rs.getString("password");
+////            if (SCryptUtil.check(passwd, hashed)) {
+////                System.out.println("It matches");
+////            } else {
+////                System.out.println("It does not match");
+////            }
+//
+//        }
+////        SCryptUtil.scrypt(passwd, N, r, p)
+////        SCryptUtil.check(passwd, hashed)
 
         try {
             switch (function) {
