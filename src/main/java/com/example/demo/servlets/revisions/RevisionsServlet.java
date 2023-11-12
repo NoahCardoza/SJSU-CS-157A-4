@@ -1,17 +1,10 @@
 package com.example.demo.servlets.revisions;
 
 import com.example.demo.Util;
-import com.example.demo.Validation;
 import com.example.demo.beans.Alert;
-import com.example.demo.beans.entities.AmenityWithImage;
-import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.Revision;
 import com.example.demo.beans.entities.User;
-import com.example.demo.beans.forms.LocationForm;
-import com.example.demo.daos.AmenityDao;
-import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.RevisionDao;
-import com.example.demo.daos.UserDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,13 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @WebServlet(name = "Revisions", value = "/revisions")
 public class RevisionsServlet extends HttpServlet {
@@ -49,13 +38,79 @@ public class RevisionsServlet extends HttpServlet {
             switch (function) {
                 case "list" -> list(request, response);
                 case "vote" -> vote(request, response);
-                case "get" ->
-                        request.getRequestDispatcher("/template/locations/delete-location.jsp").forward(request, response);
+                case "revert" -> revert(request, response);
+                case "get" -> get(request, response);
                 default -> response.sendRedirect(request.getContextPath() + "/");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void get(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        Long revisionId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (revisionId == null) {
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        Optional<Revision> revision = RevisionDao.getInstance().get(revisionId);
+
+        if (revision.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+
+
+        RevisionDao.getInstance().getEditsForRevision(revision.get());
+        RevisionDao.getInstance().getUserForRevision(revision.get());
+        request.setAttribute("revision", revision.get());
+
+        request.getRequestDispatcher("template/revisions/get.jsp").forward(request, response);
+    }
+
+    private void revert(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+        if (!request.getMethod().equals("POST")) {
+            response.getWriter().println("Invalid method");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        HttpSession session = request.getSession(true);
+
+        User user = (User) request.getAttribute("user");
+        if (user == null) {
+            session.setAttribute("alert", new Alert("danger", "You must be logged in to revert"));
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        if (!(user.isAdministrator() || user.isModerator())) {
+            session.setAttribute("alert", new Alert("danger", "You must be an administrator or moderator to revert"));
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        Long revisionId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (revisionId == null) {
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        Optional<Revision> revision = RevisionDao.getInstance().get(revisionId);
+
+        if (!revision.isPresent()) {
+            return;
+        }
+
+        RevisionDao.getInstance().revert(revision.get());
+
+        session.setAttribute("alert", new Alert("success", "Revert successful!"));
+        response.sendRedirect(request.getContextPath() + "/revisions?f=list&type=" + revision.get().getTableName()+ "&id=" + revision.get().getPrimaryKey());
     }
 
     private void vote(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
@@ -122,7 +177,11 @@ public class RevisionsServlet extends HttpServlet {
             return;
         }
 
-        List<Revision> revisions = RevisionDao.getInstance().getRevisionEdits(tableName, primaryKey);
+        List<Revision> revisions = RevisionDao.getInstance().getEntityRevisions(tableName, primaryKey);
+
+        for (Revision revision : revisions) {
+            RevisionDao.getInstance().getUserForRevision(revision);
+        }
 
         request.setAttribute(
                 "revisions",

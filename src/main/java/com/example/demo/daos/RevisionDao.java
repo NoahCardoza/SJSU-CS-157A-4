@@ -4,6 +4,7 @@ import com.example.demo.Database;
 import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.Revision;
 import com.example.demo.beans.entities.RevisionEdit;
+import com.example.demo.beans.entities.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class RevisionDao {
         revision.setUserId(resultSet.getLong("user_id"));
         revision.setTableName(resultSet.getString("table_name"));
         revision.setPrimaryKey(resultSet.getLong("primary_key"));
+        revision.setReverted(resultSet.getBoolean("reverted"));
         revision.setCreatedAt(resultSet.getTimestamp("created_at"));
 
         return revision;
@@ -41,10 +43,6 @@ public class RevisionDao {
             return Optional.of(fromResultSet(resultSet));
         }
         return Optional.empty();
-    }
-
-    public List<Revision> getAll() throws SQLException {
-        return null;
     }
 
     public Long create(Revision revision) throws SQLException {
@@ -68,7 +66,7 @@ public class RevisionDao {
         return revision.getId();
     }
 
-    public ArrayList<Revision> getRevisionEdits(String tableName, Long primaryKey) throws SQLException {
+    public ArrayList<Revision> getEntityRevisions(String tableName, Long primaryKey) throws SQLException {
         ArrayList<Revision> revisions = new ArrayList<>();
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM Revision WHERE table_name = ? AND primary_key = ?");
@@ -78,12 +76,7 @@ public class RevisionDao {
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
-            Revision revision = new Revision();
-            revision.setId(resultSet.getLong("id"));
-            revision.setUserId(resultSet.getLong("user_id"));
-            revision.setTableName(resultSet.getString("table_name"));
-            revision.setPrimaryKey(resultSet.getLong("primary_key"));
-            revision.setCreatedAt(resultSet.getTimestamp("created_at"));
+            Revision revision = fromResultSet(resultSet);
             revision.setEdits(RevisionEditDao.getInstance().getAllByRevisionId(revision.getId()));
 
             revisions.add(revision);
@@ -93,7 +86,21 @@ public class RevisionDao {
     }
 
     public ArrayList<Revision> getRevisionsForLocation(Long locationId) throws SQLException {
-        return getRevisionEdits("Location", locationId);
+        return getEntityRevisions("Location", locationId);
+    }
+
+    public void getEditsForRevision(Revision revision) throws SQLException {
+        revision.setEdits(RevisionEditDao.getInstance().getAllByRevisionId(revision.getId()));
+    }
+
+    public void getUserForRevision(Revision revision) throws SQLException {
+        Optional<User> user = UserDao.getInstance().get(revision.getUserId());
+        if (user.isPresent()) {
+            revision.setUser(user.get());
+        } else {
+            revision.setUser(null);
+            System.out.println("User not found for revision " + revision.getId());
+        }
     }
 
 
@@ -181,5 +188,35 @@ public class RevisionDao {
             statement.setInt(3, value);
             statement.executeUpdate();
         }
+    }
+
+    public void revert(Revision revision) throws SQLException {
+        // TODO: merge if edits have been made since
+
+        getEditsForRevision(revision);
+
+        for (RevisionEdit edit : revision.getEdits()) {
+            String tableName = edit.getTableName();
+            String columnName = edit.getColumnName();
+            String newValue = edit.getPreviousValue();
+            Long primaryKey = edit.getPrimaryKey();
+
+            PreparedStatement statement = Database.getConnection().prepareStatement(
+                    "UPDATE " + tableName + " SET " + columnName + " = ? WHERE id = ?"
+            );
+            statement.setString(1, newValue);
+            statement.setLong(2, primaryKey);
+            statement.executeUpdate();
+        }
+
+        // TODO: track who reverted the revision
+        revision.setReverted(true);
+
+        PreparedStatement statement = Database.getConnection().prepareStatement(
+                "UPDATE Revision SET reverted = ? WHERE id = ?"
+        );
+        statement.setBoolean(1, true);
+        statement.setLong(2, revision.getId());
+        statement.executeUpdate();
     }
 }

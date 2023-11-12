@@ -13,6 +13,7 @@ public class Revision {
 
     // utility field
     private List<RevisionEdit> edits;
+    private User user;
 
     public Revision() {
         this.edits = new ArrayList<>();
@@ -24,6 +25,14 @@ public class Revision {
 
     public List<RevisionEdit> getEdits() {
         return edits;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public Long getId() {

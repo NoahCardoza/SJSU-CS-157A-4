@@ -13,15 +13,12 @@
         <div class="container mt-5">
             <h1 class="mb-2">${location.name}</h1>
             <div class="col">
-<%--                <img width="200" height="200" src="/locations?f=map&id=${location.id}">--%>
-                <div>
-                    <p>${location.description}</p>
-                </div>
+                <img width="200" height="200" src="/locations?f=map&id=${location.id}">
             </div>
             <div class="col">
                 <p>${location.description}</p>
             </div>
-            <a class="btn btn-warning" href="/revisions?f=list&type=Location&id=${location.id}">Edit</a>
+            <a class="btn btn-warning" href="/revisions?f=list&type=Location&id=${location.id}">Revisions</a>
             <a class="btn btn-secondary" href="/locations?f=edit&id=${location.id}">Edit</a>
             
             <div class="row">

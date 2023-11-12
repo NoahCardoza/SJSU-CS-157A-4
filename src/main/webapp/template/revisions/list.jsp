@@ -24,10 +24,9 @@
                     </thead>
                     <tbody>
                     <c:forEach var="revision" items="${revisions}">
-
                                 <tr>
                                     <td>${revision.createdAt}</td>
-                                    <td>${revision.userId}</td>
+                                    <td><a href="/users?f=get&id=${revision.user.id}">${revision.user.username}</a></td>
                                     <td>${revision.edits.size()}</td>
                                     <td>
                                         <a href="/revisions?f=get&id=${revision.id}" class="btn btn-primary">View</a>
@@ -36,8 +35,12 @@
                                             <button type="submit" name="action" value="up" class="btn btn-primary">Up Vote</button>
                                             <button type="submit" name="action" value="down" class="btn btn-primary">Down Vote</button>
                                         </form>
-                                        <c:if test="${user.administrator || user.moderator}">
-                                            <a href="/revisions?f=revert&id=${revision.id}" class="btn btn-danger">Revert</a>
+
+                                        <c:if test="${(user.administrator || user.moderator) && !revision.isReverted()}">
+                                            <form action="/revisions?f=revert" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="${revision.id}">
+                                                <button type="submit" name="method" value="revert" class="btn btn-warning">Revert</button>
+                                            </form>
                                         </c:if>
                                     </td>
                                 </tr>
