@@ -87,7 +87,7 @@ public class UserDao {
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getEmail());
 
             ResultSet rs = ps.executeQuery();
 
