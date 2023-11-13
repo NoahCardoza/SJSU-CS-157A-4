@@ -42,6 +42,11 @@
                 width: 400px;
             }
 
+            body.new-amenity #map {
+
+                cursor: cell!important;
+            }
+
         </style>
         <script src="/js/map.js"></script>
     </head>
@@ -58,6 +63,9 @@
 
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" ></div>
+        </div>
+        <div class="toolbar-container position-fixed bottom-0 end-0 start-0 text-center p-3" style="z-index: 1000;">
+            <button class="btn btn-primary" id="report-new-amenity">New</button>
         </div>
         <div class="search-container position-fixed start-0 p-3" style="top: 56px; bottom: 56px; z-index: 1000;">
             <div id="search-form-container" class="p-3 shadow-lg" style="background: white; width: 400px; border-radius: 10px; max-height: 100%; overflow-y: auto;">

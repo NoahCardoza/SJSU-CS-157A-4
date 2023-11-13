@@ -135,13 +135,21 @@ public class LocationsServlet extends HttpServlet {
         }
 
         // get the location ids
-        locations = locations.stream().filter((location) -> {
+//        locations = locations.stream().filter((location) -> {
+//            if (locationIds.containsKey(location.getId())) {
+//                location.setAmenities(locationIds.get(location.getId()));
+//                return true;
+//            }
+//            return false;
+//        }).collect(Collectors.toList());
+
+        for (Location location : locations) {
             if (locationIds.containsKey(location.getId())) {
                 location.setAmenities(locationIds.get(location.getId()));
-                return true;
+            } else {
+                location.setAmenities(new ArrayList<>());
             }
-            return false;
-        }).collect(Collectors.toList());
+        }
 
         Gson gson = new Gson();
         String json = gson.toJson(new LocationSearchAjaxResponse(

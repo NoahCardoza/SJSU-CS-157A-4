@@ -25,10 +25,9 @@
 
                 <div class="row mb-2">
                     <label for="location" class="form-label">Location</label>
-                    <select class="form-select" name="locationID" id="location">
-                        <option value="0">All</option>
+                    <select class="form-select" name="location_id" id="location" autocomplete="off" disabled>
                         <c:forEach var="location" items="${locations}">
-                            <option ${param.get('locationID') == amenityType.id ? 'selected' : ''} value="${location.id}"
+                            <option ${param.get('location_id') == location.id ? 'selected' : ''} value="${location.id}"
                             >${location.name}</option>
                         </c:forEach>
                     </select>

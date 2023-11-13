@@ -172,6 +172,7 @@ public class AmenitiesServlet extends HttpServlet {
                     if (v.isValid()) {
                         Amenity amenity = new Amenity();
                         amenity.setUserId(user.get().getId());
+                        amenity.setLocationId(form.getParentId());
                         amenity.setName(form.getName());
                         amenity.setDescription(form.getDescription());
                         amenity.setAmenityTypeId(form.getParentId());

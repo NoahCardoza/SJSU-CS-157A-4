@@ -9,6 +9,7 @@ public class AmenityForm {
 
     Long parentId = null;
     String parentName = "None";
+    Long locationId;
 
     String name = "";
     String description = "";
@@ -18,6 +19,7 @@ public class AmenityForm {
 
     public AmenityForm(HttpServletRequest request) {
         this.parentId = Util.parseLongOrNull(request.getParameter("parentId"));
+        this.locationId = Util.parseLongOrNull(request.getParameter("locationId"));
         this.parentName = request.getParameter("parentName");
         this.name = request.getParameter("name");
         this.description = request.getParameter("description");
@@ -48,6 +50,10 @@ public class AmenityForm {
 
         if (name.length() > 255) {
             v.addMessage("Name must be less than 255 characters.");
+        }
+
+        if (locationId == null) {
+            v.addMessage("Location is required.");
         }
 
         description = description == null ? "" : description.trim();
@@ -85,6 +91,14 @@ public class AmenityForm {
 
     public String getDescription() {
         return description;
+    }
+
+    public Long getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Long locationId) {
+        this.locationId = locationId;
     }
 
     public void setDescription(String description) {
