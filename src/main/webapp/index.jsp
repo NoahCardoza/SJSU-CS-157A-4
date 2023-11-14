@@ -29,6 +29,8 @@
                     Welcome, ${user.email}!
                 </p>
             </c:if>
+
+            <a href="/locations?f=map" class="btn btn-primary">View Map</a>
         </div>
     </body>
 </html>

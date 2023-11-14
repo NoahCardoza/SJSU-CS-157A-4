@@ -1,7 +1,3 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
-<%@ taglib uri="/WEB-INF/custom-functions.tld" prefix="cfn" %>
 <%@ taglib prefix="hg" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>

@@ -25,7 +25,7 @@
                     <a class="nav-link <%= path.startsWith("/login") ? "active" : "" %>" href="<%= isLoggedIn ? "logout.jsp" : "login" %>"><%= isLoggedIn ? "Logout" : "Login" %></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith("/locations") ? "active" : "" %>" href="/locations">Locations</a>
+                    <a class="nav-link <%= path.startsWith("/locations") ? "active" : "" %>" href="/locations?f=map">Map</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <%= path.startsWith("/search") ? "active" : "" %>" href="/search">Search</a>
