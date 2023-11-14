@@ -4,6 +4,7 @@ import com.example.demo.Database;
 import com.example.demo.beans.entities.User;
 import jakarta.servlet.http.HttpSession;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +47,7 @@ public class UserDao {
         user.setModerator(resultSet.getBoolean("moderator"));
         user.setPassword(resultSet.getString("password"));
         user.setCreatedAt(resultSet.getTimestamp("created_at"));
+        user.setVerified(resultSet.getBoolean("verified"));
 
 
 
@@ -64,11 +66,12 @@ public class UserDao {
     public Long create(User user) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password) VALUES (?, ?, ?, ?)");
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password, verified) VALUES (?, ?, ?, ?, ?)");
         statement.setString(1, user.getUsername());
         statement.setString(2, user.getEmail());
         statement.setString(3, user.getEmail());
         statement.setString(4, user.getPassword());
+        statement.setBoolean(5, user.isVerified() == null ? false : user.isVerified());
 
         statement.executeUpdate();
 
@@ -100,5 +103,19 @@ public class UserDao {
         }
 
         return false;
+    }
+
+    public void delete(User user) throws SQLException {
+        try (Connection con = Database.getConnection()) {
+            con.prepareStatement("DELETE FROM User WHERE id = ?" + user.getId()).executeUpdate();
+        }
+    }
+
+    public void verifyEmail(Long userId) throws SQLException {
+        try (Connection con = Database.getConnection()) {
+            PreparedStatement statement = con.prepareStatement("UPDATE User SET verified = 1 WHERE id = ?");
+            statement.setLong(1, userId);
+            statement.executeUpdate();
+        }
     }
 }

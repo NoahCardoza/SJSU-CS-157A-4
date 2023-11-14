@@ -12,6 +12,7 @@ public class User {
     private boolean banned;
     private String password;
     private Timestamp createdAt;
+    private Boolean verified;
 
     // Getters and Setters for each field
 
@@ -87,6 +88,14 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    public Boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(Boolean verified) {
+        this.verified = verified;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -99,6 +108,7 @@ public class User {
                 ", banned=" + banned +
                 ", password='" + password + '\'' +
                 ", createdAt='" + createdAt + '\'' +
+                ", verified=" + verified +
                 '}';
     }
 }

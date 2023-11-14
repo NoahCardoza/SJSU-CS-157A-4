@@ -10,23 +10,15 @@ import com.example.demo.daos.RevisionDao;
 import com.example.demo.daos.UserDao;
 import com.example.demo.servlets.search.SearchServlet;
 import com.google.gson.Gson;
-import com.lambdaworks.crypto.SCryptUtil;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletResponseWrapper;
-import org.json.JSONArray;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +27,7 @@ import java.util.stream.Collectors;
 //@MultipartConfig
 public class LocationsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
+        String baseUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "");
         try {
             doRequest(request, response);
         } catch (SQLException e) {
