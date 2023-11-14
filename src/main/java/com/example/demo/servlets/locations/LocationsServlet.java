@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 //@MultipartConfig
 public class LocationsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
-        String baseUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "");
         try {
             doRequest(request, response);
         } catch (SQLException e) {
