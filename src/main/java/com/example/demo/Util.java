@@ -139,4 +139,14 @@ public class Util {
 
         return baos.toString();
     }
+
+    public static Long parseLongOrDefault(String id, Long defaultValue) {
+        Long parsed = parseLongOrNull(id);
+
+        if (parsed == null) {
+            return defaultValue;
+        }
+
+        return parsed;
+    }
 }

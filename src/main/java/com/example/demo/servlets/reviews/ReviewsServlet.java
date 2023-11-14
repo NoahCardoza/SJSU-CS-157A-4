@@ -1,5 +1,6 @@
 package com.example.demo.servlets.reviews;
 
+import com.example.demo.Guard;
 import com.example.demo.Util;
 import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.*;
@@ -81,10 +82,14 @@ public class ReviewsServlet extends HttpServlet {
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        User user = (User) request.getAttribute( "user");
+        User user = Guard.requireAuthenticationWithMessage(
+                request,
+                response,
+                "You must be logged in to create a review."
+        );
 
         if (user == null) {
-            request.setAttribute("alert", new Alert("danger", "You must be logged in to create a review"));
+            return;
         }
 
         Long amenityId = Util.parseLongOrNull(request.getParameter("amenityId"));

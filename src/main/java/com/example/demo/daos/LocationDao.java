@@ -72,6 +72,7 @@ public class LocationDao {
                 results.add(fromResultSet(resultSet));
             }
         }
+
         return results;
     }
 

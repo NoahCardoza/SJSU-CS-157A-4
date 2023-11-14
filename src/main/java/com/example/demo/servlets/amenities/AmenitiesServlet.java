@@ -1,5 +1,6 @@
 package com.example.demo.servlets.amenities;
 
+import com.example.demo.Guard;
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.*;
@@ -110,9 +111,13 @@ public class AmenitiesServlet extends HttpServlet {
 
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create an amenity.");
+        if (user == null) {
+            return;
+        }
+
         switch (request.getMethod()) {
             case "GET":
-
                 List<Location> locations = LocationDao.getInstance().getAll();
 
                 request.setAttribute(
@@ -157,21 +162,11 @@ public class AmenitiesServlet extends HttpServlet {
                 String action = request.getParameter("action");
 
                 if (action != null && action.equals("submit")) {
-                    Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
-                    if (!user.isPresent()) {
-                        response.setStatus(401);
-                        request.setAttribute(
-                                "alert",
-                                new Alert("danger", "You must be logged in to create a location.")
-                        );
-                        response.sendRedirect(request.getContextPath() + "/login");
-                        return;
-                    }
                     Validation v = form.validate();
 
                     if (v.isValid()) {
                         Amenity amenity = new Amenity();
-                        amenity.setUserId(user.get().getId());
+                        amenity.setUserId(user.getId());
                         amenity.setLocationId(form.getParentId());
                         amenity.setName(form.getName());
                         amenity.setDescription(form.getDescription());
@@ -230,7 +225,7 @@ public class AmenitiesServlet extends HttpServlet {
                 Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
                 if (user.isEmpty()) {
                     response.setStatus(401);
-                    request.getSession(true).setAttribute(
+                    request.getSession().setAttribute(
                             "alert",
                             new Alert("danger", "You must be logged in to edit a location.")
                     );

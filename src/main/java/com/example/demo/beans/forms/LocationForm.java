@@ -61,11 +61,11 @@ public class LocationForm {
             v.addMessage("Name is required.");
         }
 
-        if (latitude < -180 || latitude > 180) {
+        if (longitude < -180 || longitude > 180) {
             v.addMessage("Longitude must be between -180 and 180.");
         }
 
-        if (longitude < -90 || longitude > 90) {
+        if (latitude < -90 || latitude > 90) {
             v.addMessage("Latitude must be between -90 and 90.");
         }
 

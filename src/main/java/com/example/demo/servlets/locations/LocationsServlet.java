@@ -25,6 +25,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -277,19 +278,10 @@ public class LocationsServlet extends HttpServlet {
                 amenities
         );
 
-//        String r = Util.captureTemplateOutput(request, response, "template/locations/get.jsp");
-//
-//        System.out.println(r);
-//
-//        response.getWriter().write(r);
-//        response.flushBuffer();
-
         request.getRequestDispatcher("template/locations/get.jsp").forward(request, response);
     }
     public void parentSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         LocationForm form = new LocationForm(request);
-
-        System.out.println(form);
 
         // if parent id is 0, it means that the user has selected "None"
         if (form.getParentId() != null && form.getParentId() == 0) {
@@ -324,12 +316,7 @@ public class LocationsServlet extends HttpServlet {
 
         List<Location> locations = LocationDao.getInstance().getParentLocationsOf(form.getParentId());
 
-        Long locationId = Util.parseLongOrNull(request.getParameter("id"));
-
-        if (locationId == null) {
-            response.sendRedirect(request.getContextPath() + "/locations");
-            return;
-        }
+        Long locationId = Util.parseLongOrDefault(request.getParameter("id"), 0L);
 
         // remove the current location from the list of locations
         locations = locations.stream().filter(
@@ -390,7 +377,7 @@ public class LocationsServlet extends HttpServlet {
                 Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
                 if (user.isEmpty()) {
                     response.setStatus(401);
-                    request.getSession(true).setAttribute(
+                    request.getSession().setAttribute(
                             "alert",
                             new Alert("danger", "You must be logged in to edit a location.")
                     );
@@ -421,7 +408,6 @@ public class LocationsServlet extends HttpServlet {
                 } else {
                     // TODO: implement form errors and a list of alerts
                     request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
-                    System.out.println(v.getMessages());
                 }
             }
         }
@@ -434,15 +420,9 @@ public class LocationsServlet extends HttpServlet {
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        User user = (User) request.getAttribute("user");
+
+        User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
         if (user == null) {
-            response.setStatus(401);
-            request.getSession().setAttribute(
-                    "alert",
-                    new Alert("danger", "You must be logged in to create a location.")
-            );
-            String redirect = URLEncoder.encode(request.getRequestURI() + "?" + request.getQueryString(), "UTF-8");
-            response.sendRedirect(request.getContextPath() + "/login?redirect=" + redirect);
             return;
         }
 
@@ -463,34 +443,37 @@ public class LocationsServlet extends HttpServlet {
                 break;
             case "POST":
                 String action = request.getParameter("action");
+                if (action != null) {
+                    if (action.equals("submit")) {
+                        Validation v = form.validate();
+                        if (v.isValid()) {
+                            Location location = new Location();
+                            location.setUserId(user.getId());
+                            location.setName(form.getName());
+                            location.setDescription(form.getDescription());
+                            location.setAddress(form.getAddress());
+                            location.setLatitude(form.getLatitude());
+                            location.setLongitude(form.getLongitude());
+                            location.setParentLocationId(form.getParentId());
 
-                if (action != null && action.equals("submit")) {
-                    Validation v = form.validate();
-
-                    if (v.isValid()) {
-                        Location location = new Location();
-                        location.setUserId(user.getId());
-                        location.setName(form.getName());
-                        location.setDescription(form.getDescription());
-                        location.setAddress(form.getAddress());
-                        location.setLatitude(form.getLatitude());
-                        location.setLongitude(form.getLongitude());
-                        location.setParentLocationId(form.getParentId());
-                        try {
-                            LocationDao.getInstance().create(location);
-                        } catch (SQLException e) {
-                            request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
-                            throw new RuntimeException(e);
+                            try {
+                                LocationDao.getInstance().create(location);
+                                response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + location.getId());
+                                return;
+                            } catch (SQLException e) {
+                                request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
+                                e.printStackTrace();
+                            }
+                            return;
+                        } else {
+                            // TODO: send all errors
+                            request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
                         }
-
-                        // TODO: redirect to location page
-
-                        response.sendRedirect(request.getContextPath() + "/locations");
-                        return;
                     } else {
-                        request.setAttribute("errors", v.getMessages());
+                        request.setAttribute("alert", new Alert("danger", "Invalid action"));
                     }
                 }
+
 
                 request.setAttribute("form", form);
 

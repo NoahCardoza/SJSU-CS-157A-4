@@ -1,5 +1,6 @@
 package com.example.demo.servlets.revisions;
 
+import com.example.demo.Guard;
 import com.example.demo.Util;
 import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.Revision;
@@ -78,14 +79,18 @@ public class RevisionsServlet extends HttpServlet {
             return;
         }
 
-        HttpSession session = request.getSession(true);
+        User user = Guard.requireAuthenticationWithMessage(
+                request,
+                response,
+                "You must be logged in to revert.",
+                false
+        );
 
-        User user = (User) request.getAttribute("user");
         if (user == null) {
-            session.setAttribute("alert", new Alert("danger", "You must be logged in to revert"));
-            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
+        HttpSession session = request.getSession();
 
         if (!(user.isAdministrator() || user.isModerator())) {
             session.setAttribute("alert", new Alert("danger", "You must be an administrator or moderator to revert"));
@@ -120,7 +125,17 @@ public class RevisionsServlet extends HttpServlet {
             return;
         }
 
-        HttpSession session = request.getSession(true);
+        User user = Guard.requireAuthenticationWithMessage(
+                request,
+                response,
+                "You must be logged in to vote."
+        );
+
+        if (user == null) {
+            return;
+        }
+
+        HttpSession session = request.getSession();
 
         Long revisionId = Util.parseLongOrNull(request.getParameter("id"));
 
@@ -135,14 +150,6 @@ public class RevisionsServlet extends HttpServlet {
         if (revision.isEmpty()) {
             session.setAttribute("alert", new Alert("danger", "Invalid revision id" ));
             response.sendRedirect(request.getContextPath() + "/");
-            return;
-        }
-
-        User user = (User) request.getAttribute("user");
-
-        if (user == null) {
-            session.setAttribute("alert", new Alert("danger", "You must be logged in to vote"));
-            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 

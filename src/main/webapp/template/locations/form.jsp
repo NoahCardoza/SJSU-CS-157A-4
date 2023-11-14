@@ -36,16 +36,7 @@
                         </div>
                         <button
                                 class="btn btn-primary float-end"
-                                onclick="(function(self) {
-                                    const form = document.getElementById('new-location-form');
-                                    <c:if test="${not empty param['id']}">
-                                        form.action = '/locations?f=parentSelect&id=${param['id']}';
-                                    </c:if>
-                                    <c:if test="${empty param['id']}">
-                                        form.action = '/locations?f=parentSelect';
-                                    </c:if>
-                                    form.submit();
-                                })(this)"
+                                onclick="$('#new-location-form').attr('action', '${param['id'] ? '/locations?f=parentSelect&id=' + param['id'] : '/locations?f=parentSelect'}').submit()"
                         >Select Parent</button>
                     </div>
                 </div>
