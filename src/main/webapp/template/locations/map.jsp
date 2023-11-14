@@ -60,12 +60,11 @@
                 <div class="p-3" id="amenities-container-inner"></div>
             </div>
         </div>
-
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" ></div>
         </div>
         <div class="toolbar-container position-fixed bottom-0 end-0 start-0 text-center p-3" style="z-index: 1000;">
-            <button class="btn btn-primary" id="report-new-amenity">New</button>
+            <button class="btn btn-primary" id="report-new-amenity">New Amenity</button>
         </div>
         <div class="search-container position-fixed start-0 p-3" style="top: 56px; bottom: 56px; z-index: 1000;">
             <div id="search-form-container" class="p-3 shadow-lg" style="background: white; width: 400px; border-radius: 10px; max-height: 100%; overflow-y: auto;">
@@ -73,5 +72,26 @@
             </div>
             <button class="btn btn-primary mt-3 w-100 shadow-lg" onclick="$('#search-form').submit()">Search</button>
         </div>
+        <div id="new-location-modal" class="modal" tabindex="-1">
+            <div class="modal modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Choose a location</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Choose a nearby location from the list or create a new location to report an amenity.
+                        </p>
+                        <label for="new-amenity-location-select" class="form-label">Location</label>
+                        <select class="form-select form-select-sm" name="location_id" id="new-amenity-location-select"></select>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="new-location-cancel" type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-target="#new-location-modal">Cancel</button>
+                        <button id="new-location-submit" type="button" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </body>
 </html>

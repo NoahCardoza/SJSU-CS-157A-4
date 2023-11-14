@@ -197,7 +197,6 @@ public class AmenityDao {
         for (int i = 0; i < params.size(); i++) {
             stmt.setString(i+1, params.get(i));
         }
-        System.out.println(stmt.toString());
         resultSet = stmt.executeQuery();
 
         while (resultSet.next()) {
@@ -251,8 +250,6 @@ public class AmenityDao {
                 ");");
         statement.setLong(1, locationId);
 
-        System.out.println(statement);
-
         resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
@@ -272,8 +269,6 @@ public class AmenityDao {
             amenity.setImage(reviewImage);
             amenityTypes.add(amenity);
         }
-
-        System.out.println(amenityTypes);
 
         return amenityTypes;
     }

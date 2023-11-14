@@ -18,22 +18,31 @@ public class LoginServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         LoginBean bean = new LoginBean(request.getParameter("email"), request.getParameter("password"));
 
-        Long userId = null;
         try {
-            userId = bean.validate();
+            Long userId = bean.validate();
 
-            if (userId != null) {
-                HttpSession session = request.getSession();
-                session.setAttribute("user_id", userId);
-                response.sendRedirect("index.jsp");
-            } else {
+            if (userId == null) {
                 request.setAttribute(
                     "alert",
                     new Alert("danger", "That email/password combination cannot be found in our records")
                 );
 
                 request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
+                return;
             }
+
+            HttpSession session = request.getSession();
+            session.setAttribute("user_id", userId);
+            if (request.getParameter("remember_me") != null) {
+                session.setMaxInactiveInterval(60 * 60 * 24 * 30);
+            }
+            String redirect = request.getParameter("redirect");
+            if (redirect != null) {
+                response.sendRedirect(request.getContextPath() + redirect);
+            } else {
+                response.sendRedirect(request.getContextPath());
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute(

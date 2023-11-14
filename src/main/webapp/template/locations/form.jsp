@@ -16,7 +16,7 @@
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
             <h1>${headerText}</h1>
-
+            <img src="/locations?f=mapImage&latitude=${form.latitude}&longitude=${form.longitude}">
             <form method="POST" class="mt-5" id="new-location-form">
                 <div class="row">
                     <%@include file="../../includes/alerts.jsp" %>
@@ -59,10 +59,10 @@
                 <textarea id="description" name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
                 <label for="address" class="form-label">Address</label>
                 <input type="text" id="address" name="address" value="${form.address}" class="form-control mb-3" placeholder="Address" />
-                <label for="longitude" class="form-label">Longitude</label>
-                <input type="text" id="longitude" name="longitude" value="${form.longitude}" class="form-control mb-3" placeholder="Longitude" />
-                <label for="latitude" class="form-label">Latitude</label>
-                <input type="text" id="latitude" name="latitude" value="${form.latitude}" class="form-control mb-3" placeholder="Latitude" />
+<%--                <label for="longitude" class="form-label">Longitude</label>--%>
+                <input type="hidden" id="longitude" name="longitude" value="${form.longitude}" class="form-control mb-3" placeholder="Longitude" />
+<%--                <label for="latitude" class="form-label">Latitude</label>--%>
+                <input type="hidden" id="latitude" name="latitude" value="${form.latitude}" class="form-control mb-3" placeholder="Latitude" />
                 <input type="hidden" name="redirect" value="${pathWithQueryString}">
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">${primaryButtonText}</button>
             </form>

@@ -1,9 +1,6 @@
 package com.example.demo.servlets.locations;
 
-import com.example.demo.CopyPrintWriter;
-import com.example.demo.Database;
-import com.example.demo.Util;
-import com.example.demo.Validation;
+import com.example.demo.*;
 import com.example.demo.beans.*;
 import com.example.demo.beans.entities.*;
 import com.example.demo.beans.forms.LocationForm;
@@ -27,13 +24,14 @@ import org.json.JSONArray;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "Locations", value = "/locations")
-@MultipartConfig
+//@MultipartConfig
 public class LocationsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         try {
@@ -64,6 +62,7 @@ public class LocationsServlet extends HttpServlet {
             switch (function) {
                 case "get":
                     get(request, response);
+                    break;
                 case "create":
                     create(request, response);
                     break;
@@ -102,64 +101,67 @@ public class LocationsServlet extends HttpServlet {
             return;
         }
 
+        String method = request.getParameter("m");
+
+        if (method == null) {
+            response.setStatus(400);
+            response.getWriter().write("Method is required");
+            return;
+        }
+
         Double longitude = Util.parseDoubleOrNull(request.getParameter("longitude"));
         Double latitude = Util.parseDoubleOrNull(request.getParameter("latitude"));
-        Integer radius = Util.parseIntOrDefault(request.getParameter("radius"), 1000);
+        Integer radius = Util.parseIntOrNull(request.getParameter("radius"));
 
-        if (longitude == null || latitude == null) {
+        if (longitude == null || latitude == null || radius == null) {
             response.setStatus(400);
             return;
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final PrintStream ps = new PrintStream(baos);
-        final PrintWriter writer = new PrintWriter(ps);
-        List<Location> locations = LocationDao.getInstance().search(longitude, latitude, radius);
-        HttpServletResponseWrapper wrapper = new HttpServletResponseWrapper((HttpServletResponse) response) {
-            @Override public PrintWriter getWriter() {
-                return writer;
-            }
-        };
-        SearchServlet.setSearchAttributes(request, locations);
-        request.getRequestDispatcher("/template/locations/ajaxForm.jsp").forward(request, wrapper);
-
-        List<Amenity> amenities = (List<Amenity>) request.getAttribute("amenities");
-
-        // group amenities by location id
-        HashMap<Long, List<Amenity>> locationIds = new HashMap<>();
-        for (Amenity amenity : amenities) {
-            if (!locationIds.containsKey(amenity.getLocationId())) {
-                locationIds.put(amenity.getLocationId(), new ArrayList<>());
-            }
-            locationIds.get(amenity.getLocationId()).add(amenity);
-        }
-
-        // get the location ids
-//        locations = locations.stream().filter((location) -> {
-//            if (locationIds.containsKey(location.getId())) {
-//                location.setAmenities(locationIds.get(location.getId()));
-//                return true;
-//            }
-//            return false;
-//        }).collect(Collectors.toList());
-
-        for (Location location : locations) {
-            if (locationIds.containsKey(location.getId())) {
-                location.setAmenities(locationIds.get(location.getId()));
-            } else {
-                location.setAmenities(new ArrayList<>());
-            }
-        }
-
+        List<Location> locations;
         Gson gson = new Gson();
-        String json = gson.toJson(new LocationSearchAjaxResponse(
-                baos.toString(),
-                locations
-//                amenities
-        ));
 
-        response.getWriter().write(json);
-        response.setStatus(200);
+        switch (method) {
+            case "locationsWithinDistance":
+                locations = LocationDao.getInstance().search(longitude, latitude, radius);
+                response.getWriter().write(gson.toJson(locations));
+                response.setStatus(200);
+                break;
+            case "search":
+                locations = LocationDao.getInstance().search(longitude, latitude, radius);
+                SearchServlet.setSearchAttributes(request, locations);
+
+                String formHtml = Util.captureTemplateOutput(request, response, "/template/locations/ajaxForm.jsp");
+
+                List<Amenity> amenities = (List<Amenity>) request.getAttribute("amenities");
+
+                // group amenities by location id
+                HashMap<Long, List<Amenity>> locationIds = new HashMap<>();
+                for (Amenity amenity : amenities) {
+                    if (!locationIds.containsKey(amenity.getLocationId())) {
+                        locationIds.put(amenity.getLocationId(), new ArrayList<>());
+                    }
+                    locationIds.get(amenity.getLocationId()).add(amenity);
+                }
+
+                for (Location location : locations) {
+                    if (locationIds.containsKey(location.getId())) {
+                        location.setAmenities(locationIds.get(location.getId()));
+                    } else {
+                        location.setAmenities(new ArrayList<>());
+                    }
+                }
+                response.getWriter().write(gson.toJson(new LocationSearchAjaxResponse(
+                        formHtml,
+                        locations
+                )));
+                response.setStatus(200);
+                break;
+            default:
+                response.setStatus(400);
+                response.getWriter().write("Invalid method");
+                break;
+        }
     }
 
 
@@ -167,31 +169,51 @@ public class LocationsServlet extends HttpServlet {
     protected void mapImage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             Long locationId = Util.parseLongOrNull(request.getParameter("id"));
-            if (locationId == null) {
+            Double latitude = Util.parseDoubleOrNull(request.getParameter("latitude"));
+            Double longitude = Util.parseDoubleOrNull(request.getParameter("longitude"));
+            User user = (User) request.getAttribute("user");
+
+            // only allow users to get the map image of locations
+            // or, make sure they are logged in to use custom coordinates
+            // this is to prevent abuse of the API key
+            // TODO: sign jwt to prevent abuse
+            if (user == null) {
+                if (locationId == null) {
+                    response.setStatus(400);
+                    response.getWriter().write("Location ID is required");
+                    return;
+                }
+            }
+
+            if (locationId != null) {
+                Location location = LocationDao.getInstance().get(locationId).orElse(null);
+
+                if (location == null) {
+                    response.setStatus(404);
+                    response.getWriter().write("Location not found");
+                    return;
+                }
+
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            }
+
+            if (latitude == null || longitude == null) {
                 response.setStatus(400);
-                response.getWriter().write("Location ID is required");
+                response.getWriter().write("Latitude and longitude are required");
                 return;
             }
-
-            Location location = LocationDao.getInstance().get(locationId).orElse(null);
-
-            if (location == null) {
-                response.setStatus(404);
-                response.getWriter().write("Location not found");
-                return;
-            }
-
 
             Integer width = Util.parseIntOrDefault(request.getParameter("width"), 200);
             Integer height = Util.parseIntOrDefault(request.getParameter("height"), 200);
 
-            String apiKey = System.getProperty("GEOAPIFY_API_KEY");
+            String apiKey = Env.get("GEOAPIFY_API_KEY");
 
             URL url = new URL("https://maps.geoapify.com/v1/staticmap?style=osm-carto&" +
                     "width=" + width +
                     "&height=" + height +
-                    "&center=lonlat:" + location.getLongitude() + "," + location.getLatitude() +
-                    "&marker=lonlat:" + location.getLongitude() + "," + location.getLatitude() + ";" +
+                    "&center=lonlat:" + longitude + "," + latitude +
+                    "&marker=lonlat:" + longitude + "," + latitude + ";" +
                     "color:%23ff0000;size:medium&zoom=14&" +
                     "apiKey=" + apiKey
             );
@@ -205,6 +227,11 @@ public class LocationsServlet extends HttpServlet {
             response.setContentType("image/jpeg");
 
             inputStream.transferTo(response.getOutputStream());
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+
+            response.setStatus(200);
+            response.flushBuffer();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -244,11 +271,18 @@ public class LocationsServlet extends HttpServlet {
         );
 
         List<AmenityWithImage> amenities = AmenityDao.getInstance().getFromLocationId(locationId);
-
+        amenities = amenities.subList(0, Math.min(amenities.size(), 10));
         request.setAttribute(
                 "amenities",
                 amenities
         );
+
+//        String r = Util.captureTemplateOutput(request, response, "template/locations/get.jsp");
+//
+//        System.out.println(r);
+//
+//        response.getWriter().write(r);
+//        response.flushBuffer();
 
         request.getRequestDispatcher("template/locations/get.jsp").forward(request, response);
     }
@@ -400,8 +434,22 @@ public class LocationsServlet extends HttpServlet {
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        User user = (User) request.getAttribute("user");
+        if (user == null) {
+            response.setStatus(401);
+            request.getSession().setAttribute(
+                    "alert",
+                    new Alert("danger", "You must be logged in to create a location.")
+            );
+            String redirect = URLEncoder.encode(request.getRequestURI() + "?" + request.getQueryString(), "UTF-8");
+            response.sendRedirect(request.getContextPath() + "/login?redirect=" + redirect);
+            return;
+        }
+
         request.setAttribute("headerText", "Create Location");
         request.setAttribute("primaryButtonText", "Create");
+
+        LocationForm form = new LocationForm(request);
 
         switch (request.getMethod()) {
             case "GET":
@@ -409,30 +457,19 @@ public class LocationsServlet extends HttpServlet {
 
                 request.setAttribute("hasParent", false);
                 request.setAttribute("locations", locations);
+                request.setAttribute("form", form);
 
                 request.getRequestDispatcher("/template/locations/form.jsp").forward(request, response);
                 break;
             case "POST":
-                LocationForm form = new LocationForm(request);
-
                 String action = request.getParameter("action");
 
                 if (action != null && action.equals("submit")) {
-                    Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
-                    if (!user.isPresent()) {
-                        response.setStatus(401);
-                        request.setAttribute(
-                                "alert",
-                                new Alert("danger", "You must be logged in to create a location.")
-                        );
-                        response.sendRedirect(request.getContextPath() + "/login");
-                        return;
-                    }
                     Validation v = form.validate();
 
                     if (v.isValid()) {
                         Location location = new Location();
-                        location.setUserId(user.get().getId());
+                        location.setUserId(user.getId());
                         location.setName(form.getName());
                         location.setDescription(form.getDescription());
                         location.setAddress(form.getAddress());

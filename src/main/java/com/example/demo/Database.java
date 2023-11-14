@@ -15,6 +15,8 @@ public class Database {
             DataSource datasource = (DataSource) ctx.lookup("jdbc/hidden_gems");
             if (connection == null) {
                 connection = datasource.getConnection();
+            } else if (connection.isClosed()) {
+                connection = datasource.getConnection();
             }
             return connection;
         } catch (NamingException e) {

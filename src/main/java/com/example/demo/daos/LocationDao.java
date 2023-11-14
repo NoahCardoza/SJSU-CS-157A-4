@@ -39,40 +39,39 @@ public class LocationDao {
     }
 
     public Optional<Location> get(long id) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
+            try (PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location WHERE id = ?")) {
+                statement.setDouble(1, id);
 
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location WHERE id = ?");
-        statement.setDouble(1, id);
+                ResultSet resultSet = statement.executeQuery();
 
-        ResultSet resultSet = statement.executeQuery();
-
-        if (resultSet.next()) {
-            return Optional.of(fromResultSet(resultSet));
+                if (resultSet.next()) {
+                    return Optional.of(fromResultSet(resultSet));
+                }
+            }
         }
-
         return Optional.empty();
     }
 
     public List<Location> getParentLocationsOf(Long id) throws SQLException {
-        Connection conn = Database.getConnection();
-
         List<Location> results = new ArrayList<>();
 
-        PreparedStatement statement;
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement;
 
-        if (id == null) {
-            statement = conn.prepareStatement("SELECT * FROM Location WHERE parent_location_id IS NULL");
-        } else {
-            statement = conn.prepareStatement("SELECT * FROM Location WHERE parent_location_id = ?");
-            statement.setLong(1, id);
+            if (id == null) {
+                statement = conn.prepareStatement("SELECT * FROM Location WHERE parent_location_id IS NULL");
+            } else {
+                statement = conn.prepareStatement("SELECT * FROM Location WHERE parent_location_id = ?");
+                statement.setLong(1, id);
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                results.add(fromResultSet(resultSet));
+            }
         }
-
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            results.add(fromResultSet(resultSet));
-        }
-
         return results;
     }
 
@@ -97,28 +96,26 @@ public class LocationDao {
     }
 
     public Long create(Location location) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            statement.setLong(1, location.getUserId());
+            if (location.getParentLocationId() == null) {
+                statement.setNull(2, Types.INTEGER);
+            } else {
+                statement.setDouble(2, location.getParentLocationId());
+            }
+            statement.setDouble(3, location.getLongitude());
+            statement.setDouble(4, location.getLatitude());
+            statement.setString(5, location.getName());
+            statement.setString(6, location.getAddress());
+            statement.setString(7, location.getDescription());
 
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        statement.setLong(1, location.getUserId());
-        if (location.getParentLocationId() == null) {
-            statement.setNull(2, Types.INTEGER);
-        } else {
-            statement.setDouble(2, location.getParentLocationId());
+            statement.executeUpdate();
+
+            location.setId(Database.getLastInsertedId("Location"));
+
+            return location.getId();
         }
-        statement.setDouble(3, location.getLongitude());
-        statement.setDouble(4, location.getLatitude());
-        statement.setString(5, location.getName());
-        statement.setString(6, location.getAddress());
-        statement.setString(7, location.getDescription());
-
-        statement.executeUpdate();
-
-        location.setId(Database.getLastInsertedId("Location"));
-
-        return location.getId();
-
-        // todo: get the id of the newly created location
     }
 
 
