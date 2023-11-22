@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hidden Gems</title>
+        <title>Little Hidden Gems</title>
         <%@include file="includes/head.jsp" %>
     </head>
     <body>
