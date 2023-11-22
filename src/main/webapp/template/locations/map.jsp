@@ -48,7 +48,7 @@
             }
 
         </style>
-        <script src="/js/map.js"></script>
+        <script src="<c:url value="/js/map.js"/>"></script>
     </head>
     <body>
         <div class="d-flex flex-row" style="width: 100vw">

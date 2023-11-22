@@ -1,10 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="com.example.demo.Database" %>
+
 <!DOCTYPE html>
 <html>
     <head>
-        <title>JSP - Hello World</title>
+        <title>Hidden Gems</title>
         <%@include file="includes/head.jsp" %>
     </head>
     <body>
@@ -30,7 +29,7 @@
                 </p>
             </c:if>
 
-            <a href="/locations?f=map" class="btn btn-primary">View Map</a>
+            <a href="<c:url value="/locations?f=map" />" class="btn btn-primary">View Map</a>
         </div>
     </body>
 </html>

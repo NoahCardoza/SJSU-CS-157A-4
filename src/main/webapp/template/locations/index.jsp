@@ -24,7 +24,7 @@
                 </tr>
                 <c:forEach var="location" items="${locations}">
                     <tr>
-                        <td scope="row"><a href="/locations?f=get&id=${location.id}">${location.id}</a></td>
+                        <td scope="row"><a href="<c:url value="/locations?f=get&id=${location.id}"/>">${location.id}</a></td>
                         <td>${location.name}</td>
                         <td>${location.address}</td>
                         <td>${location.description}</td>
@@ -33,7 +33,7 @@
                     </tr>
                 </c:forEach>
             </table>
-            <a class="btn btn-primary float-end" href="/locations?f=create">New</a>
+            <a class="btn btn-primary float-end" href="<c:url value="/locations?f=create"/>">New</a>
         </div>
     </body>
 </html>

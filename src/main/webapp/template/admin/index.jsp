@@ -16,7 +16,7 @@
                 <div class="col d-flex justify-content-between">
                     <h2 >Amenity Types</h2>
                     <div>
-                        <a href="/admin?f=amenityTypeNew" class="btn btn-primary ">New</a>
+                        <a href="<c:url value="/admin?f=amenityTypeNew"/>" class="btn btn-primary ">New</a>
                     </div>
                 </div>
                 <div class="row">
@@ -36,8 +36,8 @@
                                     <td>${amenityType.icon}</td>
                                     <td>${amenityType.description}</td>
                                     <td>
-                                        <a href="/admin?f=amenityTypeEdit&id=${amenityType.id}" class="btn btn-primary">Edit</a>
-                                        <form action="/admin?f=amenityTypeDelete" method="post" class="d-inline">
+                                        <a href="<c:url value="/admin?f=amenityTypeEdit&id=${amenityType.id}"/>" class="btn btn-primary">Edit</a>
+                                        <form action="<c:url value="/admin?f=amenityTypeDelete"/>" method="post" class="d-inline">
                                             <input type="hidden" name="id" value="${amenityType.id}">
                                             <button type="submit" class="btn btn-danger">Delete</button>
                                         </form>

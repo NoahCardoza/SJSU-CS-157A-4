@@ -16,7 +16,7 @@
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
             <h1>${headerText}</h1>
-            <img src="/locations?f=mapImage&latitude=${form.latitude}&longitude=${form.longitude}">
+            <img src="<c:url value="/locations?f=mapImage&latitude=${form.latitude}&longitude=${form.longitude}"/>">
             <form method="POST" class="mt-5" id="new-location-form">
                 <div class="row">
                     <%@include file="../../includes/alerts.jsp" %>

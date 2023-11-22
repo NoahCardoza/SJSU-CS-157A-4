@@ -25,22 +25,22 @@
                     <a class="nav-link <%= path.startsWith("/login") ? "active" : "" %>" href="<%= isLoggedIn ? "logout.jsp" : "login" %>"><%= isLoggedIn ? "Logout" : "Login" %></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith("/locations") ? "active" : "" %>" href="/locations?f=map">Map</a>
+                    <a class="nav-link <%= path.startsWith("/locations") ? "active" : "" %>" href="<c:url value="/locations?f=map"/>">Map</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith("/search") ? "active" : "" %>" href="/search">Search</a>
+                    <a class="nav-link <%= path.startsWith("/search") ? "active" : "" %>" href="<c:url value="/search"/>">Search</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith("/reviews") ? "active" : "" %>" href="/reviews">Reviews</a>
+                    <a class="nav-link <%= path.startsWith("/reviews") ? "active" : "" %>" href="<c:url value="/reviews"/>">Reviews</a>
                 </li>
                 <c:if test="${user.administrator}">
                     <li class="nav-item">
-                        <a class="nav-link <%= path.startsWith("/admin") ? "active" : "" %>" href="/admin">Admin</a>
+                        <a class="nav-link <%= path.startsWith("/admin") ? "active" : "" %>" href="<c:url value="/admin"/>">Admin</a>
                     </li>
                 </c:if>
                 <c:if test="${user.administrator || user.moderator}">
                     <li class="nav-item">
-                        <a class="nav-link <%= path.startsWith("/moderator") ? "active" : "" %>" href="/moderation">Moderation</a>
+                        <a class="nav-link <%= path.startsWith("/moderator") ? "active" : "" %>" href="<c:url value="/moderation"/>">Moderation</a>
                     </li>
                 </c:if>
                 <c:if test="${!isLoggedIn}">

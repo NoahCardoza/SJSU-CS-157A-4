@@ -21,7 +21,7 @@
             <h1 class="mb-2">Search</h1>
             <div class="row">
                 <div class="col col-4 mb-2">
-                <a href="/amenities?f=create" class="btn btn-secondary">Create Amenity</a>
+                <a href="<c:url value="/amenities?f=create"/>" class="btn btn-secondary">Create Amenity</a>
                 <hg:form
                         autoSubmit="${true}"
                         amenityTypes="${amenityTypes}"
@@ -66,9 +66,9 @@
                             <div class="card-body">
                                 <h5 class="card-title">${amenity.name}</h5>
                                 <p class="card-text">${amenity.description}</p>
-                                <a type="select" href="/amenities?f=get&id=${amenity.id}" class="btn btn-primary">Select</a>
-                                <a type="edit" href="/amenities?f=edit&id=${amenity.id}" class="btn btn-secondary">Edit</a>
-                                <a type="delete" href="/amenities?f=delete&id=${amenity.id}" class="btn btn-danger">Delete</a>
+                                <a type="select" href="<c:url value="/amenities?f=get&id=${amenity.id}"/>" class="btn btn-primary">Select</a>
+                                <a type="edit" href="<c:url value="/amenities?f=edit&id=${amenity.id}"/>" class="btn btn-secondary">Edit</a>
+                                <a type="delete" href="<c:url value="/amenities?f=delete&id=${amenity.id}"/>" class="btn btn-danger">Delete</a>
                             </div>
                         </div>
                     </div>

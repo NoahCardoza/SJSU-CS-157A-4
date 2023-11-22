@@ -54,7 +54,7 @@
                     </tbody>
                 </table>
                 <c:if test="${(user.administrator || user.moderator) && !revision.isReverted()}">
-                    <form action="/revisions?f=revert" method="post">
+                    <form action="<c:url value="/revisions?f=revert"/>" method="post">
                         <input type="hidden" name="id" value="${revision.id}">
                         <button type="submit" name="method" value="revert" class="btn btn-warning">Revert</button>
                     </form>
