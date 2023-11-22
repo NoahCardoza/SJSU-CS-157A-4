@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Locations</title>
+    <title>LHG | Location | ${location.name}</title>
     <%@include file="../../includes/head.jsp" %>
 </head>
 <body>

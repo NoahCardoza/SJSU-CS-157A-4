@@ -406,7 +406,9 @@ public class LocationsServlet extends HttpServlet {
 
         request.setAttribute("form", form);
         request.setAttribute("primaryButtonText", "Update");
+        request.setAttribute("titleText", "Update");
         request.setAttribute("headerText", "Update Location");
+
 
         request.getRequestDispatcher("/template/locations/form.jsp").forward(request, response);
     }
@@ -420,6 +422,7 @@ public class LocationsServlet extends HttpServlet {
 
         request.setAttribute("headerText", "Create Location");
         request.setAttribute("primaryButtonText", "Create");
+        request.setAttribute("titleText", "Create");
 
         LocationForm form = new LocationForm(request);
 

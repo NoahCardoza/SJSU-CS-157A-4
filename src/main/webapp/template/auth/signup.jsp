@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Signup</title>
+        <title>LHG | Signup</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

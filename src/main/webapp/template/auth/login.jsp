@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Login Page</title>
+        <title>LHG | Login</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

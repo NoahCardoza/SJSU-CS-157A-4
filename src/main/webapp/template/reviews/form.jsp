@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Reviews</title>
+        <title>LHG | Review | Create</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

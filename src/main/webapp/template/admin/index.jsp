@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Admin</title>
+        <title>LHG | Admin</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

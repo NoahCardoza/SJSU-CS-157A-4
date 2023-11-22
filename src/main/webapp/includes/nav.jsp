@@ -30,9 +30,6 @@
                 <li class="nav-item">
                     <a class="nav-link <%= path.startsWith("/search") ? "active" : "" %>" href="<c:url value="/search"/>">Search</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith("/reviews") ? "active" : "" %>" href="<c:url value="/reviews"/>">Reviews</a>
-                </li>
                 <c:if test="${user.administrator}">
                     <li class="nav-item">
                         <a class="nav-link <%= path.startsWith("/admin") ? "active" : "" %>" href="<c:url value="/admin"/>">Admin</a>

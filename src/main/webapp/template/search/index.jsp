@@ -11,7 +11,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Locations</title>
+        <title>LHG | Search</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

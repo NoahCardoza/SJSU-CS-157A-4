@@ -1,4 +1,5 @@
 <%--@elvariable id="headerText" type="java.lang.String"--%>
+<%--@elvariable id="titleText" type="java.lang.String"--%>
 <%--@elvariable id="pathWithQueryString" type="java.lang.String"--%>
 <%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
 <%--@elvariable id="form" type="List<com.example.demo.beans.forms.LocationForm>"--%>
@@ -9,7 +10,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Locations</title>
+        <title>LHG | Location | ${titleText}</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

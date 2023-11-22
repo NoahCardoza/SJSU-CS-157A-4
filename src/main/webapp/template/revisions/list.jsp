@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Locations</title>
+        <title>LHG | Revisions | ${param['type']} | ${param['id']} </title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

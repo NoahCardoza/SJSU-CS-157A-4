@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Amenities</title>
+        <title>LHG | Amenity | ${amenity.name}</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

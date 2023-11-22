@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Amenity</title>
+        <title>LHG | Amenity | Create</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
