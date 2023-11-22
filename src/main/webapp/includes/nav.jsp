@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%--@elvariable id="user" type="com.example.demo.beans.entities.User"--%>
+
 <%
     Boolean isLoggedIn = session.getAttribute("user_id") != null;
     request.setAttribute("isLoggedIn", isLoggedIn);
@@ -17,12 +18,10 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 w-100">
+
                 <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith("/index.jsp") ? "active" : "" %>" aria-current="page" href="index.jsp">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith("/login") ? "active" : "" %>" href="<%= isLoggedIn ? "logout.jsp" : "login" %>"><%= isLoggedIn ? "Logout" : "Login" %></a>
+                    <a class="nav-link <%= path.startsWith(request.getContextPath() + "/") ? "active" : "" %>" aria-current="page" href="<c:url value="/" />">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <%= path.startsWith("/locations") ? "active" : "" %>" href="<c:url value="/locations?f=map"/>">Map</a>
@@ -44,8 +43,18 @@
                     </li>
                 </c:if>
                 <c:if test="${!isLoggedIn}">
+                    <li class="nav-item ms-lg-auto">
+                        <a class="nav-link <%= path.startsWith("/login") ? "active" : "" %>" href="<c:url value="/login" />">Login</a>
+                    </li>
+                </c:if>
+                <c:if test="${!isLoggedIn}">
                     <li class="nav-item">
                         <a class="nav-link <%= path.equals("/signup") ? "active" : "" %>" href="signup">Signup</a>
+                    </li>
+                </c:if>
+                <c:if test="${isLoggedIn}">
+                    <li class="nav-item ms-lg-auto">
+                        <a class="nav-link" href="<c:url value="/login?f=logout" />">Logout</a>
                     </li>
                 </c:if>
             </ul>

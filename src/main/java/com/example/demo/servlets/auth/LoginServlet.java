@@ -82,6 +82,14 @@ public class LoginServlet extends HttpServlet {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String f = request.getParameter("f");
+
+        if (f != null && f.equals("logout")) {
+            request.getSession().invalidate();
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
         request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
     }
 }
