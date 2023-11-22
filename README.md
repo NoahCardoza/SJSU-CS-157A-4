@@ -6,7 +6,7 @@ Group 4's Project for SJSU's Into to Database Management Systems
 ### Requirements
 - MySQL Server 8.0.35 or higher
 - IntelliJ IDEA Ultimate 2023.2.4
-- Java 18 (OpenJDK)
+- Java 16 (OpenJDK)
 - Maven
 - Tomcat 10.1.13
 
@@ -61,7 +61,7 @@ Group 4's Project for SJSU's Into to Database Management Systems
 12. Run the new configuration by clicking the green play button in the top right corner of the screen.
 
 ### Deployment
-1. Remember set the JAVA_HOME environment variable to the path of your Java 18 installation.
+1. Remember set the JAVA_HOME environment variable to the path of your Java 16 installation.
 2. Build the project by running `mvn clean package` in the project directory.
    1. If you don't have Maven installed, you can download it from [here](https://maven.apache.org/download.cgi).
 3. Deploy the `target/ROOT-*.war` file to your Tomcat server as `ROOT.war`.
@@ -79,4 +79,4 @@ Group 4's Project for SJSU's Into to Database Management Systems
    -DJWT_SECRET=
    ``` 
 5. (Re)start the Tomcat server to use the new system properties and Java version.
-   1. Remember set the JAVA_HOME environment variable to the path of your Java 18 installation.
+   1. Remember set the JAVA_HOME environment variable to the path of your Java 16 installation.
