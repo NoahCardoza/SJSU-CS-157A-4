@@ -60,5 +60,4 @@ public class AmenityTypeMetricDao {
         return amenityTypes;
     }
 
-
 }

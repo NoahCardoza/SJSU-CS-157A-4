@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 @WebServlet(name = "Search", value = "/search")
@@ -36,6 +37,7 @@ public class SearchServlet extends HttpServlet {
     }
 
     static public void setSearchAttributes(HttpServletRequest request, List<Location> locations) throws SQLException {
+
         List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
 
         request.setAttribute(
@@ -55,7 +57,6 @@ public class SearchServlet extends HttpServlet {
                     amenityTypeAttributeGrouper
             );
         }
-
 
         List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityFilter, locations);
 

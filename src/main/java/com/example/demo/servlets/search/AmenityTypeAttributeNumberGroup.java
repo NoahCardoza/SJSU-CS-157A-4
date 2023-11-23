@@ -6,10 +6,7 @@ import com.example.demo.daos.AmenityTypeAttributeDao;
 import jakarta.servlet.ServletRequest;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 
 import static com.example.demo.daos.AmenityTypeAttributeDao.TYPE_NUMBER_ID_PREFIX;
 
@@ -18,6 +15,7 @@ public class AmenityTypeAttributeNumberGroup {
     List<AmenityTypeAttribute> attributes;
 
     public AmenityTypeAttributeNumberGroup(ServletRequest request) {
+
         this.request = request;
         this.attributes = new ArrayList<>();
     }

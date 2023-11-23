@@ -15,6 +15,7 @@ import com.example.demo.daos.AmenityDao;
 
 import com.example.demo.servlets.search.AmenityFilter;
 import com.example.demo.servlets.search.AmenityTypeAttributeGrouper;
+import com.example.demo.beans.entities.AmenityWithImage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Enumeration;
 
 @WebServlet(name = "Amenities", value = "/amenities")
 
@@ -73,14 +75,24 @@ public class AmenitiesServlet extends HttpServlet {
     }
 
     public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        // request: f: get, id: 1
+
+        // this is the id of the amenity
         Long amenityId = Util.parseLongOrNull(request.getParameter("id"));
 
+        System.out.println(amenityId);
+
+        // checking if the id is valid
         if (amenityId == null) {
             response.sendRedirect(request.getContextPath() + "/amenities");
             return;
         }
 
         Optional<Amenity> amenity = AmenityDao.getInstance().get(amenityId);
+        Amenity object = amenity.get();
+
+        System.out.println(amenity);
 
         if (amenity.isPresent()) {
             request.setAttribute(
@@ -93,20 +105,39 @@ public class AmenitiesServlet extends HttpServlet {
             return;
         }
 
-        AmenityFilter amenityFilter = new AmenityFilter(request);
+        System.out.println(amenity);
+        System.out.println(object);
 
-        if (amenityFilter.getAmenityTypeId() != null) {
-            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenityFilter.getAmenityTypeId());
+        if (object.getAmenityTypeId() != null) {
+            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(object.getAmenityTypeId());
 
-            var amenityTypeAttributeGrouper = new AmenityTypeAttributeGrouper(request, amenityTypeAttributes);
+            var amenitiesTypeAttributeGrouper = new AmenitiesTypeAttributeGrouper(object, amenityTypeAttributes);
+
+            System.out.println("amenityGrouper: " + amenitiesTypeAttributeGrouper);
 
             request.setAttribute(
                     "amenityTypeAttributes",
-                    amenityTypeAttributeGrouper
+                    amenitiesTypeAttributeGrouper
+            );
+
+            List<AmenityTypeMetric> amenityTypeMetrics = AmenityTypeMetricDao.getInstance().getAllByAmenityType(object.getAmenityTypeId());
+
+            request.setAttribute(
+                    "amenityTypeMetrics",
+                    amenityTypeMetrics
             );
         }
 
+        List<Review> reviews = ReviewDao.getInstance().getAllReviews(object.getId());
+        request.setAttribute(
+                "reviews",
+                reviews
+        );
+
+        System.out.println("done");
+
         request.getRequestDispatcher("template/amenity/view-amenity.jsp").forward(request, response);
+
     }
 
 
@@ -145,13 +176,6 @@ public class AmenitiesServlet extends HttpServlet {
                             amenityTypeAttributeGrouper
                     );
                 }
-
-                List<AmenityWithImage> amenities = AmenityDao.getInstance().getWithFilter(amenityFilter, null);
-
-                request.setAttribute(
-                        "amenities",
-                        amenities
-                );
 
                 request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
                 break;
@@ -263,16 +287,6 @@ public class AmenitiesServlet extends HttpServlet {
     public void delete(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
         // TODO: Needs to check if user is admin for deletion
-        /*Optional<User> user = UserDao.getInstance().isAdmin();
-        if (!user.isPresent()) {
-            response.setStatus(401);
-            request.setAttribute(
-                    "alert",
-                    new Alert("danger", "You must be an admin to delete an amenity.")
-            );
-            response.sendRedirect(request.getContextPath() + "/search");
-            return;
-        }*/
 
         Long amenityId = Util.parseLongOrNull(request.getParameter("id"));
 

@@ -14,9 +14,12 @@
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
             <h1 class="mb-2">${amenity.name}</h1>
+            </br>
             <a class="btn btn-secondary" href="<c:url value="/amenities?f=edit&id=${location.id}"/>">Edit</a>
             <a class="btn btn-warning" href="<c:url value="/revisions?f=list&type=Location&id=${location.id}"/>">Revision</a>
             <a class = "btn btn-secondary" href="<c:url value="/reviews?f=create&amenityId=${amenity.id}"/>">Create Review</a>
+             </br>
+             </br>
              <div class="col">
                 <div>
                 <p>${amenityTypeAttributes.textAttributes}</p>
@@ -27,6 +30,12 @@
             </div>
             <div class="col">
               <p>${amenityTypeAttributes.numberAttributes}</p>
+            </div>
+            <div class="col">
+              <p>${amenityTypeMetrics}</p>
+            </div>
+            <div class="col">
+              <p>${reviews}</p>
             </div>
         </div>
     </body>

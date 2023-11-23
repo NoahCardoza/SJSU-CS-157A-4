@@ -1,6 +1,7 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
+import com.example.demo.beans.entities.AmenityTypeMetric;
 import com.example.demo.beans.entities.AmenityTypeMetricRecord;
 import com.example.demo.beans.entities.AmenityTypeMetricRecordWithName;
 import com.example.demo.beans.entities.Review;
@@ -125,5 +126,24 @@ public class ReviewDao {
         ps.setDouble(3, record.getValue());
 
         ps.executeUpdate();
+    }
+
+    public List<Review> getAllReviews(Long amenityId) throws SQLException {
+        ArrayList<Review> reviews = new ArrayList<>();
+
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT * FROM Review WHERE amenity_id = ?"
+        );
+
+        statement.setDouble(1, amenityId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            reviews.add(fromResultSet(resultSet));
+        }
+
+        return reviews;
     }
 }
