@@ -71,7 +71,7 @@ public class UserDao {
         PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password, verified) VALUES (?, ?, ?, ?, ?)");
         statement.setString(1, escapeHtml(user.getUsername()));
         statement.setString(2, user.getEmail());
-        statement.setString(3, user.getEmail());
+        statement.setString(3, user.getNormalizedEmail());
         statement.setString(4, user.getPassword());
         statement.setBoolean(5, user.isVerified() == null ? false : user.isVerified());
 
@@ -92,7 +92,7 @@ public class UserDao {
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getEmail());
+            ps.setString(3, user.getNormalizedEmail());
 
             ResultSet rs = ps.executeQuery();
 

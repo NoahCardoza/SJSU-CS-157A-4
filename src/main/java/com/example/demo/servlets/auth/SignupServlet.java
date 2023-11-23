@@ -66,6 +66,7 @@ public class SignupServlet extends HttpServlet {
                 user.setUsername(form.getUsername());
                 user.setPassword(Security.hashPassword(form.getPassword()));
                 user.setEmail(form.getEmail());
+                user.setNormalizedEmail(Security.normalizeEmail(form.getEmail()));
                 String baseUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "");
 
                 // this disables email verification for localhost
