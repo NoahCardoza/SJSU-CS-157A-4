@@ -108,7 +108,7 @@ public class SignupServlet extends HttpServlet {
                     } else {
                         request.setAttribute(
                                 "alert",
-                                new Alert("danger", "Duplicate username/password")
+                                new Alert("danger", "This username or email is already in use.")
                         );
                     }
                 } catch (SQLException e) {

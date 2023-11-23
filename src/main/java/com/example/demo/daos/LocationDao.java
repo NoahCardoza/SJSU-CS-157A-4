@@ -140,7 +140,6 @@ public class LocationDao {
         ps.setLong(8, location.getId());
 
         ps.executeUpdate();
-
     }
 
     public ArrayList<Location> search(Double longitude, Double latitude, Integer radius) throws SQLException {
