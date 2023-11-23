@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.lambdaworks.crypto.SCryptUtil;
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 public class Security {
     static int SCRYPT_N = 16384;
@@ -13,5 +14,11 @@ public class Security {
 
     static public boolean checkPassword(String password, String hashedPassword) {
         return SCryptUtil.check(password, hashedPassword);
+    }
+
+
+    // TODO: implement this
+    static public String escapeHtml(String input) {
+        return escapeHtml4(input);
     }
 }

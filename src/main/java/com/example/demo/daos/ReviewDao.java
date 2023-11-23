@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.demo.Security.escapeHtml;
+
 public class ReviewDao {
 
     static ReviewDao instance = null;
@@ -102,8 +104,8 @@ public class ReviewDao {
 
         statement.setLong(1, review.getAmenityId());
         statement.setLong(2, review.getUserId());
-        statement.setString(3, review.getDescription());
-        statement.setString(4, review.getName());
+        statement.setString(3, escapeHtml(review.getDescription()));
+        statement.setString(4, escapeHtml(review.getName()));
 
         statement.executeUpdate();
 

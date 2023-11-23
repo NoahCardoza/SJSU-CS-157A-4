@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.demo.Security.escapeHtml;
+
 public class LocationDao {
     static LocationDao instance = null;
     static public LocationDao getInstance() {
@@ -107,9 +109,9 @@ public class LocationDao {
             }
             statement.setDouble(3, location.getLongitude());
             statement.setDouble(4, location.getLatitude());
-            statement.setString(5, location.getName());
-            statement.setString(6, location.getAddress());
-            statement.setString(7, location.getDescription());
+            statement.setString(5, escapeHtml(location.getName()));
+            statement.setString(6, escapeHtml(location.getAddress()));
+            statement.setString(7, escapeHtml(location.getDescription()));
 
             statement.executeUpdate();
 
@@ -132,9 +134,9 @@ public class LocationDao {
         }
         ps.setDouble(3, location.getLongitude());
         ps.setDouble(4, location.getLatitude());
-        ps.setString(5, location.getName());
-        ps.setString(6, location.getAddress());
-        ps.setString(7, location.getDescription());
+        ps.setString(5, escapeHtml(location.getName()));
+        ps.setString(6, escapeHtml(location.getAddress()));
+        ps.setString(7, escapeHtml(location.getDescription()));
         ps.setLong(8, location.getId());
 
         ps.executeUpdate();

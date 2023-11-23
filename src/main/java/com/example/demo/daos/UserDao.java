@@ -9,6 +9,8 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.demo.Security.escapeHtml;
+
 public class UserDao {
     static UserDao instance = null;
     static public UserDao getInstance() {
@@ -67,7 +69,7 @@ public class UserDao {
         Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password, verified) VALUES (?, ?, ?, ?, ?)");
-        statement.setString(1, user.getUsername());
+        statement.setString(1, escapeHtml(user.getUsername()));
         statement.setString(2, user.getEmail());
         statement.setString(3, user.getEmail());
         statement.setString(4, user.getPassword());

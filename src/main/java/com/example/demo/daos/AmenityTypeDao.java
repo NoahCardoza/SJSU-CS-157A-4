@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.demo.Security.escapeHtml;
+
 public class AmenityTypeDao {
     static AmenityTypeDao instance = null;
     static public AmenityTypeDao getInstance() {
@@ -67,9 +69,9 @@ public class AmenityTypeDao {
     public void update(AmenityType amenityType) throws SQLException {
         var ps = Database.getConnection().prepareStatement("UPDATE AmenityType SET name = ?, icon = ?, description = ?, parent_amenity_type_id = ? WHERE id = ?");
 
-        ps.setString(1, amenityType.getName());
-        ps.setString(2, amenityType.getIcon());
-        ps.setString(3, amenityType.getDescription());
+        ps.setString(1, escapeHtml(amenityType.getName()));
+        ps.setString(2, escapeHtml(amenityType.getIcon()));
+        ps.setString(3, escapeHtml(amenityType.getDescription()));
         ps.setLong(4, amenityType.getParentAmenityTypeId());
         ps.setLong(5, amenityType.getId());
         ps.executeUpdate();
