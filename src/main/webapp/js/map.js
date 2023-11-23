@@ -252,6 +252,14 @@ $(document).ready(async function() {
         toggleReportingState(map)
     })
 
+    console.log("toggle search bar")
+
+    $('#toggle-search-bar').on('click', function (e) {
+        console.log("toggle search bar")
+        $('#toggle-search-bar i').toggleClass("bi-chevron-left bi-chevron-right")
+        $('#search-container').toggleClass("closed")
+    })
+
     refreshLocations(map);
     setupSearchForm(map);
 

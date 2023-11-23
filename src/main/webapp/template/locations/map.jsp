@@ -32,7 +32,7 @@
             }
 
             #amenities-container-inner {
-                width: 400px;
+                width: 300px;
                 height: 100%;
             }
 
@@ -45,6 +45,15 @@
                 cursor: cell!important;
             }
 
+            #search-container {
+                animation: slide-in 0.5s forwards;
+                transition: transform 500ms ease-in-out;
+            }
+
+            #search-container.closed {
+                transform: translateX(calc(-300px - 1rem));
+            }
+
         </style>
         <script src="<c:url value="/js/map.js"/>"></script>
     </head>
@@ -53,10 +62,10 @@
             <div class="d-flex flex-column" style="height: 100vh; flex: 1">
                 <%@include file="../../includes/nav.jsp" %>
                 <div style="height: 100%;">
-                    <div class="search-container position-fixed start-0 p-3" style="z-index: 1000;">
+                    <div id="search-container" class="position-fixed start-0 p-3" style="z-index: 1000;">
                         <div class="d-flex flex-row">
                             <div class="me-2">
-                                <div id="search-form-container" class="p-3 shadow-lg" style="max-height: calc(100vh - 145px); background: white; width: 400px; border-radius: 10px;  overflow-y: auto;">
+                                <div id="search-form-container" class="p-3 shadow-lg" style="max-height: calc(100vh - 145px); background: white; width: 300px; border-radius: 10px;  overflow-y: auto;">
                                     <%@include file="../locations/ajaxForm.jsp" %>
                                 </div>
                                 <button class="btn btn-primary mt-3 w-100 shadow-lg" onclick="$('#search-form').submit()">
@@ -64,15 +73,27 @@
                                     <span>Search</span>
                                 </button>
                             </div>
-                            <div>
-                                <button
-                                        title="Report a new amenity"
-                                        id="report-new-amenity"
-                                        class="btn btn-primary btn-sm"
-                                        style="border-radius: 100%"
-                                >
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
+                            <div class="container">
+                                <div class="row mb-1">
+                                    <button
+                                            title="Toggle side bar"
+                                            id="toggle-search-bar"
+                                            class="btn btn-secondary btn-sm shadow-lg"
+                                            style="border-radius: 100%"
+                                    >
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <button
+                                            title="Report a new amenity"
+                                            id="report-new-amenity"
+                                            class="btn btn-primary btn-sm shadow-lg"
+                                            style="border-radius: 100%"
+                                    >
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
