@@ -1,5 +1,6 @@
 package com.example.demo.servlets.admin;
 
+import com.example.demo.Guard;
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.Alert;
@@ -131,12 +132,11 @@ public class AdminServlet extends HttpServlet {
                 if (action != null && action.equals("submit")) {
                     Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
                     if (!user.isPresent()) {
-                        response.setStatus(401);
-                        request.setAttribute(
-                                "alert",
+                        Guard.redirectToLogin(
+                                request,
+                                response,
                                 new Alert("danger", "You must be logged in to create a location.")
                         );
-                        response.sendRedirect(request.getContextPath() + "/login");
                         return;
                     }
                     Validation v = form.validate();

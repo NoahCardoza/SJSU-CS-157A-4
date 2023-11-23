@@ -7,7 +7,7 @@
 
     String path = (String) request.getAttribute("jakarta.servlet.forward.servlet_path");
     if (path == null) {
-        path = request.getServletPath();
+        path = String.valueOf(request.getRequestURI());
     }
 %>
 
@@ -22,7 +22,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 w-100">
                 <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith(request.getContextPath() + "/") ? "active" : "" %>" aria-current="page" href="<c:url value="/" />">Home</a>
+                    <a class="nav-link <%= path.equals(request.getContextPath() + "/") ? "active" : "" %>" aria-current="page" href="<c:url value="/" />">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <%= path.startsWith("/locations") ? "active" : "" %>" href="<c:url value="/locations?f=map"/>">Map</a>

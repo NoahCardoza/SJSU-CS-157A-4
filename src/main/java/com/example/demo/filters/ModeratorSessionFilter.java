@@ -1,6 +1,7 @@
 package com.example.demo.filters;
 
 import com.example.demo.Guard;
+import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,12 +22,12 @@ public class ModeratorSessionFilter implements Filter {
             return;
         }
 
-        if (!user.isModerator()) {
-            ((HttpServletRequest)request).getSession().setAttribute(
-                    "alert",
-                    "You must be a moderator to access this page."
+        if (!user.isModerator() && !user.isAdministrator()) {
+            Guard.redirectToLogin(
+                    (HttpServletRequest)request,
+                    (HttpServletResponse)response,
+                    new Alert("danger", "You must be a moderator to access this page.")
             );
-            ((HttpServletResponse)response).sendRedirect("/login");
             return;
         }
 

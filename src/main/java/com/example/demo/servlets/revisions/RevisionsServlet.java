@@ -93,9 +93,11 @@ public class RevisionsServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         if (!(user.isAdministrator() || user.isModerator())) {
-            session.setAttribute("alert", new Alert("danger", "You must be an administrator or moderator to revert"));
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.sendRedirect(request.getContextPath() + "/login");
+            Guard.redirectToLogin(
+                    request,
+                    response,
+                    new Alert("danger", "You must be an administrator or moderator to revert")
+            );
             return;
         }
 

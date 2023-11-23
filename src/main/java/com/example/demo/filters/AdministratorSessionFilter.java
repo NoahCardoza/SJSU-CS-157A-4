@@ -1,6 +1,7 @@
 package com.example.demo.filters;
 
 import com.example.demo.Guard;
+import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,11 +23,11 @@ public class AdministratorSessionFilter implements Filter {
         }
 
         if (!user.isAdministrator()) {
-            ((HttpServletRequest)request).getSession().setAttribute(
-                    "alert",
-                    "You must be an administrator to access this page."
+            Guard.redirectToLogin(
+                    (HttpServletRequest)request,
+                    (HttpServletResponse)response,
+                    new Alert("danger", "You must be an administrator to access this page.")
             );
-            ((HttpServletResponse)response).sendRedirect("/login");
             return;
         }
 

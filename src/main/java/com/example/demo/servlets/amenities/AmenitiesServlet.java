@@ -224,12 +224,11 @@ public class AmenitiesServlet extends HttpServlet {
             if (action != null && action.equals("submit")) {
                 Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
                 if (user.isEmpty()) {
-                    response.setStatus(401);
-                    request.getSession().setAttribute(
-                            "alert",
+                    Guard.redirectToLogin(
+                            request,
+                            response,
                             new Alert("danger", "You must be logged in to edit a location.")
                     );
-                    response.sendRedirect(request.getContextPath() + "/login");
                     return;
                 }
                 Validation v = form.validate();

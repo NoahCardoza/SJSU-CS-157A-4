@@ -1,9 +1,6 @@
 package com.example.demo.servlets.auth;
 
-import com.example.demo.Emailer;
-import com.example.demo.JWTManager;
-import com.example.demo.Validation;
-import com.example.demo.Security;
+import com.example.demo.*;
 import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.User;
 import com.example.demo.beans.forms.SignupForm;
@@ -41,11 +38,7 @@ public class SignupServlet extends HttpServlet {
 
             try {
                 UserDao.getInstance().verifyEmail(userId);
-                request.getSession().setAttribute(
-                        "alert",
-                        new Alert("success", "Your email has been verified!")
-                );
-                response.sendRedirect(request.getContextPath() + "/login");
+                Guard.redirectToLogin(request, response, new Alert("success", "Your email has been verified!"));
                 return;
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -87,11 +80,11 @@ public class SignupServlet extends HttpServlet {
                         UserDao.getInstance().create(user);
 
                         if (user.isVerified()) {
-                            request.getSession().setAttribute(
-                                    "alert",
+                            Guard.redirectToLogin(
+                                    request,
+                                    response,
                                     new Alert("success", "Your account has been created!")
                             );
-                            response.sendRedirect(request.getContextPath() + "/login");
                             return;
                         } else {
                             try {
@@ -105,11 +98,11 @@ public class SignupServlet extends HttpServlet {
                                 );
 
                             }
-                            request.getSession().setAttribute(
-                                    "alert",
+                            Guard.redirectToLogin(
+                                    request,
+                                    response,
                                     new Alert("success", "Your account has been created! Please check your email to verify your account.")
                             );
-                            response.sendRedirect(request.getContextPath() + "/login");
                             return;
                         }
                     } else {
