@@ -6,24 +6,30 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>LHG | Admin | Amenity Type | Edit</title>
+        <title>LHG | Admin | Amenity Type | Create</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
-            <h1>Amenity Type Edit</h1>
+            <h1>Amenity Type Create</h1>
 
             <form method="POST" class="mt-5" id="new-location-form">
-                <input name="id" type="hidden" value="${amenityType.id}"/>
-                <input name="parentAmenityTypeId" type="hidden" value="${amenityType.parentAmenityTypeId}"/>
                 <label for="name">Name</label>
                 <input id="name" name="name" type="text" class="form-control" placeholder="Name" value="${amenityType.name}"/>
+
                 <label for="description">Description</label>
                 <textarea id="description" name="description" type="" class="form-control" placeholder="Description">${amenityType.description}</textarea>
+
+                <label for="attributes">Attributes</label>
+                <textarea id="attributes" name="attributes" type="" class="form-control" placeholder="attributeA:type,attributeB:type,etc.">${amenityType.attributes}</textarea>
+
+                <label for="metrics">Metrics</label>
+                <textarea id="metrics" name="metrics" type="" class="form-control" placeholder="metricA:type,metricB:type,etc.">${amenityType.metrics}</textarea>
+
                 <label for="icon">Icon</label>
                 <input id="icon" name="icon" type="text" class="form-control" placeholder="Icon" value="${amenityType.icon}"/>
-                <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Update</button>
+                <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
             </form>
         </div>
     </body>

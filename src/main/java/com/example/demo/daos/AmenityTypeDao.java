@@ -63,7 +63,27 @@ public class AmenityTypeDao {
     }
 
     public Long create(AmenityType amenityType) throws SQLException {
-        return null;
+
+        Long id = 0L;
+
+        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityType (name, icon, description) VALUES (?, ?, ?)");
+
+        ps.setString(1, escapeHtml(amenityType.getName()));
+        ps.setString(2, escapeHtml(amenityType.getIcon()));
+        ps.setString(3, escapeHtml(amenityType.getDescription()));
+        //ps.setLong(4, amenityType.getParentAmenityTypeId());
+        ps.executeUpdate();
+
+
+        var ret = Database.getConnection().prepareStatement("SELECT id FROM AmenityType WHERE name = ?");
+        ret.setString(1, escapeHtml(amenityType.getName()));
+        ResultSet  rs = ret.executeQuery();
+
+        while(rs.next()){
+            id = rs.getLong("id");
+        }
+
+        return id;
     }
 
     public void update(AmenityType amenityType) throws SQLException {
