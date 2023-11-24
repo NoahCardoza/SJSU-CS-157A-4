@@ -97,6 +97,27 @@ public class AmenityTypeAttributeDao {
         return attributeValues;
     }
 
+    public String getAllValuesForAttribute(Long attributeId, Long amenityId) throws SQLException {
+        String attributeValue = "";
+
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?"
+        );
+
+        statement.setDouble(1, attributeId);
+        statement.setDouble(2, amenityId);
+
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            attributeValue += resultSet.getString("value");
+        }
+
+        return attributeValue;
+    }
+
     public Optional<MinMax> getMinMaxIntValuesForAttribute(Long attributeId) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(

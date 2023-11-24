@@ -54,6 +54,7 @@ public class AmenityTypeAttributeTextGroup {
                 }
                 joiner.add("</select></div>");
             }
+            System.out.println(joiner.toString());
             return joiner.toString();
         } catch (SQLException e) {
             throw new RuntimeException(e);
