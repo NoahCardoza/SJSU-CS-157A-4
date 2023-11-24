@@ -16,11 +16,11 @@
         <div class="panel-heading">
             <h1 class="panel-title">Create Review</h1>
         </div>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <%@include file="../../includes/alerts.jsp" %>
 
             <div class="row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 mb-3">
                     <div class="form-group">
                         <label for="username">Title</label>
                         <input class ="form-control" type="text" id="username" name="title">
@@ -32,7 +32,7 @@
                     </div>
 
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 mb-3">
                     <p>Metrics</p>
                     <c:forEach var="metric" items="${metrics}">
                         <div class="form-group">
@@ -40,6 +40,23 @@
                             <input class="form-control" type="text" id="metric-${metric.id}" name="metric-${metric.id}" placeholder="Rate 0 to 5" />
                         </div>
                     </c:forEach>
+                </div>
+                <div class="form-group mb-3 d-flex flex-row container">
+                    <div class="row gx-3" id="selected-images">
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="image-input" class="form-label">Choose image</label>
+                    <input
+                            name="images"
+                            required
+                            multiple
+<%-- TODO:                            ,.heic,.heif --%>
+                            accept="image/*,.heic,.heif"
+                            class="form-control"
+                            type="file"
+                            id="image-input"
+                    >
                 </div>
                 <div class="clearfix"></div>
                 <div class="form-group mt-3">
@@ -49,6 +66,39 @@
         </form>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $('#image-input').on('change', function () {
+            const files = $(this).prop('files');
+            const selectedImages = $('#selected-images');
+            selectedImages.empty();
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                console.log(file)
+                const name = file.name.toLowerCase();
+                if (name.endsWith('.heic') || name.endsWith('.heif')) {
+                    selectedImages.append(`
+                        <div class="col">
+                            <div class="img-thumbnail d-flex justify-content-center align-items-center" style="height: 200px; width: 200px;">
+                                <p class="fs-6">
+                                    HEIC previews are not supported
+                                </p>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = $('<div class="col"><img class="img-thumbnail" width="200" height="200" /></div>');
+                        img.children(0).attr('src', e.target.result);
+                        selectedImages.append(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
 

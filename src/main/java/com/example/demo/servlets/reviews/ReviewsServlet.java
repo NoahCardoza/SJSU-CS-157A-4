@@ -1,22 +1,27 @@
 package com.example.demo.servlets.reviews;
 
 import com.example.demo.Guard;
+import com.example.demo.S3;
 import com.example.demo.Util;
 import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.*;
 import com.example.demo.daos.*;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @WebServlet(name = "Reviews", value = "/reviews")
+@MultipartConfig
 public class ReviewsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         doRequest(request, response);
@@ -135,6 +140,21 @@ public class ReviewsServlet extends HttpServlet {
                 metricRecord.setValue(value);
 
                 ReviewDao.createReviewRecord(metricRecord);
+            }
+
+            for (Part part : request.getParts()) {
+                if (part.getName().equals("images")) {
+                    try {
+                        String imageUrl = S3.uploadFile(
+                                "little-hidden-gems",
+                                "review-image-" + review.getId() + "-" + UUID.randomUUID(),
+                                part
+                        );
+                        ReviewDao.createReviewImage(review.getId(), imageUrl);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             response.sendRedirect(request.getContextPath() + "/reviews?f=view&id=" + review.getId());

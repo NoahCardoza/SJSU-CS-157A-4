@@ -6,6 +6,7 @@ import com.example.demo.beans.entities.AmenityTypeMetricRecord;
 import com.example.demo.beans.entities.AmenityTypeMetricRecordWithName;
 import com.example.demo.beans.entities.Review;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,19 @@ public class ReviewDao {
         }
 
         return records;
+    }
+
+    public static void createReviewImage(Long id, String imageUrl) throws SQLException {
+        try (Connection connection = Database.getConnection()) {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO ReviewImage (review_id, url) VALUES (?, ?)"
+            );
+
+            ps.setDouble(1, id);
+            ps.setString(2, imageUrl);
+
+            ps.executeUpdate();
+        }
     }
 
     public List<Review> getAll() throws SQLException {
