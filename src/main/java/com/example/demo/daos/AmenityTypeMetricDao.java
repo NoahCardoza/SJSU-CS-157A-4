@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.demo.Security.escapeHtml;
+
 public class AmenityTypeMetricDao {
     static public String TYPE_NUMBER_ID_PREFIX = "amenityTypeNumberAttribute-";
     static public String TYPE_TEXT_ID_PREFIX = "amenityTypeTextAttribute-";
@@ -27,6 +29,16 @@ public class AmenityTypeMetricDao {
     }
 
     private AmenityTypeMetricDao() {}
+
+    public void create(AmenityTypeMetric amenityTypeMetric) throws SQLException {
+        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityTypeMetric (amenity_type_id, name, icon, type) VALUES (?, ?, ?, ?)");
+
+        ps.setLong(1, amenityTypeMetric.getAmenityTypeId());
+        ps.setString(2, escapeHtml(amenityTypeMetric.getName()));
+        ps.setString(3, escapeHtml(amenityTypeMetric.getIcon()));
+        ps.setString(4, escapeHtml(amenityTypeMetric.getType()));
+        ps.executeUpdate();
+    }
 
     private AmenityTypeMetric fromResultSet(ResultSet resultSet) throws SQLException {
         AmenityTypeMetric amenityTypeMetric = new AmenityTypeMetric();

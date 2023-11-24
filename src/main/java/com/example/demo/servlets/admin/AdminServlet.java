@@ -4,15 +4,9 @@ import com.example.demo.Guard;
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.Alert;
-import com.example.demo.beans.entities.AmenityType;
-import com.example.demo.beans.entities.AmenityWithImage;
-import com.example.demo.beans.entities.Location;
-import com.example.demo.beans.entities.User;
+import com.example.demo.beans.entities.*;
 import com.example.demo.beans.forms.LocationForm;
-import com.example.demo.daos.AmenityDao;
-import com.example.demo.daos.AmenityTypeDao;
-import com.example.demo.daos.LocationDao;
-import com.example.demo.daos.UserDao;
+import com.example.demo.daos.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,6 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +39,9 @@ public class AdminServlet extends HttpServlet {
 
         try {
             switch (function) {
-                // TODO: amenityTypeNew
+                case "amenityTypeCreate":
+                    amenityTypeCreate(request, response);
+                    break;
                 case "amenityTypeEdit":
                     amenityTypeEdit(request, response);
                     break;
@@ -171,7 +169,84 @@ public class AdminServlet extends HttpServlet {
                 break;
         }
     }
+
+    public void amenityTypeCreate(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        switch (request.getMethod()) {
+            case "GET":
+                request.getRequestDispatcher("/template/admin/amenityTypeCreate.jsp").forward(request, response);
+                break;
+            case "POST":
+                amenityTypeCreatePost(request, response);
+                break;
+        }
+    }
+
+    private void amenityTypeCreatePost(HttpServletRequest request, HttpServletResponse response) {
+
+        Enumeration<String> params = request.getParameterNames();
+        while(params.hasMoreElements()){
+            String paramName = params.nextElement();
+            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
+        }
+
+        AmenityType amenityType = new AmenityType();
+        amenityType.setName(request.getParameter("name"));
+        amenityType.setDescription(request.getParameter("description"));
+        amenityType.setIcon(request.getParameter("icon"));
+
+        String attributes = request.getParameter("attributes");
+        String metrics = request.getParameter("metrics");
+
+        // TODO: validate
+
+        try {
+            amenityType.setId(AmenityTypeDao.getInstance().create(amenityType));
+
+            List<String> attributeList = Arrays.asList(attributes.split(","));
+
+            for(String attribute:attributeList){
+                List<String> attributeWithType = Arrays.asList(attribute.split(":"));
+
+                AmenityTypeAttribute newAttribute = new AmenityTypeAttribute();
+                newAttribute.setName(attributeWithType.get(0));
+                newAttribute.setAmenityTypeId(amenityType.getId());
+                newAttribute.setType(attributeWithType.get(1));
+                newAttribute.setIcon(amenityType.getIcon());
+                AmenityTypeAttributeDao.getInstance().create(newAttribute);
+            }
+
+            List<String> metricList = Arrays.asList(metrics.split(","));
+            for(String metric:metricList){
+
+                List<String> metricWithType = Arrays.asList(metric.split(":"));
+
+                AmenityTypeMetric newMetric = new AmenityTypeMetric();
+                newMetric.setName(metricWithType.get(0));
+                newMetric.setAmenityTypeId(amenityType.getId());
+                newMetric.setType(metricWithType.get((1)));
+                newMetric.setIcon(amenityType.getIcon());
+                AmenityTypeMetricDao.getInstance().create(newMetric);
+            }
+
+            response.sendRedirect(request.getContextPath() + "/admin");
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+            request.setAttribute("amenityType", amenityType);
+            request.setAttribute("alert", new Alert("danger", "Failed to insert amenity type."));
+        }
+    }
+
+
+
     public void amenityTypeEdit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        Enumeration<String> params = request.getParameterNames();
+        while(params.hasMoreElements()){
+            String paramName = params.nextElement();
+            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
+        }
+
         switch (request.getMethod()) {
             case "GET":
                 amenityTypeEditGet(request, response);

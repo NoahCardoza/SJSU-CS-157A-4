@@ -16,7 +16,7 @@
                 <div class="col d-flex justify-content-between">
                     <h2 >Amenity Types</h2>
                     <div>
-                        <a href="<c:url value="/admin?f=amenityTypeNew"/>" class="btn btn-primary ">New</a>
+                        <a href="<c:url value="/admin?f=amenityTypeCreate"/>" class="btn btn-primary ">Create</a>
                     </div>
                 </div>
                 <div class="row">
