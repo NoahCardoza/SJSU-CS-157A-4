@@ -146,4 +146,24 @@ public class ReviewDao {
 
         return reviews;
     }
+
+    public List<String> getAllImages(Long amenityId) throws SQLException {
+        ArrayList<String> urls = new ArrayList<>();
+
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT url FROM ReviewImage x LEFT JOIN Review y ON x.review_id = y.id WHERE amenity_id = ?"
+        );
+
+        statement.setDouble(1, amenityId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            urls.add(resultSet.getString("url"));
+        }
+
+        return urls;
+
+    }
 }

@@ -60,4 +60,26 @@ public class AmenityTypeMetricDao {
         return amenityTypes;
     }
 
+    public Long getAvgAmenityMetricValue(Long metricId) throws SQLException {
+        long avgMetricValue;
+
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT AVG(value) AS value FROM ReviewMetricRecord WHERE amenity_metric_id = ?"
+        );
+
+        statement.setDouble(1, metricId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            avgMetricValue = resultSet.getLong("value");
+        }
+        else {
+            avgMetricValue = 0;
+        }
+
+        return avgMetricValue;
+    }
+
 }

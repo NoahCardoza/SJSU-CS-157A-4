@@ -38,12 +38,6 @@ public class SearchServlet extends HttpServlet {
 
     static public void setSearchAttributes(HttpServletRequest request, List<Location> locations) throws SQLException {
 
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
         List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
 
         request.setAttribute(

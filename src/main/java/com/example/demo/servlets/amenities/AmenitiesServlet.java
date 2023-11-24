@@ -81,8 +81,6 @@ public class AmenitiesServlet extends HttpServlet {
         // this is the id of the amenity
         Long amenityId = Util.parseLongOrNull(request.getParameter("id"));
 
-        System.out.println(amenityId);
-
         // checking if the id is valid
         if (amenityId == null) {
             response.sendRedirect(request.getContextPath() + "/amenities");
@@ -105,7 +103,6 @@ public class AmenitiesServlet extends HttpServlet {
             return;
         }
 
-
         if (object.getAmenityTypeId() != null) {
             List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(object.getAmenityTypeId());
 
@@ -116,7 +113,10 @@ public class AmenitiesServlet extends HttpServlet {
                     amenitiesTypeAttributeGrouper
             );
 
-            List<AmenityTypeMetric> amenityTypeMetrics = AmenityTypeMetricDao.getInstance().getAllByAmenityType(object.getAmenityTypeId());
+            List<AmenityTypeMetric> amenityTypeMetricsList = AmenityTypeMetricDao.getInstance().getAllByAmenityType(object.getAmenityTypeId());
+
+            var amenityTypeMetrics = new AmenitiesTypeMetricsGroup(object, amenityTypeMetricsList);
+
 
             request.setAttribute(
                     "amenityTypeMetrics",
@@ -124,15 +124,22 @@ public class AmenitiesServlet extends HttpServlet {
             );
         }
 
+        // gets all reviews for this amenity
         List<Review> reviews = ReviewDao.getInstance().getAllReviews(object.getId());
+        var amenityReview = new AmenitiesReviewGrouper(object, reviews);
         request.setAttribute(
                 "reviews",
-                reviews
+                amenityReview
         );
 
+        List<String> urls = ReviewDao.getInstance().getAllImages(object.getId());
+
+        request.setAttribute(
+                "images",
+                urls
+        );
 
         request.getRequestDispatcher("template/amenity/view-amenity.jsp").forward(request, response);
-
     }
 
 
@@ -428,8 +435,6 @@ public class AmenitiesServlet extends HttpServlet {
                 "amenities",
                 amenities
         );
-
-        System.out.println("im in the default method!");
 
         // TODO: change the path later
         request.getRequestDispatcher("template/auth/signup.jsp").forward(request, response);
