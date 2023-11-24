@@ -17,11 +17,13 @@ import static com.example.demo.daos.AmenityTypeAttributeDao.TYPE_TEXT_ID_PREFIX;
 
 public class AmenitiesTypeAttributeTextGroup {
 
-    Long request;
+    Long amenityId;
+    Long typeId;
     List<AmenityTypeAttribute> attributes;
 
     public AmenitiesTypeAttributeTextGroup(Amenity amenity) {
-        this.request = amenity.getAmenityTypeId();
+        this.amenityId = amenity.getId();
+        this.typeId = amenity.getAmenityTypeId();
         this.attributes = new ArrayList<>();
     }
 
@@ -36,11 +38,29 @@ public class AmenitiesTypeAttributeTextGroup {
         }
 
         String textAttributes = "";
+        StringJoiner joiner = new StringJoiner(System.lineSeparator());
 
-        for (AmenityTypeAttribute attribute : attributes) {
-            textAttributes += attribute + " ";
+        try{
+            //get the attribute id and then match it
+            for(AmenityTypeAttribute attribute : attributes){
+                //gets you the values from the database for the amenityType
+                String value = AmenityTypeAttributeDao.getInstance().getAllValuesForAttribute(attribute.getId(), amenityId);
+
+                // may need to change, i'm unsure if there can be multiple values for one attribute
+                if(value.isEmpty()){
+                    joiner.add(attribute.getName() + ": N/A");
+                }
+                else {
+                    joiner.add(attribute.getName() + ": " + value);
+                }
+            }
+
+            textAttributes = joiner.toString();
+
+            return textAttributes;
         }
-
-        return textAttributes;
+        catch(SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -105,15 +105,11 @@ public class AmenitiesServlet extends HttpServlet {
             return;
         }
 
-        System.out.println(amenity);
-        System.out.println(object);
 
         if (object.getAmenityTypeId() != null) {
             List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(object.getAmenityTypeId());
 
             var amenitiesTypeAttributeGrouper = new AmenitiesTypeAttributeGrouper(object, amenityTypeAttributes);
-
-            System.out.println("amenityGrouper: " + amenitiesTypeAttributeGrouper);
 
             request.setAttribute(
                     "amenityTypeAttributes",
@@ -134,7 +130,6 @@ public class AmenitiesServlet extends HttpServlet {
                 reviews
         );
 
-        System.out.println("done");
 
         request.getRequestDispatcher("template/amenity/view-amenity.jsp").forward(request, response);
 
