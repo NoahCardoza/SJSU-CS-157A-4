@@ -4,8 +4,6 @@
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
-<%--@elvariable id="form" type="List<com.example.demo.beans.forms.LocationForm>"--%>
 <%--@elvariable id="postParams" type="java.util.HashMap"--%>
 
 <%

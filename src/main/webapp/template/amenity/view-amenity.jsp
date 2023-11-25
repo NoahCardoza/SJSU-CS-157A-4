@@ -21,6 +21,13 @@
             <a class="btn btn-danger" href="<c:url value="/amenities?f=delete&id=${amenity.id}"/>" class="btn btn-danger">Delete</a>
              </br>
              </br>
+             <c:forEach var="image" items="${images}">
+              <div class="col-4 mb-4">
+                 <div class="card">
+                   <img class="card-img-top" src="${image}" style="height: 200px; width: 100%; object-fit: cover;">
+                 </div>
+              </div>
+            </c:forEach>
              <div class="col">
                 <div>
                 <p>${amenityTypeAttributes.textAttributes}</p>
@@ -38,9 +45,6 @@
             <div class="col">
               <p>${reviews}</p>
             </div>
-
-
-
         </div>
     </body>
 </html>

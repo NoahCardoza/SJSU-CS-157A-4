@@ -19,32 +19,64 @@
         <div class="container mt-5">
             <h1>Add an Amenity</h1>
 
-                <div class="row mb-2">
-                    <label for="location" class="form-label">Location</label>
-                    <select class="form-select" name="locationId" id="location">
-                        <option value="0">N/A</option>
-                        <c:forEach var="location" items="${locations}">
-                            <option ${param.get('locationId') == location.id ? 'selected' : ''} value="${location.id}"
-                            >${location.name}</option>
-                        </c:forEach>
-                    </select>
+           <form method="POST" class="mt-5" id="new-location-form">
+                <div class="row">
+                    <%@include file="../../includes/alerts.jsp" %>
+                    <div class="col mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            Location:
+                            <b>
+                                <c:choose>
+                                    <c:when test="${empty form.locationName}">
+                                        None
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${form.locationName}
+                                    </c:otherwise>
+                                </c:choose>
+                            </b>
+                        </div>
+                        <button
+                                class="btn btn-primary float-end"
+                                onclick="$('#new-location-form').attr('action', '${param['id'] ? '/amenities?f=locationSelect&id=' + param['id'] : '/amenities?f=locationSelect'}').submit()"
+                        >Select Location</button>
+                    </div>
                 </div>
 
-                <div class="row mb-2">
-                    <label for="amenityType" class="form-label">Amenity Type</label>
-                    <select class="form-select" name="amenityTypeId" id="amenityType">
-                        <option value="0">N/A</option>
-                        <c:forEach var="amenityType" items="${amenityTypes}">
-                            <option ${param.get('amenityTypeId') == amenityType.id ? 'selected' : ''} value="${amenityType.id}"
-                            >${amenityType.name}</option>
-                        </c:forEach>
-                    </select>
+                <div class="row">
+                    <%@include file="../../includes/alerts.jsp" %>
+                    <div class="col mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            Amenity Type:
+                            <b>
+                                <c:choose>
+                                    <c:when test="${empty form.typeName}">
+                                        None
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${form.typeName}
+                                    </c:otherwise>
+                                </c:choose>
+                            </b>
+                        </div>
+                        <button
+                                class="btn btn-primary float-end"
+                                onclick="$('#new-location-form').attr('action', '${param['id'] ? '/amenities?f=typeSelect&id=' + param['id'] : '/amenities?f=typeSelect'}').submit()"
+                        >Select Amenity Type</button>
+                    </div>
                 </div>
 
-                <input type="text" name="name" value="${form.name}" class="form-control mt-5 mb-3" placeholder="Name" />
-                <textarea name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
+                <input type="hidden" name="locationId" id="locationId" value="${form.locationId}">
+                <input type="hidden" name="locationName" id="locationName" value="${form.locationName}">
+                <input type="hidden" name="typeId" id="typeId" value="${form.typeId}">
+                <input type="hidden" name="typeName" id="typeName" value="${form.typeName}">
+
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" name="name" value="${form.name}" class="form-control mb-3" placeholder="Name" />
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
+                <input type="hidden" name="redirect" value="${pathWithQueryString}">
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
-            </form>
         </div>
     </body>
 </html>

@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Enumeration;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "Amenities", value = "/amenities")
 
@@ -59,8 +60,8 @@ public class AmenitiesServlet extends HttpServlet {
                 case "delete":
                     delete(request, response);
                     break;
-                case "parentSelect":
-                    parentSelect(request, response);
+                case "typeSelect":
+                    typeSelect(request, response);
                     break;
                 case "locationSelect":
                     locationSelect(request, response);
@@ -144,90 +145,79 @@ public class AmenitiesServlet extends HttpServlet {
 
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create an amenity.");
+        User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
+        if (user == null) {
+            return;
+        }
+
+        Enumeration<String> params = request.getParameterNames();
+        while(params.hasMoreElements()){
+            String paramName = params.nextElement();
+            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
+        }
+
+        AmenityForm form = new AmenityForm(request);
+
+        /*String x = request.getParameter("typeId");
+        System.out.println("typeId: " + x + "\n\n\n");
+
+        if(x!=null){
+            Long selectedAmenityTypeId = Long.parseLong(x);
+            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(selectedAmenityTypeId);
+            request.setAttribute("amenityTypeAttributes", amenityTypeAttributes);
+            System.out.println("\n\n\nin here!\n\n\n");
+        }*/
 
         switch (request.getMethod()) {
             case "GET":
-                amenityCreateGet(request, response);
-                break;
+                List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);
+                List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
 
+                request.setAttribute("hasParent", false);
+                request.setAttribute("locations", locations);
+                request.setAttribute("amenityTypes", amenityTypes);
+                request.setAttribute("form", form);
+
+                request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
+                break;
             case "POST":
-                amenityCreatePost(request, response);
-                break;
-        }
-    }
+                String action = request.getParameter("action");
+                if (action != null) {
+                    if (action.equals("submit")) {
+                        Validation v = form.validate();
+                        if (v.isValid()) {
+                            Amenity amenity = new Amenity();
+                            amenity.setUserId(user.getId());
+                            amenity.setName(form.getName());
+                            amenity.setDescription(form.getDescription());
+                            amenity.setLocationId(form.getLocationId());
+                            amenity.setAmenityTypeId(form.getTypeId());
 
-    private void amenityCreateGet(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, ServletException{
-
-        List<Location> locations = LocationDao.getInstance().getAll();
-
-        request.setAttribute(
-                "locations",
-                locations
-        );
-
-        List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
-
-        request.setAttribute(
-                "amenityTypes",
-                amenityTypes
-        );
-
-        AmenityFilter amenityFilter = new AmenityFilter(request);
-
-        if (amenityFilter.getAmenityTypeId() != null) {
-
-            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenityFilter.getAmenityTypeId());
-
-            var amenityTypeAttributeGrouper = new AmenityTypeAttributeGrouper(request, amenityTypeAttributes);
-
-            request.setAttribute(
-                    "amenityTypeAttributes",
-                    amenityTypeAttributeGrouper
-            );
-        }
-
-        //return;
-
-        request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
-        //return;
-    }
-
-    private void amenityCreatePost(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, ServletException{
-        /*AmenityForm form = new AmenityForm(request);
-
-        String action = request.getParameter("action");
-
-        if (action != null && action.equals("submit")) {
-            Validation v = form.validate();
-
-            if (v.isValid()) {
-                Amenity amenity = new Amenity();
-                //amenity.setUserId(user.getId());
-                amenity.setLocationId(form.getParentId());
-                amenity.setName(form.getName());
-                amenity.setDescription(form.getDescription());
-                amenity.setAmenityTypeId(form.getParentId());
-                try {
-                    AmenityDao.getInstance().create(amenity);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                            try {
+                                AmenityDao.getInstance().create(amenity);
+                                response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.getId());
+                                return;
+                            } catch (SQLException e) {
+                                request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
+                                e.printStackTrace();
+                            }
+                            return;
+                        } else {
+                            // TODO: send all errors
+                            request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
+                        }
+                    } else {
+                        request.setAttribute("alert", new Alert("danger", "Invalid action"));
+                    }
                 }
 
-                // TODO: redirect to location page
 
-                response.sendRedirect(request.getContextPath() + "/amenities");
-                return;
-            } else {
-                request.setAttribute("errors", v.getMessages());
-            }
+                request.setAttribute("form", form);
+
+                request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
+                break;
         }
-
-        request.setAttribute("form", form);*/
-
-        request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
     }
-
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
@@ -249,11 +239,11 @@ public class AmenitiesServlet extends HttpServlet {
         AmenityForm form;
         if (request.getMethod().equals("GET")) {
             form = new AmenityForm(amenity.get());
-            form.setParentName("None");
+            form.setLocationName("None");
 
             if (amenity.get().getAmenityTypeId() != null) {
                 Optional<Location> parentLocation = LocationDao.getInstance().get(amenity.get().getAmenityTypeId());
-                parentLocation.ifPresent(value -> form.setParentName(value.getName()));
+                parentLocation.ifPresent(value -> form.setLocationName(value.getName()));
             }
         } else {
             form = new AmenityForm(request);
@@ -324,35 +314,34 @@ public class AmenitiesServlet extends HttpServlet {
     }
 
 
-    // TODO: ask if this should be parent_amenity_type or just the amentiy type's id
-    public void parentSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+    public void typeSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         AmenityForm form = new AmenityForm(request);
 
         // if parent id is 0, it means that the user has selected "None"
-        if (form.getParentId() != null && form.getParentId() == 0) {
-            form.setParentId(null);
+        if (form.getTypeId() != null && form.getTypeId() == 0) {
+            form.setTypeId(null);
         }
 
         String action = request.getParameter("action");
 
         // if the user clicks the back button, we need to get the parent of the current parent
-        if (action != null && action.equals("back") && form.getParentId() != null) {
-            Optional<AmenityType> amenityTypeOpt = AmenityTypeDao.getInstance().get(form.getParentId());
+        if (action != null && action.equals("back") && form.getTypeId() != null) {
+            Optional<AmenityType> amenityTypeOpt = AmenityTypeDao.getInstance().get(form.getTypeId());
             if (amenityTypeOpt.isPresent()) {
-                form.setParentId(amenityTypeOpt.get().getParentAmenityTypeId());
+                form.setTypeId(amenityTypeOpt.get().getParentAmenityTypeId());
                 if (amenityTypeOpt.get().getParentAmenityTypeId() == null) {
                     // if the parent of the parent is null, it means that the parent is the root
-                    form.setParentName("None");
+                    form.setTypeName("None");
                 } else {
                     // get the name of the parent
                     amenityTypeOpt = AmenityTypeDao.getInstance().get(amenityTypeOpt.get().getParentAmenityTypeId());
                     if (amenityTypeOpt.isPresent()) {
-                        form.setParentName(amenityTypeOpt.get().getName());
+                        form.setTypeName(amenityTypeOpt.get().getName());
                     } else {
                         // just to be safe, this shouldn't happen unless something is removed
                         // from the database while the user is using the app
-                        form.setParentId(null);
-                        form.setParentName("None");
+                        form.setTypeId(null);
+                        form.setTypeName("None");
                     }
                 }
             }
@@ -363,13 +352,19 @@ public class AmenitiesServlet extends HttpServlet {
 
         // if a parent is selected, add it to the list of locations
         // so the user can see it
-        if (form.getParentId() != null) {
+        if (form.getTypeId() != null) {
             AmenityType selected = new AmenityType();
 
-            selected.setId(form.getParentId());
-            selected.setName(form.getParentName());
+            selected.setId(form.getTypeId());
+            selected.setName(form.getTypeName());
 
             amenityTypes.add(0, selected);
+
+            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(form.getTypeId());
+            request.setAttribute(
+                    "amenityTypeAttributes",
+                    amenityTypeAttributes
+            );
         }
 
         request.setAttribute(
@@ -379,51 +374,59 @@ public class AmenitiesServlet extends HttpServlet {
 
         request.setAttribute("form", form);
 
-        request.getRequestDispatcher("/template/amenity/amenity-type-select.jsp").forward(request, response);
+        request.getRequestDispatcher("/template/amenity/type-select.jsp").forward(request, response);
     }
 
     public void locationSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
         AmenityForm form = new AmenityForm(request);
 
         // if parent id is 0, it means that the user has selected "None"
-        if (form.getParentId() != null && form.getParentId() == 0) {
-            form.setParentId(null);
+        if (form.getLocationId() != null && form.getLocationId() == 0) {
+            form.setLocationId(null);
         }
 
         String action = request.getParameter("action");
 
         // if the user clicks the back button, we need to get the parent of the current parent
-        if (action != null && action.equals("back") && form.getParentId() != null) {
-            Optional<Location> parentLocationOpt = LocationDao.getInstance().get(form.getParentId());
-            if (parentLocationOpt.isPresent()) {
-                form.setParentId(parentLocationOpt.get().getParentLocationId());
-                if (parentLocationOpt.get().getParentLocationId() == null) {
+        if (action != null && action.equals("back") && form.getLocationId() != null) {
+            Optional<Location> locationOpt = LocationDao.getInstance().get(form.getLocationId());
+            if (locationOpt.isPresent()) {
+                form.setLocationId(locationOpt.get().getParentLocationId());
+                if (locationOpt.get().getParentLocationId() == null) {
                     // if the parent of the parent is null, it means that the parent is the root
-                    form.setParentName("None");
+                    form.setLocationName("None");
                 } else {
                     // get the name of the parent
-                    parentLocationOpt = LocationDao.getInstance().get(parentLocationOpt.get().getParentLocationId());
-                    if (parentLocationOpt.isPresent()) {
-                        form.setParentName(parentLocationOpt.get().getName());
+                    locationOpt = LocationDao.getInstance().get(locationOpt.get().getParentLocationId());
+                    if (locationOpt.isPresent()) {
+                        form.setLocationName(locationOpt.get().getName());
                     } else {
                         // just to be safe, this shouldn't happen unless something is removed
                         // from the database while the user is using the app
-                        form.setParentId(null);
-                        form.setParentName("None");
+                        form.setLocationId(null);
+                        form.setLocationName("None");
                     }
                 }
             }
         }
 
-        List<Location> locations = LocationDao.getInstance().getParentLocationsOf(form.getParentId());
+        List<Location> locations = LocationDao.getInstance().getParentLocationsOf(form.getLocationId());
+
+        Long locationId = Util.parseLongOrDefault(request.getParameter("id"), 0L);
+
+        // remove the current location from the list of locations
+        locations = locations.stream().filter(
+                (location) -> !location.getId().equals(locationId)
+        ).collect(Collectors.toList());
 
         // if a parent is selected, add it to the list of locations
         // so the user can see it
-        if (form.getParentId() != null) {
+        if (form.getLocationId() != null) {
             Location selected = new Location();
 
-            selected.setId(form.getParentId());
-            selected.setName(form.getParentName());
+            selected.setId(form.getLocationId());
+            selected.setName(form.getLocationName());
 
             locations.add(0, selected);
         }
