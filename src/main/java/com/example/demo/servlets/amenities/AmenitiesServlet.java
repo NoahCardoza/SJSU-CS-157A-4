@@ -145,81 +145,93 @@ public class AmenitiesServlet extends HttpServlet {
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create an amenity.");
-        if (user == null) {
-            return;
-        }
 
         switch (request.getMethod()) {
             case "GET":
-                List<Location> locations = LocationDao.getInstance().getAll();
-
-                request.setAttribute(
-                        "locations",
-                        locations
-                );
-
-                List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
-
-                request.setAttribute(
-                        "amenityTypes",
-                        amenityTypes
-                );
-
-                AmenityFilter amenityFilter = new AmenityFilter(request);
-
-                if (amenityFilter.getAmenityTypeId() != null) {
-
-                    List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenityFilter.getAmenityTypeId());
-
-                    var amenityTypeAttributeGrouper = new AmenityTypeAttributeGrouper(request, amenityTypeAttributes);
-
-                    request.setAttribute(
-                            "amenityTypeAttributes",
-                            amenityTypeAttributeGrouper
-                    );
-                }
-
-                request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
+                amenityCreateGet(request, response);
                 break;
 
             case "POST":
-                AmenityForm form = new AmenityForm(request);
-
-                String action = request.getParameter("action");
-
-                if (action != null && action.equals("submit")) {
-                    Validation v = form.validate();
-
-                    if (v.isValid()) {
-                        Amenity amenity = new Amenity();
-                        amenity.setUserId(user.getId());
-                        amenity.setLocationId(form.getParentId());
-                        amenity.setName(form.getName());
-                        amenity.setDescription(form.getDescription());
-                        amenity.setAmenityTypeId(form.getParentId());
-                        try {
-                            AmenityDao.getInstance().create(amenity);
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        // TODO: redirect to location page
-
-                        response.sendRedirect(request.getContextPath() + "/amenities");
-                        return;
-                    } else {
-                        request.setAttribute("errors", v.getMessages());
-                    }
-                }
-
-                request.setAttribute("form", form);
-
-                request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
+                amenityCreatePost(request, response);
                 break;
         }
     }
 
+    private void amenityCreateGet(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, ServletException{
+
+        List<Location> locations = LocationDao.getInstance().getAll();
+
+        request.setAttribute(
+                "locations",
+                locations
+        );
+
+        List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
+
+        request.setAttribute(
+                "amenityTypes",
+                amenityTypes
+        );
+
+        AmenityFilter amenityFilter = new AmenityFilter(request);
+
+        if (amenityFilter.getAmenityTypeId() != null) {
+
+            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenityFilter.getAmenityTypeId());
+
+            var amenityTypeAttributeGrouper = new AmenityTypeAttributeGrouper(request, amenityTypeAttributes);
+
+            request.setAttribute(
+                    "amenityTypeAttributes",
+                    amenityTypeAttributeGrouper
+            );
+        }
+
+        //return;
+
+        request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
+        //return;
+    }
+
+    private void amenityCreatePost(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, ServletException{
+        /*AmenityForm form = new AmenityForm(request);
+
+        String action = request.getParameter("action");
+
+        if (action != null && action.equals("submit")) {
+            Validation v = form.validate();
+
+            if (v.isValid()) {
+                Amenity amenity = new Amenity();
+                //amenity.setUserId(user.getId());
+                amenity.setLocationId(form.getParentId());
+                amenity.setName(form.getName());
+                amenity.setDescription(form.getDescription());
+                amenity.setAmenityTypeId(form.getParentId());
+                try {
+                    AmenityDao.getInstance().create(amenity);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // TODO: redirect to location page
+
+                response.sendRedirect(request.getContextPath() + "/amenities");
+                return;
+            } else {
+                request.setAttribute("errors", v.getMessages());
+            }
+        }
+
+        request.setAttribute("form", form);*/
+
+        request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
+    }
+
+
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to edit an amenity.");
 
         Long amenityID = Util.parseLongOrNull(request.getParameter("id"));
         if (amenityID == null) {
@@ -248,21 +260,21 @@ public class AmenitiesServlet extends HttpServlet {
 
             String action = request.getParameter("action");
             if (action != null && action.equals("submit")) {
-                Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
-                if (user.isEmpty()) {
+                //Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
+                /*if (user.isEmpty()) {
                     Guard.redirectToLogin(
                             request,
                             response,
                             new Alert("danger", "You must be logged in to edit a location.")
                     );
                     return;
-                }
+                }*/
                 Validation v = form.validate();
 
                 if (v.isValid()) {
                     Amenity newAmenity = new Amenity();
                     newAmenity.setId(amenityID);
-                    newAmenity.setUserId(user.get().getId());
+                    //newAmenity.setUserId(user.get().getId());
                     newAmenity.setName(form.getName());
                     newAmenity.setDescription(form.getDescription());
 
@@ -283,12 +295,12 @@ public class AmenitiesServlet extends HttpServlet {
         request.setAttribute("primaryButtonText", "Update");
         request.setAttribute("headerText", "Update Location");
 
-        request.getRequestDispatcher("/template/amenity/amenityForm.jsp").forward(request, response);
+        request.getRequestDispatcher("/template/amenity/amenityEdit.jsp").forward(request, response);
     }
 
     public void delete(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
-        // TODO: Needs to check if user is admin for deletion
+        User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to delete an amenity.");
 
         Long amenityId = Util.parseLongOrNull(request.getParameter("id"));
 
@@ -437,7 +449,7 @@ public class AmenitiesServlet extends HttpServlet {
         );
 
         // TODO: change the path later
-        request.getRequestDispatcher("template/auth/signup.jsp").forward(request, response);
+        request.getRequestDispatcher("template/amenity/view-amenity.jsp").forward(request, response);
     }
 }
 
