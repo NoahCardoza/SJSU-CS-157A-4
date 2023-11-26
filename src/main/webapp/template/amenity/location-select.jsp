@@ -4,8 +4,6 @@
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%--@elvariable id="postParams" type="java.util.HashMap"--%>
-
 <%
     request.setAttribute("postParams", Util.getPostParameters(request));
 %>
@@ -13,47 +11,47 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>LHG | Location | Parent Select</title>
+        <title>LHG | Amenity | Location Select</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
-            <h1>Location Parent Select</h1>
+            <h1>Amenity Location Select</h1>
             <form method="POST" class="mb-5">
                 <select
-                        name="parentId"
+                        name="locationId"
                         class="form-select mb-3"
-                        aria-label="Select a parent location"
+                        aria-label="Select a location"
                         onchange='
                             (function onchange(self) {
                                 console.log(event.target.value);
-                                document.getElementById("parentName").value = event.target.querySelector("[value=\"" + event.target.value + "\"]").innerText
+                                document.getElementById("locationName").value = event.target.querySelector("[value=\"" + event.target.value + "\"]").innerText
                                 self.form.submit();
                             })(this)'
                 >
-                    <option value="0" ${form.parentId == null ? 'selected' : ''}>None</option>
+                    <option value="0" ${form.locationId == null ? 'selected' : ''}>None</option>
 
                     <c:forEach var="location" items="${locations}">
-                        <option ${location.id == form.parentId ? 'selected' : ''} value="${location.id}">${location.name}</option>
+                        <option ${location.id == form.locationId ? 'selected' : ''} value="${location.id}">${location.name}</option>
                     </c:forEach>
                 </select>
 
-                <input type="hidden" name="parentName" id="parentName" value="${form.parentName}">
-                <button type="submit" class="btn btn-secondary w-100" name="action" value="back">Back</button>
+                <input type="hidden" name="locationName" id="locationName" value="${form.locationName}">
+                <button type="submit" class="btn btn-secondary w-100" name="action" value="back">Revert</button>
 
                 <c:forEach items="${postParams}" var="p">
-                    <c:if test="${!fn:startsWith(p.key, 'parent') && p.key != 'action'}">
+                    <c:if test="${!fn:startsWith(p.key, 'location') && p.key != 'action'}">
                         <input type="hidden" name="${p.key}" value="${p.value}">
                     </c:if>
                 </c:forEach>
             </form>
 
             <form action="${postParams['redirect']}" method="post">
-                <input type="hidden" name="parentId" value="${form.parentId}">
-                <input type="hidden" name="parentName" value="${form.parentName}">
+                <input type="hidden" name="locationId" value="${form.locationId}">
+                <input type="hidden" name="locationName" value="${form.locationName}">
                 <c:forEach items="${postParams}" var="p">
-                    <c:if test="${!fn:startsWith(p.key, 'parent') && p.key != 'action'}">
+                    <c:if test="${!fn:startsWith(p.key, 'location') && p.key != 'action'}">
                         <input type="hidden" name="${p.key}" value="${p.value}">
                     </c:if>
                 </c:forEach>

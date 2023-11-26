@@ -5,12 +5,14 @@ import com.example.demo.Validation;
 import com.example.demo.beans.entities.Amenity;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.HashMap;
+
 public class AmenityForm {
 
-    Long parentId = null;
-    String parentName = "None";
+    Long typeId = null;
+    String typeName = "None";
     Long locationId;
-
+    String locationName = "None";
     String name = "";
     String description = "";
 
@@ -18,15 +20,16 @@ public class AmenityForm {
     public AmenityForm() {}
 
     public AmenityForm(HttpServletRequest request) {
-        this.parentId = Util.parseLongOrNull(request.getParameter("parentId"));
+        this.typeId = Util.parseLongOrNull(request.getParameter("typeId"));
         this.locationId = Util.parseLongOrNull(request.getParameter("locationId"));
-        this.parentName = request.getParameter("parentName");
+        this.locationName = request.getParameter("locationName");
+        this.typeName = request.getParameter("typeName");
         this.name = request.getParameter("name");
         this.description = request.getParameter("description");
     }
 
     public AmenityForm(Amenity amenity) {
-        this.parentId = amenity.getAmenityTypeId();
+        this.typeId = amenity.getAmenityTypeId();
         this.name = amenity.getName();
         this.description = amenity.getDescription();
     }
@@ -65,20 +68,20 @@ public class AmenityForm {
         return v;
     }
 
-    public Long getParentId() {
-        return parentId;
+    public Long getTypeId() {
+        return typeId;
     }
 
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
+    public void setTypeId(Long typeId) {
+        this.typeId = typeId;
     }
 
-    public String getParentName() {
-        return parentName;
+    public String getTypeName() {
+        return typeName;
     }
 
-    public void setParentName(String parentName) {
-        this.parentName = parentName;
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
     public String getName() {
@@ -100,6 +103,12 @@ public class AmenityForm {
     public void setLocationId(Long locationId) {
         this.locationId = locationId;
     }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) { this.locationName = locationName; }
 
     public void setDescription(String description) {
         this.description = description;
