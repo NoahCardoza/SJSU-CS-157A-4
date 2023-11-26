@@ -190,7 +190,7 @@ public class RevisionsServlet extends HttpServlet {
             return;
         }
 
-        List<Revision> revisions = RevisionDao.getInstance().getEntityRevisions(tableName, primaryKey, (Long) request.getAttribute("user_id"));
+        List<Revision> revisions = RevisionDao.getInstance().getEntityRevisions(tableName, primaryKey, (Long) request.getSession().getAttribute("user_id"));
 
         for (Revision revision : revisions) {
             RevisionDao.getInstance().getUserForRevision(revision);

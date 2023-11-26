@@ -97,6 +97,8 @@ public class Revision {
                 ", userId=" + userId +
                 ", reverted=" + reverted +
                 ", createdAt=" + createdAt +
+                ", voted=" + voted +
+                ", votes=" + votes +
                 ", edits=" + edits +
                 '}';
     }
@@ -110,10 +112,10 @@ public class Revision {
     }
 
     public void setVoted(int voted) {
-        this.votes = voted;
+        this.voted = voted;
     }
 
     public int getVoted() {
-        return votes;
+        return voted;
     }
 }

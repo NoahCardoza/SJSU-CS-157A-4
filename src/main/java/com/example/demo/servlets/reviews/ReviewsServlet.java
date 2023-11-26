@@ -3,11 +3,9 @@ package com.example.demo.servlets.reviews;
 import com.example.demo.Guard;
 import com.example.demo.S3;
 import com.example.demo.Util;
-import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.*;
 import com.example.demo.daos.*;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +20,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @WebServlet(name = "Reviews", value = "/reviews")
-@MultipartConfig
 public class ReviewsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         doRequest(request, response);
@@ -41,17 +38,17 @@ public class ReviewsServlet extends HttpServlet {
 
         try {
             switch (function) {
-                case "view":
-                    view(request, response);
+                case "list":
+                    list(request, response);
                     break;
                 case "create":
                     create(request, response);
                     break;
                 case "edit":
-                    request.getRequestDispatcher("/template/reviews/edit-review.jsp").forward(request, response);
+                    edit(request, response);
                     break;
                 case "delete":
-                    request.getRequestDispatcher("/template/reviews/delete-review.jsp").forward(request, response);
+                    delete(request, response);
                     break;
                 default:
                     getAll(request, response);
@@ -62,7 +59,19 @@ public class ReviewsServlet extends HttpServlet {
         }
     }
 
-    public void view(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+    private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        User user = Guard.requireAuthenticationWithMessage(request, response, "Must be logged in to delete.");
+        if (user == null) return;
+        Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if(reviewId == null){
+            response.sendRedirect(request.getContextPath() + "/reviews");
+            return;
+        };
+
+    }
+
+    public void list(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
 
         if (reviewId == null) {
@@ -70,18 +79,27 @@ public class ReviewsServlet extends HttpServlet {
             return;
         }
 
-        Optional<Review> review = ReviewDao.get(reviewId);
+        List<Review> reviews = ReviewDao.getAllReviews(reviewId);
 
-        if (!review.isPresent()) {
-            response.sendRedirect(request.getContextPath() + "/reviews");
-            return;
+        for (Review review:
+             reviews) {
+            review.setMetrics(ReviewDao.getAllReviewMetricRecordsWithNames(review.getId()));
+            review.setImages(ReviewDao.getAllImages(review.getId()));
+
         }
 
-        List<AmenityTypeMetricRecordWithName> metrics =  ReviewDao.getAllReviewMetricRecordsWithNames(reviewId);
 
-        response.getWriter().println(review.get());
-        response.getWriter().println(metrics);
+
+        List<AmenityTypeMetricRecordWithName> metrics =  ReviewDao.getAllReviewMetricRecordsWithNames(reviewId);
+        request.setAttribute("reviews", reviews);
+
+        request.getRequestDispatcher("/template/reviews/list.jsp").forward(request, response);
+
+
+
     }
+
+
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
