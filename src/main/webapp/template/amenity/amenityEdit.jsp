@@ -23,46 +23,14 @@
                 <div class="row">
                     <%@include file="../../includes/alerts.jsp" %>
                     <div class="col mb-3 d-flex justify-content-between align-items-center">
-                        <div>
-                            Location:
-                            <b>
-                                <c:choose>
-                                    <c:when test="${empty form.locationName}">
-                                        None
-                                    </c:when>
-                                    <c:otherwise>
-                                        ${form.locationName}
-                                    </c:otherwise>
-                                </c:choose>
-                            </b>
-                        </div>
-                        <button
-                                class="btn btn-primary float-end"
-                                onclick="$('#new-location-form').attr('action', '${param['id'] ? '/amenities?f=locationSelect&id=' + param['id'] : '/amenities?f=locationSelect'}').submit()"
-                        >Select Location</button>
+                            <p>Location: <b> ${form.locationName} </b> </p>
                     </div>
                 </div>
 
                 <div class="row">
                     <%@include file="../../includes/alerts.jsp" %>
                     <div class="col mb-3 d-flex justify-content-between align-items-center">
-                        <div>
-                            Amenity Type:
-                            <b>
-                                <c:choose>
-                                    <c:when test="${empty form.typeName}">
-                                        None
-                                    </c:when>
-                                    <c:otherwise>
-                                        ${form.typeName}
-                                    </c:otherwise>
-                                </c:choose>
-                            </b>
-                        </div>
-                        <button
-                                class="btn btn-primary float-end"
-                                onclick="$('#new-location-form').attr('action', '${param['id'] ? '/amenities?f=typeSelect&id=' + param['id'] : '/amenities?f=typeSelect'}').submit()"
-                        >Select Amenity Type</button>
+                            <p>Amenity Type: <b> ${form.typeName} </b></p>
                     </div>
                 </div>
 
@@ -74,15 +42,13 @@
 
                 <div class="form-group col-md-6 mb-3">
                     <p>Attributes</p>
-                    <c:forEach var="amenityTypeAttribute" items="${amenityTypeAttributes}">
+                    <c:forEach var="amenityAttributeWithName" items="${amenityAttributesWithNames}">
                         <div class="form-group">
-                            <label for="amenityTypeAttribute-${amenityTypeAttribute.id}">${amenityTypeAttribute.name}</label>
-                            <input class="form-control" type="text" id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" value="amenityTypeAttribute-${amenityTypeAttribute.id}"/>
+                            <label for="amenityTypeAttribute-${amenityAttributeWithName.value}">${amenityAttributeWithName.name}</label>
+                            <input class="form-control" type="text" id="amenityTypeAttribute-${amenityAttributeWithName.value}" name="amenityTypeAttribute-${amenityAttributeWithName.value}" value="${amenityAttributeWithName.value}"/>
                         </div>
                     </c:forEach>
                 </div>
-
-
 
                 <label for="name" class="form-label">Name</label>
                 <input type="text" id="name" name="name" value="${form.name}" class="form-control mb-3" placeholder="Name" />

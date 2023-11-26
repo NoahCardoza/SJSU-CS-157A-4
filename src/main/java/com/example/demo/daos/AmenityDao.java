@@ -111,21 +111,24 @@ public class AmenityDao {
         ps.executeUpdate();
     }
 
-
-    public String getValueFromAmenityRecord(AmenityTypeAttribute amenityTypeAttribute, Amenity amenity) throws SQLException {
+    public String getAttributeName(Long attributeId, Long amenityId) throws SQLException {
 
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
-                "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?"
+                "SELECT y.name\n" +
+                        "FROM AmenityAttributeRecord x\n" +
+                        "LEFT JOIN AmenityTypeAttribute y\n" +
+                        "ON x.amenity_attribute_id = y.id\n" +
+                        "WHERE amenity_attribute_id = ? AND amenity_id = ?"
         );
 
-        statement.setDouble(1, amenityTypeAttribute.getAmenityTypeId());
-        statement.setDouble(2, amenity.getId());
+        statement.setLong(1, attributeId);
+        statement.setLong(2, amenityId);
 
         ResultSet resultSet = statement.executeQuery();
 
         if (resultSet.next()) {
-            return resultSet.getString("value");
+            return resultSet.getString("name");
         }
 
         return "";
@@ -134,7 +137,39 @@ public class AmenityDao {
 
     //TODO: need to update this statement with amenity
     public void update(Amenity amenity) throws SQLException {
+        Connection conn = Database.getConnection();
 
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO Amenity (amenity_type_id, location_id, user_id, description, name) \n" +
+                "VALUES (?, ?, ?, ?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS);
+
+        statement.setLong(1, amenity.getAmenityTypeId());
+        statement.setLong(2, amenity.getLocationId());
+        statement.setLong(3, amenity.getUserId());
+        statement.setString(4, escapeHtml(amenity.getDescription()));
+        statement.setString(5, escapeHtml(amenity.getName()));
+
+        statement.executeUpdate();
+
+        ResultSet rs = statement.getGeneratedKeys();
+
+        rs.next();
+
+        amenity.setId(rs.getLong(1));
+    }
+
+    public void updateAmenityRecord(AmenityTypeAttributeRecord record) throws SQLException {
+
+        PreparedStatement ps = Database.getConnection().prepareStatement(
+                "INSERT INTO AmenityAttributeRecord (amenity_attribute_id, amenity_id, value) VALUES (?, ?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS
+        );
+
+        ps.setLong(1, record.getAmenityAttributeId());
+        ps.setLong(2, record.getAmenityId());
+        ps.setString(3, record.getValue());
+
+        ps.executeUpdate();
     }
 
     public List<AmenityWithImage> getWithFilter(AmenityFilter filter, List<Location> locations) throws SQLException {
