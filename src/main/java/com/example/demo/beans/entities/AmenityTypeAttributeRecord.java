@@ -25,8 +25,8 @@ public class AmenityTypeAttributeRecord {
     @Override
     public String toString() {
         return "AmenityTypeAttributeRecord{" +
-                "amenityMetricId=" + amenityAttributeId +
-                ", reviewId=" + amenityId +
+                "amenityAttributeId=" + amenityAttributeId +
+                ", amenityId=" + amenityId +
                 ", value=" + value +
                 '}';
     }

@@ -17,7 +17,7 @@
     <body>
         <%@include file="../../includes/nav.jsp" %>
         <div class="container mt-5">
-            <h1>Edit an Amenity</h1>
+            <h1>Edit Amenity</h1>
 
            <form method="POST" class="mt-5" id="new-location-form">
                 <div class="row">
@@ -70,13 +70,26 @@
                 <input type="hidden" name="locationName" id="locationName" value="${form.locationName}">
                 <input type="hidden" name="typeId" id="typeId" value="${form.typeId}">
                 <input type="hidden" name="typeName" id="typeName" value="${form.typeName}">
+                <input type="hidden" name="amenityTypeAttributes" id="amenityTypeAttributes" value="${form.attributes}">
+
+                <div class="form-group col-md-6 mb-3">
+                    <p>Attributes</p>
+                    <c:forEach var="amenityTypeAttribute" items="${amenityTypeAttributes}">
+                        <div class="form-group">
+                            <label for="amenityTypeAttribute-${amenityTypeAttribute.id}">${amenityTypeAttribute.name}</label>
+                            <input class="form-control" type="text" id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" value="amenityTypeAttribute-${amenityTypeAttribute.id}"/>
+                        </div>
+                    </c:forEach>
+                </div>
+
+
 
                 <label for="name" class="form-label">Name</label>
                 <input type="text" id="name" name="name" value="${form.name}" class="form-control mb-3" placeholder="Name" />
                 <label for="description" class="form-label">Description</label>
                 <textarea id="description" name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
                 <input type="hidden" name="redirect" value="${pathWithQueryString}">
-                <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Edit</button>
+                <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
         </div>
     </body>
 </html>

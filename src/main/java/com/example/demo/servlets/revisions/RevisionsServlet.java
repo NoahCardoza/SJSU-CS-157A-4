@@ -63,8 +63,6 @@ public class RevisionsServlet extends HttpServlet {
             return;
         }
 
-
-
         RevisionDao.getInstance().getEditsForRevision(revision.get());
         RevisionDao.getInstance().getUserForRevision(revision.get());
         request.setAttribute("revision", revision.get());

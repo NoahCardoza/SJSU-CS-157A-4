@@ -16,7 +16,7 @@
             <h1 class="mb-2">${amenity.name}</h1>
             </br>
             <a class="btn btn-secondary" href="<c:url value="/amenities?f=edit&id=${amenity.id}"/>">Edit</a>
-            <a class="btn btn-warning" href="<c:url value="/revisions?f=list&type=Location&id=${location.id}"/>">Revision</a>
+            <a class="btn btn-warning" href="<c:url value="/revisions?f=list&type=Amenity&id=${amenity.id}"/>">Revision</a>
             <a class = "btn btn-secondary" href="<c:url value="/reviews?f=create&amenityId=${amenity.id}"/>">Create Review</a>
             <a class="btn btn-danger" href="<c:url value="/amenities?f=delete&id=${amenity.id}"/>" class="btn btn-danger">Delete</a>
              </br>

@@ -57,7 +57,7 @@ public class AmenityDao {
         PreparedStatement statement = conn.prepareStatement("DELETE * FROM Amenity WHERE id = ?");
         statement.setDouble(1, id);
 
-        ResultSet resultSet = statement.executeQuery();
+        statement.executeQuery();
     }
 
     public List<Amenity> getAll() throws SQLException {
@@ -73,11 +73,13 @@ public class AmenityDao {
         return amenityTypes;
     }
 
-    public Long create(Amenity amenity) throws SQLException {
+    public void create(Amenity amenity) throws SQLException {
+
         Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("INSERT INTO Amenity (amenity_type_id, location_id, user_id, description, name) \n" +
-                "VALUES (?, ?, ?, ?, ?)");
+                "VALUES (?, ?, ?, ?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS);
 
         statement.setLong(1, amenity.getAmenityTypeId());
         statement.setLong(2, amenity.getLocationId());
@@ -87,15 +89,18 @@ public class AmenityDao {
 
         statement.executeUpdate();
 
-        return amenity.getId();
+        ResultSet rs = statement.getGeneratedKeys();
+
+        rs.next();
+
+        amenity.setId(rs.getLong(1));
+
     }
 
     public void createAmenityRecord(AmenityTypeAttributeRecord record) throws SQLException {
 
-        System.out.println(record);
-
         PreparedStatement ps = Database.getConnection().prepareStatement(
-                "INSERT INTO ReviewMetricRecord (amenity_attribute_id, amenity_id, value) VALUES (?, ?, ?)",
+                "INSERT INTO AmenityAttributeRecord (amenity_attribute_id, amenity_id, value) VALUES (?, ?, ?)",
                 PreparedStatement.RETURN_GENERATED_KEYS
         );
 
@@ -104,6 +109,27 @@ public class AmenityDao {
         ps.setString(3, record.getValue());
 
         ps.executeUpdate();
+    }
+
+
+    public String getValueFromAmenityRecord(AmenityTypeAttribute amenityTypeAttribute, Amenity amenity) throws SQLException {
+
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?"
+        );
+
+        statement.setDouble(1, amenityTypeAttribute.getAmenityTypeId());
+        statement.setDouble(2, amenity.getId());
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            return resultSet.getString("value");
+        }
+
+        return "";
+
     }
 
     //TODO: need to update this statement with amenity
