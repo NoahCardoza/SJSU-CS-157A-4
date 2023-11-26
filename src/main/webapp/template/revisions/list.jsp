@@ -25,28 +25,27 @@
                     </thead>
                     <tbody>
                     <c:forEach var="revision" items="${revisions}">
-                                <tr>
-                                    <td>${revision.createdAt}</td>
-                                    <td><a href="<c:url value="/users?f=get&id=${revision.user.id}"/>">${revision.user.username}</a></td>
-                                    <td>${revision.edits.size()}</td>
-                                    <td>${revision.votes}</td>
-                                    <td>
-                                        <a href="<c:url value="/revisions?f=get&id=${revision.id}"/>" class="btn btn-primary">View</a>
-                                        <form action="<c:url value="/revisions?f=vote"/>" class="d-inline" method="post">
-                                            <input type="hidden" name="id" value="${revision.id}">
-                                            <button type="submit" name="action" value="up" class="btn btn-${revision.voted == 1 ? 'outline-' : ''}success">Up Vote</button>
-                                            <button type="submit" name="action" value="down" class="btn btn-${revision.voted == -1 ? 'outline-' : ''}danger">Down Vote</button>
-                                        </form>
+                        <tr>
+                            <td>${revision.createdAt}</td>
+                            <td><a href="<c:url value="/users?f=get&id=${revision.user.id}"/>">${revision.user.username}</a></td>
+                            <td>${revision.edits.size()}</td>
+                            <td>${revision.votes}</td>
+                            <td>
+                                <a href="<c:url value="/revisions?f=get&id=${revision.id}"/>" class="btn btn-sm btn-primary">View</a>
+                                <form action="<c:url value="/revisions?f=vote"/>" class="d-inline" method="post">
+                                    <input type="hidden" name="id" value="${revision.id}">
+                                    <button type="submit" name="action" value="up" class="btn btn-sm btn-${revision.voted == 1 ? 'outline-' : ''}success" title="Up Vote"><i class="bi bi-caret-up-fill"></i></button>
+                                    <button type="submit" name="action" value="down" class="btn btn-sm btn-${revision.voted == -1 ? 'outline-' : ''}danger" title="Down Vote"><i class="bi bi-caret-down-fill"></i></button>
+                                </form>
 
-                                        <c:if test="${(user.administrator || user.moderator) && !revision.isReverted()}">
-                                            <form action="<c:url value="/revisions?f=revert"/>" method="post" class="d-inline">
-                                                <input type="hidden" name="id" value="${revision.id}">
-                                                <button type="submit" name="method" value="revert" class="btn btn-warning">Revert</button>
-                                            </form>
-                                        </c:if>
-                                    </td>
-                                </tr>
-
+                                <c:if test="${(user.administrator || user.moderator) && !revision.isReverted()}">
+                                    <form action="<c:url value="/revisions?f=revert"/>" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="${revision.id}">
+                                        <button type="submit" name="method" value="revert" class="btn btn-sm btn-warning" title="Revert"><i class="bi bi-arrow-counterclockwise"></i></button>
+                                    </form>
+                                </c:if>
+                            </td>
+                        </tr>
                     </c:forEach>
                     </tbody>
                 </table>

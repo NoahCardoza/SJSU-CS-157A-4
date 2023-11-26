@@ -69,14 +69,14 @@ public class RevisionDao {
     public ArrayList<Revision> getEntityRevisions(String tableName, Long primaryKey, Long currentUser) throws SQLException {
         ArrayList<Revision> revisions = new ArrayList<>();
         Connection conn = Database.getConnection();
-        // TODO: flag revisions that have been voted on by the current user
+
         PreparedStatement statement = conn.prepareStatement(
                 "SELECT *, COALESCE((" +
                         "SELECT SUM(value) " +
                         "FROM RevisionVote " +
                         "WHERE revision_id = Revision.id), 0) AS votes " +
                         (currentUser != null
-                                ? ", COALESCE((SELECT revision_id FROM RevisionVote WHERE user_id = ? AND revision_id = Revision.id), 0) AS voted "
+                                ? ", COALESCE((SELECT value FROM RevisionVote WHERE user_id = ? AND revision_id = Revision.id), 0) AS voted "
                                 : " "
                         ) +
                     "FROM Revision " +
