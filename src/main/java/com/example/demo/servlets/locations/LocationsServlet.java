@@ -426,12 +426,6 @@ public class LocationsServlet extends HttpServlet {
             return;
         }
 
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
         request.setAttribute("headerText", "Create Location");
         request.setAttribute("primaryButtonText", "Create");
         request.setAttribute("titleText", "Create");
@@ -445,12 +439,6 @@ public class LocationsServlet extends HttpServlet {
                 request.setAttribute("hasParent", false);
                 request.setAttribute("locations", locations);
                 request.setAttribute("form", form);
-
-                Enumeration<String> param = request.getParameterNames();
-                while(param.hasMoreElements()){
-                    String paramName = param.nextElement();
-                    System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-                }
 
                 request.getRequestDispatcher("/template/locations/form.jsp").forward(request, response);
                 break;

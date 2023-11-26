@@ -14,6 +14,7 @@ import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -105,6 +106,14 @@ public class ReviewsServlet extends HttpServlet {
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        System.out.println("\n\n");
+        Enumeration<String> params = request.getParameterNames();
+        while(params.hasMoreElements()){
+            String paramName = params.nextElement();
+            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
+        }
+
         User user = Guard.requireAuthenticationWithMessage(
                 request,
                 response,

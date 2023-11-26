@@ -9,6 +9,7 @@ import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.AmenityType;
 import com.example.demo.beans.entities.AmenityTypeAttribute;
 import com.example.demo.beans.forms.AmenityForm;
+import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.*;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.AmenityDao;
@@ -51,6 +52,7 @@ public class AmenitiesServlet extends HttpServlet {
             switch (function) {
                 case "get":
                     get(request, response);
+                    break;
                 case "create":
                     create(request, response);
                     break;
@@ -91,7 +93,7 @@ public class AmenitiesServlet extends HttpServlet {
         Optional<Amenity> amenity = AmenityDao.getInstance().get(amenityId);
         Amenity object = amenity.get();
 
-        System.out.println(amenity);
+        //System.out.println(amenity);
 
         if (amenity.isPresent()) {
             request.setAttribute(
@@ -150,23 +152,7 @@ public class AmenitiesServlet extends HttpServlet {
             return;
         }
 
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
         AmenityForm form = new AmenityForm(request);
-
-        /*String x = request.getParameter("typeId");
-        System.out.println("typeId: " + x + "\n\n\n");
-
-        if(x!=null){
-            Long selectedAmenityTypeId = Long.parseLong(x);
-            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(selectedAmenityTypeId);
-            request.setAttribute("amenityTypeAttributes", amenityTypeAttributes);
-            System.out.println("\n\n\nin here!\n\n\n");
-        }*/
 
         switch (request.getMethod()) {
             case "GET":
@@ -176,11 +162,15 @@ public class AmenitiesServlet extends HttpServlet {
                 request.setAttribute("hasParent", false);
                 request.setAttribute("locations", locations);
                 request.setAttribute("amenityTypes", amenityTypes);
+
                 request.setAttribute("form", form);
 
                 request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
                 break;
             case "POST":
+
+                List<AmenityTypeAttribute> attributes;
+
                 String action = request.getParameter("action");
                 if (action != null) {
                     if (action.equals("submit")) {
@@ -195,6 +185,19 @@ public class AmenitiesServlet extends HttpServlet {
 
                             try {
                                 AmenityDao.getInstance().create(amenity);
+
+                                List<AmenityTypeAttribute> attributeForRecords = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenity.getAmenityTypeId());
+
+
+                                for (AmenityTypeAttribute attribute : attributeForRecords){
+                                    AmenityTypeAttributeRecord attributeRecord = new AmenityTypeAttributeRecord();
+                                    attributeRecord.setAmenityId(amenity.getId());
+                                    attributeRecord.setAmenityAttributeId(attribute.getId());
+                                    attributeRecord.setValue(request.getParameter("amenityTypeAttribute-" + attribute.getId()));
+
+                                    AmenityDao.getInstance().createAmenityRecord(attributeRecord);
+                                }
+
                                 response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.getId());
                                 return;
                             } catch (SQLException e) {
@@ -206,12 +209,19 @@ public class AmenitiesServlet extends HttpServlet {
                             // TODO: send all errors
                             request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
                         }
+                        return;
                     } else {
                         request.setAttribute("alert", new Alert("danger", "Invalid action"));
                     }
                 }
 
-
+                if(form.getTypeId() != null){
+                    attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(form.getTypeId());
+                }
+                else {
+                    attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(0L);
+                }
+                request.setAttribute("amenityTypeAttributes", attributes);
                 request.setAttribute("form", form);
 
                 request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
@@ -221,14 +231,16 @@ public class AmenitiesServlet extends HttpServlet {
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
-        User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to edit an amenity.");
+        User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
+        if (user == null) {
+            return;
+        }
 
         Long amenityID = Util.parseLongOrNull(request.getParameter("id"));
         if (amenityID == null) {
             response.sendRedirect(request.getContextPath() + "/amenities");
             return;
         }
-
         Optional<Amenity> amenity = AmenityDao.getInstance().get(amenityID);
 
         if (!amenity.isPresent()) {
@@ -237,55 +249,110 @@ public class AmenitiesServlet extends HttpServlet {
         }
 
         AmenityForm form;
-        if (request.getMethod().equals("GET")) {
-            form = new AmenityForm(amenity.get());
-            form.setLocationName("None");
 
-            if (amenity.get().getAmenityTypeId() != null) {
-                Optional<Location> parentLocation = LocationDao.getInstance().get(amenity.get().getAmenityTypeId());
-                parentLocation.ifPresent(value -> form.setLocationName(value.getName()));
-            }
-        } else {
-            form = new AmenityForm(request);
+        switch (request.getMethod()) {
+            case "GET":
 
-            String action = request.getParameter("action");
-            if (action != null && action.equals("submit")) {
-                //Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
-                /*if (user.isEmpty()) {
-                    Guard.redirectToLogin(
-                            request,
-                            response,
-                            new Alert("danger", "You must be logged in to edit a location.")
-                    );
-                    return;
-                }*/
-                Validation v = form.validate();
+                form = new AmenityForm(amenity.get());
+                form.setLocationName("None");
 
-                if (v.isValid()) {
-                    Amenity newAmenity = new Amenity();
-                    newAmenity.setId(amenityID);
-                    //newAmenity.setUserId(user.get().getId());
-                    newAmenity.setName(form.getName());
-                    newAmenity.setDescription(form.getDescription());
+                List<AmenityTypeAttribute> amenityAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenity.get().getAmenityTypeId());
 
-                    // TODO: implement diff and track changes
-                    AmenityDao.getInstance().update(newAmenity);
-
-                    response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + amenityID);
-                    return;
-                } else {
-                    // TODO: implement form errors and a list of alerts
-                    request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
-                    System.out.println(v.getMessages());
+                if (amenity.get().getLocationId() != null) {
+                    Optional<Location> location = LocationDao.getInstance().get(amenity.get().getLocationId());
+                    if(location.isPresent()){
+                        Location object = location.get();
+                        form.setLocationName(object.getName());
+                    }
                 }
-            }
+
+                if(amenity.get().getAmenityTypeId() != null){
+                    Optional<AmenityType> amenityType = AmenityTypeDao.getInstance().get(amenity.get().getAmenityTypeId());
+                    if(amenityType.isPresent()){
+                        AmenityType object = amenityType.get();
+                        form.setTypeName(object.getName());
+                        form.setAttributes(amenityAttributes);
+                    }
+                }
+
+                System.out.println(form.getAttributes());
+                request.setAttribute("form", form);
+                request.setAttribute("amenityTypeAttributes", amenityAttributes);
+                Amenity amenityObject = amenity.get();
+
+                //have to go through the attributes and set the values and send them through to jsp
+                for (AmenityTypeAttribute attribute : amenityAttributes){
+                    String value = AmenityDao.getInstance().getValueFromAmenityRecord(attribute, amenityObject);
+                    request.setAttribute("amenityTypeAttribute-" + attribute.getId(), value);
+                }
+
+
+                request.getRequestDispatcher("/template/amenity/amenityEdit.jsp").forward(request, response);
+                break;
+
+            case "POST":
+                /*List<AmenityTypeAttribute> attributes;
+                form = new AmenityForm(request);
+
+                String action = request.getParameter("action");
+                if (action != null) {
+                    if (action.equals("submit")) {
+                        Validation v = form.validate();
+                        if (v.isValid()) {
+                            Amenity amenitySubmitted = new Amenity();
+                            amenitySubmitted.setUserId(user.getId());
+                            amenitySubmitted.setName(form.getName());
+                            amenitySubmitted.setDescription(form.getDescription());
+                            amenitySubmitted.setLocationId(form.getLocationId());
+                            amenitySubmitted.setAmenityTypeId(form.getTypeId());
+
+                            try {
+                                //Long amenityId = AmenityDao.getInstance().create(amenitySubmitted);
+
+                                List<AmenityTypeAttribute> attributeForRecords = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenity.getAmenityTypeId());
+                                System.out.println(attributeForRecords);
+
+
+                                for (AmenityTypeAttribute attribute : attributeForRecords){
+                                    AmenityTypeAttributeRecord attributeRecord = new AmenityTypeAttributeRecord();
+                                    //attributeRecord.setAmenityId(amenityId);
+                                    attributeRecord.setAmenityAttributeId(attribute.getId());
+                                    attributeRecord.setValue(request.getParameter("amenityTypeAttribute-" + attribute.getId()));
+                                    System.out.println("FINAL");
+                                    System.out.println(attributeRecord);
+
+                                    //AmenityDao.getInstance().createAmenityRecord(attributeRecord);
+                                }
+
+                                response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.getId());
+                                return;
+                            } catch (SQLException e) {
+                                request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
+                                e.printStackTrace();
+                            }
+                            return;
+                        } else {
+                            // TODO: send all errors
+                            request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
+                        }
+                        return;
+                    } else {
+                        request.setAttribute("alert", new Alert("danger", "Invalid action"));
+                    }
+                }
+
+                if(form.getTypeId() != null){
+                    attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(form.getTypeId());
+                }
+                else {
+                    attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(0L);
+                }
+                request.setAttribute("amenityTypeAttributes", attributes);
+                request.setAttribute("form", form);*/
+
+                request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
+                break;
         }
-
-        request.setAttribute("form", form);
-        request.setAttribute("primaryButtonText", "Update");
-        request.setAttribute("headerText", "Update Location");
-
-        request.getRequestDispatcher("/template/amenity/amenityEdit.jsp").forward(request, response);
     }
 
     public void delete(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {

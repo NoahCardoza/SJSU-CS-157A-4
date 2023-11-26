@@ -47,12 +47,7 @@
                 </c:forEach>
             </form>
 
-            <c:forEach var="amenityTypeAttribute" items="${amenityTypeAttributes}">
-                    <div class="container mt-5">
-                       <label for="attributeTypeName" class="form-label">${amenityTypeAttribute.name}</label>
-                       <input type="text" name="attributeTypeName" id="attributeTypeName" class="form-control mb-3" placeholder="Value" />
-                    </div>
-                </c:forEach>
+
 
             <form action="${postParams['redirect']}" method="post">
                 <input type="hidden" name="typeId" value="${form.typeId}">
