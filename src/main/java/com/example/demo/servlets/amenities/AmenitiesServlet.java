@@ -204,6 +204,7 @@ public class AmenitiesServlet extends HttpServlet {
                             // TODO: send all errors
                             request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
                         }
+                        return;
                     } else {
                         request.setAttribute("alert", new Alert("danger", "Invalid action"));
                     }
