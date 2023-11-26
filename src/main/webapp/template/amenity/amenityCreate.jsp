@@ -70,6 +70,19 @@
                 <input type="hidden" name="locationName" id="locationName" value="${form.locationName}">
                 <input type="hidden" name="typeId" id="typeId" value="${form.typeId}">
                 <input type="hidden" name="typeName" id="typeName" value="${form.typeName}">
+                <input type="hidden" name="amenityTypeAttributes" id="amenityTypeAttributes" value="${form.attributes}">
+
+                <div class="form-group col-md-6 mb-3">
+                    <p>Attributes</p>
+                    <c:forEach var="amenityTypeAttribute" items="${amenityTypeAttributes}">
+                        <div class="form-group">
+                            <label for="amenityTypeAttribute-${amenityTypeAttribute.id}">${amenityTypeAttribute.name}</label>
+                            <input class="form-control" type="text" id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" placeholder="Enter Numbers" />
+                        </div>
+                    </c:forEach>
+                </div>
+
+
 
                 <label for="name" class="form-label">Name</label>
                 <input type="text" id="name" name="name" value="${form.name}" class="form-control mb-3" placeholder="Name" />

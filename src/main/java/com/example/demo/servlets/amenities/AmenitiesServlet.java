@@ -150,37 +150,26 @@ public class AmenitiesServlet extends HttpServlet {
             return;
         }
 
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
         AmenityForm form = new AmenityForm(request);
-
-        /*String x = request.getParameter("typeId");
-        System.out.println("typeId: " + x + "\n\n\n");
-
-        if(x!=null){
-            Long selectedAmenityTypeId = Long.parseLong(x);
-            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(selectedAmenityTypeId);
-            request.setAttribute("amenityTypeAttributes", amenityTypeAttributes);
-            System.out.println("\n\n\nin here!\n\n\n");
-        }*/
 
         switch (request.getMethod()) {
             case "GET":
                 List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);
                 List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
 
+                System.out.println(form.getTypeId());
+
                 request.setAttribute("hasParent", false);
                 request.setAttribute("locations", locations);
                 request.setAttribute("amenityTypes", amenityTypes);
+
                 request.setAttribute("form", form);
 
                 request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
                 break;
             case "POST":
+                List<AmenityTypeAttribute> attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(0L);
+
                 String action = request.getParameter("action");
                 if (action != null) {
                     if (action.equals("submit")) {
@@ -195,6 +184,15 @@ public class AmenitiesServlet extends HttpServlet {
 
                             try {
                                 AmenityDao.getInstance().create(amenity);
+
+                                for (AmenityTypeAttribute attribute : attributes){
+                                    AmenityTypeAttributeRecord attributeRecord = new AmenityTypeAttributeRecord();
+                                    attributeRecord.setAmenityId(amenity.getId());
+                                    attributeRecord.setAmenityAttributeId(attribute.getId());
+                                    attributeRecord.setValue(request.getParameter("amenityTypeAttribute-" + attribute.getId()));
+                                    AmenityDao.getInstance().createAmenityRecord(attributeRecord);
+                                }
+
                                 response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.getId());
                                 return;
                             } catch (SQLException e) {
@@ -211,7 +209,13 @@ public class AmenitiesServlet extends HttpServlet {
                     }
                 }
 
-
+                if(form.getTypeId() != null){
+                    attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(form.getTypeId());
+                }
+                else {
+                    attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(0L);
+                }
+                request.setAttribute("amenityTypeAttributes", attributes);
                 request.setAttribute("form", form);
 
                 request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
@@ -222,6 +226,10 @@ public class AmenitiesServlet extends HttpServlet {
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
         User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to edit an amenity.");
+
+        if (user == null) {
+            return;
+        }
 
         Long amenityID = Util.parseLongOrNull(request.getParameter("id"));
         if (amenityID == null) {
@@ -373,6 +381,8 @@ public class AmenitiesServlet extends HttpServlet {
         );
 
         request.setAttribute("form", form);
+
+
 
         request.getRequestDispatcher("/template/amenity/type-select.jsp").forward(request, response);
     }
