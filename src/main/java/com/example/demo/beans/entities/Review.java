@@ -1,6 +1,6 @@
 package com.example.demo.beans.entities;
 
-import java.sql.*;
+import java.util.List;
 
 
 public class Review {
@@ -12,6 +12,8 @@ public class Review {
     private Boolean hidden;
     private String createdAt;
     private String updatedAt;
+    private List<String> images;
+    private List<AmenityTypeMetricRecordWithName> metrics;
 
     public Review() {
         // Default constructor
@@ -79,6 +81,22 @@ public class Review {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public List<AmenityTypeMetricRecordWithName> getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(List<AmenityTypeMetricRecordWithName> metrics) {
+        this.metrics = metrics;
     }
 
     @Override

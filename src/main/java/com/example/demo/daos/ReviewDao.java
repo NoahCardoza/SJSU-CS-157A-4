@@ -1,10 +1,7 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.entities.AmenityTypeMetric;
-import com.example.demo.beans.entities.AmenityTypeMetricRecord;
-import com.example.demo.beans.entities.AmenityTypeMetricRecordWithName;
-import com.example.demo.beans.entities.Review;
+import com.example.demo.beans.entities.*;
 
 import javax.xml.crypto.Data;
 import java.sql.*;
@@ -25,6 +22,8 @@ public class ReviewDao {
     }
 
     private ReviewDao() {}
+
+
 
 
     public static Optional<Review> get(long id) throws SQLException {
@@ -92,6 +91,8 @@ public class ReviewDao {
         }
     }
 
+
+
     public List<Review> getAll() throws SQLException {
         return null;
     }
@@ -129,6 +130,45 @@ public class ReviewDao {
         return review.getId();
     }
 
+    public static void delete(Review review) throws SQLException {
+        Connection conn = Database.getConnection();
+
+        PreparedStatement statement = conn.prepareStatement("DELETE FROM Review WHERE id = ?");
+
+        statement.setLong(1, review.getId());
+
+        statement.executeUpdate();
+    }
+
+    public static void hide(Review review) throws SQLException {
+        Connection conn = Database.getConnection();
+
+        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET hidden = ? WHERE id = ?");
+
+        statement.setBoolean(1, true); // set the hidden flag to true
+        statement.setLong(2, review.getId());
+
+        statement.executeUpdate();
+    }
+
+
+
+    public static void edit(Review review) throws SQLException {
+        Connection conn = Database.getConnection();
+
+        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET description=?, name=? WHERE id = ?");
+        statement.setString(1, escapeHtml(review.getDescription()));
+        statement.setString(2, escapeHtml(review.getName()));
+        statement.setLong(3, review.getId());
+
+        statement.executeUpdate();
+
+
+
+    }
+
+
+
     public static void createReviewRecord(AmenityTypeMetricRecord record) throws SQLException {
         PreparedStatement ps = Database.getConnection().prepareStatement(
                 "INSERT INTO ReviewMetricRecord (amenity_metric_id, review_id, value) VALUES (?, ?, ?)",
@@ -142,7 +182,8 @@ public class ReviewDao {
         ps.executeUpdate();
     }
 
-    public List<Review> getAllReviews(Long amenityId) throws SQLException {
+
+    public static List<Review> getAllReviews(Long amenityId) throws SQLException {
         ArrayList<Review> reviews = new ArrayList<>();
 
         Connection conn = Database.getConnection();
@@ -161,7 +202,7 @@ public class ReviewDao {
         return reviews;
     }
 
-    public List<String> getAllImages(Long amenityId) throws SQLException {
+    public static List<String> getAllImages(Long amenityId) throws SQLException {
         ArrayList<String> urls = new ArrayList<>();
 
         Connection conn = Database.getConnection();

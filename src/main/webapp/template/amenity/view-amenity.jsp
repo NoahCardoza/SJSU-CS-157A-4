@@ -18,7 +18,12 @@
             <a class="btn btn-secondary" href="<c:url value="/amenities?f=edit&id=${amenity.id}"/>">Edit</a>
             <a class="btn btn-warning" href="<c:url value="/revisions?f=list&type=Location&id=${location.id}"/>">Revision</a>
             <a class = "btn btn-secondary" href="<c:url value="/reviews?f=create&amenityId=${amenity.id}"/>">Create Review</a>
-            <a class="btn btn-danger" href="<c:url value="/amenities?f=delete&id=${amenity.id}"/>" class="btn btn-danger">Delete</a>
+
+            <a class="btn btn-danger" href="<c:url value="/amenities?f=delete&id=${amenity.id}"/>">Delete</a>
+
+            <a class = "btn btn-secondary" href="<c:url value="/reviews?f=list&id=${amenity.id}"/>">Reviews</a>
+
+
              </br>
              </br>
              <c:forEach var="image" items="${images}">
