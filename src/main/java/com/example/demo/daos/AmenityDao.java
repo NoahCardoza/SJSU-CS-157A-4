@@ -111,30 +111,6 @@ public class AmenityDao {
         ps.executeUpdate();
     }
 
-    public String getAttributeName(Long attributeId, Long amenityId) throws SQLException {
-
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT y.name\n" +
-                        "FROM AmenityAttributeRecord x\n" +
-                        "LEFT JOIN AmenityTypeAttribute y\n" +
-                        "ON x.amenity_attribute_id = y.id\n" +
-                        "WHERE amenity_attribute_id = ? AND amenity_id = ?"
-        );
-
-        statement.setLong(1, attributeId);
-        statement.setLong(2, amenityId);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        if (resultSet.next()) {
-            return resultSet.getString("name");
-        }
-
-        return "";
-
-    }
-
     //TODO: need to update this statement with amenity
     public void update(Amenity amenity) throws SQLException {
         Connection conn = Database.getConnection();

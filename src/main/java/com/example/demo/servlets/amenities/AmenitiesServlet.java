@@ -294,21 +294,26 @@ public class AmenitiesServlet extends HttpServlet {
                 }
 
                 List<AmenityTypeAttribute> attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(form.getTypeId());
-
+                String value = "";
+                String name = "";
 
                 for(AmenityTypeAttribute attribute : attributes){
                     AmenityTypeAttributeRecordWithName attributeRecord = new AmenityTypeAttributeRecordWithName();
+
                     attributeRecord.setAmenityId(form.getTypeId());
                     attributeRecord.setAmenityAttributeId(attribute.getId());
-                    attributeRecord.setValue(AmenityTypeAttributeDao.getInstance().getValueForAttribute(attribute.getId(), amenity.get().getId()));
-                    attributeRecord.setName(AmenityDao.getInstance().getAttributeName(attribute.getId(), amenity.get().getId()));
 
-                    System.out.println(attributeRecord);
+                    Long amenityId = amenity.get().getId();
+                    Long attributeId = attribute.getId();
+
+                    value = AmenityTypeAttributeDao.getInstance().getValueForAttribute(attributeId, amenityId);
+                    name = AmenityTypeAttributeDao.getInstance().getAttributeName(attributeId);
+
+                    attributeRecord.setValue(value);
+                    attributeRecord.setName(name);
                     amenityAttributesWithNames.add(attributeRecord);
-
                 }
 
-                System.out.println(form.getAttributes());
                 request.setAttribute("form", form);
                 request.setAttribute("amenityAttributesWithNames", amenityAttributesWithNames);
 
