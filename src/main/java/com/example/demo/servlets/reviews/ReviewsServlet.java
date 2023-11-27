@@ -53,7 +53,8 @@ public class ReviewsServlet extends HttpServlet {
                     hide(request, response);
                     break;
                 default:
-                    getAll(request, response);
+                    response.getWriter().println("Invalid function");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     break;
             }
         } catch (Exception e) {
@@ -217,7 +218,7 @@ public class ReviewsServlet extends HttpServlet {
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
 
         if(reviewId == null){
-            response.sendRedirect(request.getContextPath() + "/reviews");
+            response.sendRedirect(request.getContextPath() + "/");
             return;
         };
 
@@ -229,9 +230,16 @@ public class ReviewsServlet extends HttpServlet {
         }
 
         if(!user.getId().equals(review.get().getUserId()) ){
-            response.sendRedirect(request.getContextPath() + "/reviews");
+            request.getSession().setAttribute("alert", new Alert("danger", "You can only edit your own reviews."));
+            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
             return;
         };
+
+        if (review.get().isHidden()) {
+            request.getSession().setAttribute("alert", new Alert("danger", "You cannot edit a hidden review."));
+            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId());
+            return;
+        }
 
         Optional<Amenity> amenity = AmenityDao.getInstance().get(review.get().getAmenityId());
 
@@ -394,9 +402,5 @@ public class ReviewsServlet extends HttpServlet {
         request.setAttribute("metrics", metricsWithNames);
 
         request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
-    }
-
-    public void getAll(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-
     }
 }

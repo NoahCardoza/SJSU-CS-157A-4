@@ -19,6 +19,7 @@
             <div class="row">
                 <h1 class="mb-2">${amenity.name}</h1>
             </div>
+            <%@include file="/includes/alerts.jsp" %>
             <div class="row">
                 <div class="w-100 overflow-x-scroll" style="white-space:nowrap">
                     <c:forEach var="imageUrlIndex" begin="${1}" end="${images.size()}">
