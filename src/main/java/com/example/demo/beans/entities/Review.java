@@ -1,6 +1,8 @@
 package com.example.demo.beans.entities;
 
+
 import java.sql.Timestamp;
+
 import java.util.List;
 
 
@@ -15,6 +17,7 @@ public class Review {
     private String updatedAt;
     private List<String> images;
     private User user;
+
     private List<AmenityTypeMetricRecordWithName> metrics;
 
     private Integer voted;
@@ -28,17 +31,10 @@ public class Review {
         return user;
     }
 
-    public Integer getVoted() {
-        return voted;
-    }
-
     public void setVoted(Integer voted) {
         this.voted = voted;
     }
 
-    public Integer getVotes() {
-        return votes;
-    }
 
     public void setVotes(Integer votes) {
         this.votes = votes;
@@ -52,6 +48,7 @@ public class Review {
 
     public void setUser(User user) {
         this.user = user;
+
     }
 
     public Long getId() {
@@ -132,6 +129,22 @@ public class Review {
 
     public void setMetrics(List<AmenityTypeMetricRecordWithName> metrics) {
         this.metrics = metrics;
+    }
+
+    public void setVotes(int votes) {
+        this.votes = votes;
+    }
+
+    public int getVotes() {
+        return votes;
+    }
+
+    public void setVoted(int voted) {
+        this.votes = voted;
+    }
+
+    public int getVoted() {
+        return votes;
     }
 
     @Override

@@ -50,6 +50,9 @@ public class ReviewsServlet extends HttpServlet {
                 case "delete":
                     delete(request, response);
                     break;
+                case "hide":
+                    hide(request, response);
+                    break;
                 default:
                     getAll(request, response);
                     break;
@@ -69,6 +72,23 @@ public class ReviewsServlet extends HttpServlet {
             return;
         };
 
+        if(user.getId() == reviewId ){
+            response.sendRedirect(request.getContextPath() + "/locations");
+            return;
+
+        };
+
+    }
+
+    public void hide(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        User user = Guard.requireAuthenticationWithMessage(request, response, "Must be logged in to hide a review.");
+        if (user == null) return;
+        Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if(reviewId == null){
+            response.sendRedirect(request.getContextPath() + "/reviews");
+            return;
+        };
     }
 
     public void list(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -99,6 +119,16 @@ public class ReviewsServlet extends HttpServlet {
 
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        User user = Guard.requireAuthenticationWithMessage(
+                request,
+                response,
+                "You must be logged in to edit your review."
+        );
+
+        if (user == null) {
+            return;
+        };
+
 
     }
 

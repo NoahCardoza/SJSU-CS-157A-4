@@ -93,10 +93,6 @@ public class ReviewDao {
 
 
 
-    public List<Review> getAll() throws SQLException {
-        return null;
-    }
-
 
     static private Review fromResultSet(ResultSet row) throws SQLException {
         Review review = new Review();
@@ -151,7 +147,44 @@ public class ReviewDao {
         statement.executeUpdate();
     }
 
+    public ArrayList<Review> getEntityReview(String tableName, Long primaryKey, Long currentUser) throws SQLException {
+        ArrayList<Review> revisions = new ArrayList<>();
+        Connection conn = Database.getConnection();
+        // TODO: flag revisions that have been voted on by the current user
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT *, COALESCE((" +
+                        "SELECT SUM(value) " +
+                        "FROM ReviewVote " +
+                        "WHERE review_id = Review.id), 0) AS votes " +
+                        (currentUser != null
+                                ? ", COALESCE((SELECT review_id FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted "
+                                : " "
+                        ) +
+                        "FROM Review " +
+                        "WHERE table_name = ? AND primary_key = ?"
+        );
+        int paramIndex = 1;
+        if (currentUser != null) {
+            statement.setLong(paramIndex++, currentUser);
 
+        }
+        statement.setString(paramIndex++, tableName);
+        statement.setLong(paramIndex++, primaryKey);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            Review review = fromResultSet(resultSet);
+            review.setEdits(ReviewDao.getInstance().getAllByReviewId(review.getId()));
+            review.setVotes(resultSet.getInt("votes"));
+            if (currentUser != null) {
+                review.setVoted(resultSet.getInt("voted"));
+            }
+            review.add(review);
+        }
+
+        return review;
+    }
 
     public static void edit(Review review) throws SQLException {
         Connection conn = Database.getConnection();
