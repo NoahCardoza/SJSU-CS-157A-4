@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Enumeration;
@@ -231,6 +232,12 @@ public class AmenitiesServlet extends HttpServlet {
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
+        Enumeration<String> params = request.getParameterNames();
+        while(params.hasMoreElements()){
+            String paramName = params.nextElement();
+            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
+        }
+
         User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
         if (user == null) {
             return;
@@ -256,7 +263,8 @@ public class AmenitiesServlet extends HttpServlet {
                 form = new AmenityForm(amenity.get());
                 form.setLocationName("None");
 
-                List<AmenityTypeAttribute> amenityAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenity.get().getAmenityTypeId());
+                List<AmenityTypeAttributeRecordWithName> amenityAttributesWithNames = new ArrayList<>();
+
 
                 if (amenity.get().getLocationId() != null) {
                     Optional<Location> location = LocationDao.getInstance().get(amenity.get().getLocationId());
@@ -271,21 +279,27 @@ public class AmenitiesServlet extends HttpServlet {
                     if(amenityType.isPresent()){
                         AmenityType object = amenityType.get();
                         form.setTypeName(object.getName());
-                        form.setAttributes(amenityAttributes);
                     }
+                }
+
+                List<AmenityTypeAttribute> attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(form.getTypeId());
+
+
+                for(AmenityTypeAttribute attribute : attributes){
+                    AmenityTypeAttributeRecordWithName attributeRecord = new AmenityTypeAttributeRecordWithName();
+                    attributeRecord.setAmenityId(form.getTypeId());
+                    attributeRecord.setAmenityAttributeId(attribute.getId());
+                    attributeRecord.setValue(AmenityTypeAttributeDao.getInstance().getValueForAttribute(attribute.getId(), amenity.get().getId()));
+                    attributeRecord.setName(AmenityDao.getInstance().getAttributeName(attribute.getId(), amenity.get().getId()));
+
+                    System.out.println(attributeRecord);
+                    amenityAttributesWithNames.add(attributeRecord);
+
                 }
 
                 System.out.println(form.getAttributes());
                 request.setAttribute("form", form);
-                request.setAttribute("amenityTypeAttributes", amenityAttributes);
-                Amenity amenityObject = amenity.get();
-
-                //have to go through the attributes and set the values and send them through to jsp
-                for (AmenityTypeAttribute attribute : amenityAttributes){
-                    String value = AmenityDao.getInstance().getValueFromAmenityRecord(attribute, amenityObject);
-                    request.setAttribute("amenityTypeAttribute-" + attribute.getId(), value);
-                }
-
+                request.setAttribute("amenityAttributesWithNames", amenityAttributesWithNames);
 
                 request.getRequestDispatcher("/template/amenity/amenityEdit.jsp").forward(request, response);
                 break;
@@ -350,7 +364,7 @@ public class AmenitiesServlet extends HttpServlet {
                 request.setAttribute("amenityTypeAttributes", attributes);
                 request.setAttribute("form", form);*/
 
-                request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
+                request.getRequestDispatcher("/template/amenity/amenityEdit.jsp").forward(request, response);
                 break;
         }
     }

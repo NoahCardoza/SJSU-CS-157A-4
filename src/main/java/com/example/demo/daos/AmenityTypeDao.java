@@ -102,4 +102,5 @@ public class AmenityTypeDao {
         ps.setLong(1, amenityTypeId);
         ps.executeUpdate();
     }
+
 }
