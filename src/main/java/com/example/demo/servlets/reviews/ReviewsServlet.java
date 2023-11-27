@@ -193,9 +193,6 @@ public class ReviewsServlet extends HttpServlet {
 
         request.setAttribute("reviews", reviews);
         request.getRequestDispatcher("/template/reviews/list.jsp").forward(request, response);
-
-
-
     }
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
