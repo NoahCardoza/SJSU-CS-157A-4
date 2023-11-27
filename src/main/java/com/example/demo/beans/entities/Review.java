@@ -91,7 +91,7 @@ public class Review {
         this.name = name;
     }
 
-    public Boolean getHidden() {
+    public Boolean isHidden() {
         return hidden;
     }
 

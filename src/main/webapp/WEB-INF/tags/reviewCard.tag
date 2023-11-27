@@ -71,8 +71,8 @@
         </form>
         <div>
             <c:if test="${user.administrator || user.moderator}">
-                <a class="btn btn-sm btn-warning" href="<c:url value="/reviews?f=hide&id=${review.id}"/>" title="${review.hidden ? 'Show' : 'Hide'}">
-                    <i class="bi bi-eye${review.hidden ? '' : '-slash'}"></i>
+                <a class="btn btn-sm btn-warning" href="<c:url value="/reviews?f=hide&id=${review.id}"/>" title="${review.isHidden() ? 'Show' : 'Hide'}">
+                    <i class="bi bi-eye${review.isHidden() ? '' : '-slash'}"></i>
                 </a>
             </c:if>
             <c:if test="${user.id == review.userId}">

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 
 import javax.xml.crypto.Data;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,6 +119,67 @@ public class UserDao {
             PreparedStatement statement = con.prepareStatement("UPDATE User SET verified = 1 WHERE id = ?");
             statement.setLong(1, userId);
             statement.executeUpdate();
+        }
+    }
+
+    public void ban(Long userId) throws SQLException{
+        try (Connection con = Database.getConnection()) {
+
+        }
+    }
+
+    public void unban(Long userId) throws SQLException {
+        try (Connection con = Database.getConnection()) {
+
+        }
+    }
+
+    public void promote(Long userId, String role) throws SQLException{
+        try (Connection con = Database.getConnection()) {
+            PreparedStatement statement = con.prepareStatement("UPDATE User SET " + role + " = 1 WHERE id = ?");
+            statement.setLong(1, userId);
+            statement.executeUpdate();
+        }
+    }
+
+    public void demote(Long userId, String role) throws SQLException {
+        try (Connection con = Database.getConnection()) {
+            PreparedStatement statement = con.prepareStatement("UPDATE User SET " + role + " = 0 WHERE id = ?");
+            statement.setLong(1, userId);
+            statement.executeUpdate();
+        }
+    }
+
+    public List<User> fuzzySearch(String q) throws SQLException {
+        try (Connection con = Database.getConnection()) {
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM User WHERE username LIKE ? OR email LIKE ? OR normalized_email LIKE ?");
+            statement.setString(1, "%" + q + "%");
+            statement.setString(2, "%" + q + "%");
+            statement.setString(3, "%" + q + "%");
+
+            ResultSet resultSet = statement.executeQuery();
+
+            List<User> users = new ArrayList<>();
+            while (resultSet.next()) {
+                User user = fromResultSet(resultSet);
+                users.add(user);
+            }
+            return users;
+        }
+    }
+
+    public List<User> getAll() throws SQLException {
+        try (Connection con = Database.getConnection()) {
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM User");
+
+            ResultSet resultSet = statement.executeQuery();
+
+            List<User> users = new ArrayList<>();
+            while (resultSet.next()) {
+                User user = fromResultSet(resultSet);
+                users.add(user);
+            }
+            return users;
         }
     }
 }

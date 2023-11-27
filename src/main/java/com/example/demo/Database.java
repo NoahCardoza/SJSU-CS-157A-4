@@ -1,10 +1,13 @@
 package com.example.demo;
 
+import com.example.demo.beans.entities.User;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
 
 public class Database {
     static Connection connection = null;

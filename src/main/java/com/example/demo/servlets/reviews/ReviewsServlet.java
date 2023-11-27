@@ -1,5 +1,6 @@
 package com.example.demo.servlets.reviews;
 
+import com.example.demo.Emailer;
 import com.example.demo.Guard;
 import com.example.demo.S3;
 import com.example.demo.Util;
@@ -52,7 +53,8 @@ public class ReviewsServlet extends HttpServlet {
                     hide(request, response);
                     break;
                 default:
-                    getAll(request, response);
+                    response.getWriter().println("Invalid function");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     break;
             }
         } catch (Exception e) {
@@ -147,7 +149,7 @@ public class ReviewsServlet extends HttpServlet {
 
     }
 
-    public void hide(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+    public void hide(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, InterruptedException {
         User user = Guard.requireAuthenticationWithMessage(request, response, "Must be logged in to hide a review.");
         if (user == null) return;
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
@@ -170,7 +172,14 @@ public class ReviewsServlet extends HttpServlet {
         }
 
         ReviewDao.toggleHide(review.get());
-        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId());
+
+        if (review.get().isHidden()) {
+            Optional<User> reviewUser = UserDao.getInstance().get(review.get().getUserId());
+            if (reviewUser.isPresent()) {
+                Emailer.sendReviewHiddenNotice(reviewUser.get(), review.get());
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
 
     }
 
@@ -187,15 +196,12 @@ public class ReviewsServlet extends HttpServlet {
 
         for (Review review: reviews) {
             review.setMetrics(ReviewDao.getAllReviewMetricRecordsWithNames(review.getId()));
-            review.setImages(ReviewDao.getAllImages(review.getId()));
+            review.setImages(ReviewDao.getAllImagesForReview(review.getId()));
             UserDao.getInstance().get(review.getUserId()).ifPresent(review::setUser);
         }
 
         request.setAttribute("reviews", reviews);
         request.getRequestDispatcher("/template/reviews/list.jsp").forward(request, response);
-
-
-
     }
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -212,7 +218,7 @@ public class ReviewsServlet extends HttpServlet {
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
 
         if(reviewId == null){
-            response.sendRedirect(request.getContextPath() + "/reviews");
+            response.sendRedirect(request.getContextPath() + "/");
             return;
         };
 
@@ -224,9 +230,16 @@ public class ReviewsServlet extends HttpServlet {
         }
 
         if(!user.getId().equals(review.get().getUserId()) ){
-            response.sendRedirect(request.getContextPath() + "/reviews");
+            request.getSession().setAttribute("alert", new Alert("danger", "You can only edit your own reviews."));
+            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
             return;
         };
+
+        if (review.get().isHidden()) {
+            request.getSession().setAttribute("alert", new Alert("danger", "You cannot edit a hidden review."));
+            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId());
+            return;
+        }
 
         Optional<Amenity> amenity = AmenityDao.getInstance().get(review.get().getAmenityId());
 
@@ -301,6 +314,14 @@ public class ReviewsServlet extends HttpServlet {
 
         if (!amenity.isPresent()){
             response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        Review existingReview = ReviewDao.getReviewByUserAndAmenity(user.getId(), amenityId);
+
+        if (existingReview != null) {
+            request.getSession().setAttribute("alert", new Alert("danger", "You have already reviewed this amenity. Edit your review instead."));
+            response.sendRedirect(request.getContextPath() + "/reviews?f=edit&id=" + existingReview.getId());
             return;
         }
 
@@ -381,9 +402,5 @@ public class ReviewsServlet extends HttpServlet {
         request.setAttribute("metrics", metricsWithNames);
 
         request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
-    }
-
-    public void getAll(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-
     }
 }

@@ -9,14 +9,10 @@ import com.example.demo.beans.entities.Location;
 import com.example.demo.beans.entities.AmenityType;
 import com.example.demo.beans.entities.AmenityTypeAttribute;
 import com.example.demo.beans.forms.AmenityForm;
-import com.example.demo.beans.forms.LocationForm;
 import com.example.demo.daos.*;
 import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.AmenityDao;
 
-import com.example.demo.servlets.search.AmenityFilter;
-import com.example.demo.servlets.search.AmenityTypeAttributeGrouper;
-import com.example.demo.beans.entities.AmenityWithImage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -138,7 +134,7 @@ public class AmenitiesServlet extends HttpServlet {
 
         for (Review review: reviews) {
             review.setMetrics(ReviewDao.getAllReviewMetricRecordsWithNames(review.getId()));
-            review.setImages(ReviewDao.getAllImages(review.getId()));
+            review.setImages(ReviewDao.getAllImagesForReview(review.getId()));
             UserDao.getInstance().get(review.getUserId()).ifPresent(review::setUser);
         }
 
@@ -147,7 +143,7 @@ public class AmenitiesServlet extends HttpServlet {
                 reviews
         );
 
-        List<String> urls = ReviewDao.getAllImages(object.getId());
+        List<String> urls = ReviewDao.getAllImagesForAmenity(object.getId());
 
         request.setAttribute(
                 "images",
