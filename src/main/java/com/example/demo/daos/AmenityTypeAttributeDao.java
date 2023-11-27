@@ -128,6 +128,8 @@ public class AmenityTypeAttributeDao {
 
     public String getValueForAttribute(Long attributeId, Long amenityId) throws SQLException {
         String attributeValue = "";
+        System.out.println("attributeId: " + attributeId);
+        System.out.println("amenityId: " + amenityId);
 
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
@@ -137,14 +139,32 @@ public class AmenityTypeAttributeDao {
         statement.setDouble(1, attributeId);
         statement.setDouble(2, amenityId);
 
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            System.out.println(resultSet.getString(1));
+            attributeValue = resultSet.getString("value");
+        }
+        return attributeValue;
+    }
+
+    public String getAttributeName(Long attributeId) throws SQLException {
+
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT name FROM AmenityTypeAttribute WHERE id = ?"
+        );
+
+        statement.setLong(1, attributeId);
 
         ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            attributeValue = resultSet.getString("value");
+        if (resultSet.next()) {
+            return resultSet.getString("name");
         }
 
-        return attributeValue;
+        return "";
+
     }
 
     public Optional<MinMax> getMinMaxIntValuesForAttribute(Long attributeId) throws SQLException {
