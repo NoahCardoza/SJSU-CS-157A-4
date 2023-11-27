@@ -16,66 +16,34 @@
     </head>
     <body>
         <%@include file="../../includes/nav.jsp" %>
-        <div class="container mt-5">
+        <div class="p-5 mx-auto" style="max-width: 1200px;">
             <h1 class="mb-2">Search</h1>
-            <div class="row">
-                <div class="col col-4 mb-2">
-                <a href="<c:url value="/amenities?f=create"/>" class="btn btn-secondary">Create Amenity</a>
-                 </br>
-
-                <hg:form
+            <div class="row gx-3 gy-2">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <hg:form
                         autoSubmit="${true}"
                         amenityTypes="${amenityTypes}"
                         amenityTypeAttributes="${amenityTypeAttributes}"
-                />
+                    />
                 </div>
-<%--            <form id="search-form" class="col-4" onsubmit="if ($('#amenityType').val() === '0') {--%>
-<%--                location.href = '/search';--%>
-<%--                return false;--%>
-<%--                }">--%>
-<%--                </br>--%>
-<%--                <a href="/amenities?f=create" class="btn btn-secondary">Create Amenity</a>--%>
-<%--                </br>--%>
-<%--                </br>--%>
-<%--                <div class="row mb-2">--%>
-<%--                    <label for="amenityType" class="form-label">Amenity Type</label>--%>
-<%--                    <select class="form-select" name="amenityTypeId" id="amenityType" onchange="$('#search-form').submit()">--%>
-<%--                        <option value="0">All</option>--%>
-<%--                        <c:forEach var="amenityType" items="${amenityTypes}">--%>
-<%--                            <option ${param.get('amenityTypeId') == amenityType.id ? 'selected' : ''} value="${amenityType.id}"--%>
-<%--                            >${amenityType.name}</option>--%>
-<%--                        </c:forEach>--%>
-<%--                    </select>--%>
-<%--                </div>--%>
-
-<%--                <c:if test="${not empty amenityTypeAttributes}">--%>
-<%--                    ${amenityTypeAttributes.textAttributes}--%>
-<%--                    ${amenityTypeAttributes.booleanAttributes}--%>
-<%--                    ${amenityTypeAttributes.numberAttributes}--%>
-<%--                </c:if>--%>
-<%--                <div class="row">--%>
-<%--                    <button type="submit" class="btn btn-primary">Search</button>--%>
-<%--                </div>--%>
-<%--            </form>--%>
-
-            <div class="col-8" style="">
-                <div class="row">
-                <c:forEach var="amenity" items="${amenities}">
-                    <div class="col-4 mb-4">
-                        <div class="card">
-<%--                            <img class="card-img-top" src="${amenity.image.url}" style="height: 200px; width: 100%; object-fit: cover;">--%>
-                            <img class="card-img-top" src="<hg:cloudimg value="${amenity.image.url}" size="200" />" style="height: 200px; width: 100%; object-fit: cover;">
-                            <div class="card-body">
-                                <h5 class="card-title">${amenity.name}</h5>
-                                <p class="card-text">${amenity.description}</p>
-                                <a type="select" href="<c:url value="/amenities?f=get&id=${amenity.id}"/>" class="btn btn-primary">Select</a>
+                <div class="col-12 col-sm-6 col-md-8" style="">
+                    <div class="row g-2">
+                        <c:forEach var="amenity" items="${amenities}">
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card">
+                                    <img class="card-img-top" src="<hg:cloudimg value="${amenity.image.url}" size="200" />" style="height: 200px; width: 100%; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${amenity.name}</h5>
+                                        <p class="card-text">${amenity.description}</p>
+                                        <a type="select" href="<c:url value="/amenities?f=get&id=${amenity.id}"/>" class="btn btn-primary">Select</a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </c:forEach>
                     </div>
-                </c:forEach>
-                    <div>
-            </div>
                 </div>
+            </div>
         </div>
+        <hg:footer />
     </body>
 </html>

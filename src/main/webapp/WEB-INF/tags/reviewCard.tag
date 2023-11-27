@@ -25,6 +25,7 @@
             </div>
         </div>
         <p>${review.description}</p>
+        <hr class="my-2"/>
         <div class="row align-items-center gx-1 gy-3">
             <c:forEach var="metric" items="${review.metrics}">
                     <div class="col-12 col-sm-4 fw-bold">${metric.name}</div>
@@ -44,9 +45,7 @@
                 </div>
             </c:forEach>
         </div>
-        <button data-bs-toggle="modal" data-bs-target="#review-carousel-modal-${review.id}" class="btn btn-sm btn-outline-primary mt-2" title="View Images">
-            <i class="bi bi-images"></i>
-        </button>
+        <hr class="my-2"/>
         <div>
             <c:forEach var="imageUrlIndex" begin="${1}" end="${review.images.size()}">
                 <c:set var="imageUrl" value="${review.images.get(imageUrlIndex - 1)}" />
