@@ -47,35 +47,19 @@
         <button data-bs-toggle="modal" data-bs-target="#review-carousel-modal-${review.id}" class="btn btn-sm btn-outline-primary mt-2" title="View Images">
             <i class="bi bi-images"></i>
         </button>
-        <div >
-            <c:forEach var="imageUrl" items="${review.images}">
-                <img src="<hg:cloudimg value="${imageUrl}" size="200" />" class="img-thumbnail" alt="">
+        <div>
+            <c:forEach var="imageUrlIndex" begin="${1}" end="${review.images.size()}">
+                <c:set var="imageUrl" value="${review.images.get(imageUrlIndex - 1)}" />
+                <button class="img-thumbnail">
+                    <img
+                            src="<hg:cloudimg value="${imageUrl}" size="50" />"
+                            class="review-image-preview"
+                            onclick="$('#review-carousel-${review.id}').carousel(${imageUrlIndex - 1}); $('#review-carousel-modal-${review.id}').modal('show');"
+                            alt="Review ${review.id}: Image ${imageUrlIndex}"
+                    />
+                </button>
             </c:forEach>
         </div>
-<%--        <div id="review-carousel-modal-${review.id}" class="modal" tabindex="-1">--%>
-<%--            <div class="vh-100 vw-100">--%>
-<%--                <div class="container">--%>
-<%--                    <div id="review-carousel-${review.id}" class="carousel slide">--%>
-<%--                        <div class="carousel-inner">--%>
-<%--                            <c:forEach var="imageUrlIndex" begin="0" end="${review.images.size()}">--%>
-<%--                                <c:set var="imageUrl" value="${review.images.get(imageUrlIndex)}" />--%>
-<%--                                <div class="carousel-item ${imageUrlIndex == 0 ? 'active' : ''}">--%>
-<%--                                    <img class="d-block w-100" src="<hg:cloudimg value="${imageUrl}" />" alt="">--%>
-<%--                                </div>--%>
-<%--                            </c:forEach>--%>
-<%--                        </div>--%>
-<%--                        <button class="carousel-control-prev" type="button" data-bs-target="#review-carousel-${review.id}" data-bs-slide="prev">--%>
-<%--                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>--%>
-<%--                            <span class="visually-hidden">Previous</span>--%>
-<%--                        </button>--%>
-<%--                        <button class="carousel-control-next" type="button" data-bs-target="#review-carousel-${review.id}" data-bs-slide="next">--%>
-<%--                            <span class="carousel-control-next-icon" aria-hidden="true"></span>--%>
-<%--                            <span class="visually-hidden">Next</span>--%>
-<%--                        </button>--%>
-<%--                    </div>--%>
-<%--                </div>--%>
-<%--            </div>--%>
-<%--        </div>--%>
     </div>
     <div class="card-footer d-flex justify-content-between">
         <form action="<c:url value="/reviews?f=vote"/>" class="d-inline" method="post">
@@ -100,6 +84,30 @@
                     <i class="bi bi-trash"></i>
                 </a>
             </c:if>
+        </div>
+    </div>
+    <div id="review-carousel-modal-${review.id}" class="modal" tabindex="-1">
+        <div class="modal-dialog m-0 modal-dialog-centered min-vw-100 vh-100">
+            <div class="modal-content bg-transparent border-0">
+                <div id="review-carousel-${review.id}" class="carousel slide w-100">
+                    <div class="carousel-inner bg-transparent">
+                        <c:forEach var="imageUrlIndex" begin="${1}" end="${review.images.size()}">
+                            <c:set var="imageUrl" value="${review.images.get(imageUrlIndex - 1)}" />
+                            <div class="carousel-item ${imageUrlIndex == 1 ? 'active' : ''}" id="review-${review.id}-img-${imageUrlIndex}">
+                                <img class="d-block mx-auto"  style="max-height: calc(100vh - 4rem); max-width: calc(100vw - 12rem);" src="<hg:cloudimg value="${imageUrl}" size="800" />" alt="">
+                            </div>
+                        </c:forEach>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#review-carousel-${review.id}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#review-carousel-${review.id}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

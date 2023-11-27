@@ -16,7 +16,7 @@
 </head>
 <body>
 <%@include file="../../includes/nav.jsp" %>
-    <div class="container mt-5">
+    <div class="container mt-5 mx-auto" style="max-width: 600px">
         <h1 class="mb-3">Reviews</h1>
         <div class="overflow-hidden">
             <div class="row gy-3">
