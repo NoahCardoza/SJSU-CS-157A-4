@@ -44,8 +44,8 @@
                     <p>Attributes</p>
                     <c:forEach var="amenityAttributeWithName" items="${amenityAttributesWithNames}">
                         <div class="form-group">
-                            <label for="amenityTypeAttribute-${amenityAttributeWithName.value}">${amenityAttributeWithName.name}</label>
-                            <input class="form-control" type="text" id="amenityTypeAttribute-${amenityAttributeWithName.value}" name="amenityTypeAttribute-${amenityAttributeWithName.value}" value="${amenityAttributeWithName.value}"/>
+                            <label for="amenityTypeAttribute-${amenityAttributeWithName.amenityAttributeId}">${amenityAttributeWithName.name}</label>
+                            <input class="form-control" type="text" id="amenityTypeAttribute-${amenityAttributeWithName.amenityAttributeId}" name="amenityTypeAttribute-${amenityAttributeWithName.amenityAttributeId}" value="${amenityAttributeWithName.value}"/>
                         </div>
                     </c:forEach>
                 </div>

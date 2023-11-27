@@ -106,7 +106,7 @@ public class AmenityDao {
 
         ps.setLong(1, record.getAmenityAttributeId());
         ps.setLong(2, record.getAmenityId());
-        ps.setString(3, record.getValue());
+        ps.setString(3, escapeHtml(record.getValue()));
 
         ps.executeUpdate();
     }
@@ -115,15 +115,12 @@ public class AmenityDao {
     public void update(Amenity amenity) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO Amenity (amenity_type_id, location_id, user_id, description, name) \n" +
-                "VALUES (?, ?, ?, ?, ?)",
-                PreparedStatement.RETURN_GENERATED_KEYS);
+        PreparedStatement statement = conn.prepareStatement("UPDATE hidden_gems.Amenity SET user_id = ?, description=?, name=? WHERE id = ?");
 
-        statement.setLong(1, amenity.getAmenityTypeId());
-        statement.setLong(2, amenity.getLocationId());
-        statement.setLong(3, amenity.getUserId());
-        statement.setString(4, escapeHtml(amenity.getDescription()));
-        statement.setString(5, escapeHtml(amenity.getName()));
+        statement.setLong(1, amenity.getUserId());
+        statement.setString(2, escapeHtml(amenity.getDescription()));
+        statement.setString(3, escapeHtml(amenity.getName()));
+        statement.setLong(1, amenity.getId());
 
         statement.executeUpdate();
 
@@ -137,13 +134,12 @@ public class AmenityDao {
     public void updateAmenityRecord(AmenityTypeAttributeRecord record) throws SQLException {
 
         PreparedStatement ps = Database.getConnection().prepareStatement(
-                "INSERT INTO AmenityAttributeRecord (amenity_attribute_id, amenity_id, value) VALUES (?, ?, ?)",
-                PreparedStatement.RETURN_GENERATED_KEYS
+                "UPDATE hidden_gems.AmenityAttributeRecord SET value = ? WHERE amenity_attribute_id = ? AND amenity_id = ?;"
         );
 
-        ps.setLong(1, record.getAmenityAttributeId());
-        ps.setLong(2, record.getAmenityId());
-        ps.setString(3, record.getValue());
+        ps.setString(1, escapeHtml(record.getValue()));
+        ps.setLong(2, record.getAmenityAttributeId());
+        ps.setLong(3, record.getAmenityId());
 
         ps.executeUpdate();
     }
