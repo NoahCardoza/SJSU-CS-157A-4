@@ -124,6 +124,10 @@ public class ReviewDao {
         statement.setLong(1, review.getId());
         statement.executeUpdate();
 
+        statement = conn.prepareStatement("DELETE FROM ReviewVote WHERE review_id = ?");
+        statement.setLong(1, review.getId());
+        statement.executeUpdate();
+
         statement = conn.prepareStatement("DELETE FROM Review WHERE id = ?");
         statement.setLong(1, review.getId());
         statement.executeUpdate();
