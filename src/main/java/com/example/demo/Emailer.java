@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.beans.entities.Review;
 import com.example.demo.beans.entities.User;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -64,6 +65,26 @@ public class Emailer {
                 "params",
                 new JSONObject()
                         .put("username", user.getUsername())
+        );
+
+        sendEmail(payload);
+    }
+
+    static public void sendReviewHiddenNotice(User user, Review review) throws IOException, InterruptedException {
+        JSONObject payload = new JSONObject();
+        payload.put(
+                "to",
+                new JSONArray().put(
+                        new JSONObject().put("email", user.getEmail())
+                )
+        );
+        payload.put("templateId", 6);
+        payload.put(
+                "params",
+                new JSONObject()
+                        .put("username", user.getUsername())
+                        .put("review_name", review.getName())
+                        .put("review_description", review.getDescription())
         );
 
         sendEmail(payload);

@@ -1,5 +1,6 @@
 package com.example.demo.servlets.reviews;
 
+import com.example.demo.Emailer;
 import com.example.demo.Guard;
 import com.example.demo.S3;
 import com.example.demo.Util;
@@ -147,7 +148,7 @@ public class ReviewsServlet extends HttpServlet {
 
     }
 
-    public void hide(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+    public void hide(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, InterruptedException {
         User user = Guard.requireAuthenticationWithMessage(request, response, "Must be logged in to hide a review.");
         if (user == null) return;
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
@@ -170,7 +171,14 @@ public class ReviewsServlet extends HttpServlet {
         }
 
         ReviewDao.toggleHide(review.get());
-        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId());
+
+        if (review.get().isHidden()) {
+            Optional<User> reviewUser = UserDao.getInstance().get(review.get().getUserId());
+            if (reviewUser.isPresent()) {
+                Emailer.sendReviewHiddenNotice(reviewUser.get(), review.get());
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
 
     }
 

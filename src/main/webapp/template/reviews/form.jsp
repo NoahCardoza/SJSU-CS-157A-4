@@ -53,7 +53,6 @@
                         <label for="image-input" class="form-label">Choose image</label>
                         <input
                                 name="images"
-                                required
                                 multiple
                             <%-- TODO:                            ,.heic,.heif --%>
                                 accept="image/*,.heic,.heif"
