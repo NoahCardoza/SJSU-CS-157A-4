@@ -62,7 +62,7 @@ public class ReviewsServlet extends HttpServlet {
         }
     }
 
-    private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
         User user = Guard.requireAuthenticationWithMessage(request, response, "Must be logged in to delete.");
         if (user == null) return;
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
@@ -72,15 +72,25 @@ public class ReviewsServlet extends HttpServlet {
             return;
         };
 
-        if(user.getId() == reviewId ){
-            response.sendRedirect(request.getContextPath() + "/locations");
+        Optional<Review> review = ReviewDao.get(reviewId);
+
+        if(!review.isPresent()){
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        if(!user.getId().equals(review.get().getUserId()) ){
+            response.sendRedirect(request.getContextPath() + "/reviews");
             return;
 
         };
 
+        ReviewDao.delete(review.get());
+        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId());
+
     }
 
-    public void hide(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    public void hide(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
         User user = Guard.requireAuthenticationWithMessage(request, response, "Must be logged in to hide a review.");
         if (user == null) return;
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
@@ -89,17 +99,34 @@ public class ReviewsServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/reviews");
             return;
         };
-    }
 
-    public void list(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
+        Optional<Review> review = ReviewDao.get(reviewId);
 
-        if (reviewId == null) {
-            response.sendRedirect(request.getContextPath() + "/reviews");
+        if(!review.isPresent()){
+            response.sendRedirect(request.getContextPath() + "/");
             return;
         }
 
-        List<Review> reviews = ReviewDao.getAllReviews(reviewId);
+        if(!(user.isAdministrator() || user.isModerator())){
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        ReviewDao.toggleHide(review.get());
+        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId());
+
+    }
+
+    public void list(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        Long amenityId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (amenityId == null) {
+            response.sendRedirect(request.getContextPath() + "/reviews");
+            return;
+        }
+        User user = (User)request.getAttribute("user");
+        List<Review> reviews = ReviewDao.getAllReviews(
+                amenityId, (Long) request.getSession().getAttribute("user_id"), user == null ? Boolean.FALSE : user.isAdministrator() || user.isModerator() );
 
         for (Review review: reviews) {
             review.setMetrics(ReviewDao.getAllReviewMetricRecordsWithNames(review.getId()));
@@ -107,9 +134,7 @@ public class ReviewsServlet extends HttpServlet {
             UserDao.getInstance().get(review.getUserId()).ifPresent(review::setUser);
         }
 
-        List<AmenityTypeMetricRecordWithName> metrics =  ReviewDao.getAllReviewMetricRecordsWithNames(reviewId);
         request.setAttribute("reviews", reviews);
-
         request.getRequestDispatcher("/template/reviews/list.jsp").forward(request, response);
 
 

@@ -129,11 +129,15 @@ public class AmenitiesServlet extends HttpServlet {
         }
 
         // gets all reviews for this amenity
-        List<Review> reviews = ReviewDao.getInstance().getAllReviews(object.getId());
+        User user = (User)request.getAttribute("user");
+        List<Review> reviews = ReviewDao.getAllReviews(
+                amenityId, (Long) request.getSession().getAttribute("user_id"), user == null ? Boolean.FALSE : user.isAdministrator() || user.isModerator() );
+
         var amenityReview = new AmenitiesReviewGrouper(object, reviews);
         request.setAttribute(
                 "reviews",
                 amenityReview
+
         );
 
         List<String> urls = ReviewDao.getInstance().getAllImages(object.getId());

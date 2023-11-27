@@ -3,7 +3,6 @@ package com.example.demo.daos;
 import com.example.demo.Database;
 import com.example.demo.beans.entities.*;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,55 +135,16 @@ public class ReviewDao {
         statement.executeUpdate();
     }
 
-    public static void hide(Review review) throws SQLException {
+    public static void toggleHide(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET hidden = ? WHERE id = ?");
+        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET hidden = NOT hidden WHERE id = ?");
 
-        statement.setBoolean(1, true); // set the hidden flag to true
-        statement.setLong(2, review.getId());
-
+        statement.setLong(1, review.getId());
         statement.executeUpdate();
     }
 
-    public ArrayList<Review> getEntityReview(String tableName, Long primaryKey, Long currentUser) throws SQLException {
-        ArrayList<Review> revisions = new ArrayList<>();
-        Connection conn = Database.getConnection();
-        // TODO: flag revisions that have been voted on by the current user
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT *, COALESCE((" +
-                        "SELECT SUM(value) " +
-                        "FROM ReviewVote " +
-                        "WHERE review_id = Review.id), 0) AS votes " +
-                        (currentUser != null
-                                ? ", COALESCE((SELECT review_id FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted "
-                                : " "
-                        ) +
-                        "FROM Review " +
-                        "WHERE table_name = ? AND primary_key = ?"
-        );
-        int paramIndex = 1;
-        if (currentUser != null) {
-            statement.setLong(paramIndex++, currentUser);
 
-        }
-        statement.setString(paramIndex++, tableName);
-        statement.setLong(paramIndex++, primaryKey);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            Review review = fromResultSet(resultSet);
-            review.setEdits(ReviewDao.getInstance().getAllByReviewId(review.getId()));
-            review.setVotes(resultSet.getInt("votes"));
-            if (currentUser != null) {
-                review.setVoted(resultSet.getInt("voted"));
-            }
-            review.add(review);
-        }
-
-        return review;
-    }
 
     public static void edit(Review review) throws SQLException {
         Connection conn = Database.getConnection();
@@ -216,20 +176,43 @@ public class ReviewDao {
     }
 
 
-    public static List<Review> getAllReviews(Long amenityId) throws SQLException {
+    public static List<Review> getAllReviews(Long amenityId, Long currentUser, Boolean showHidden) throws SQLException {
         ArrayList<Review> reviews = new ArrayList<>();
 
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
-                "SELECT * FROM Review WHERE amenity_id = ?"
+                "SELECT *, COALESCE((" +
+                        "SELECT SUM(value) " +
+                        "FROM ReviewVote " +
+                        "WHERE review_id = Review.id), 0) AS votes " +
+                        (currentUser != null
+                                ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted "
+                                : " "
+                        ) +
+                        "FROM Review WHERE amenity_id = ?" + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0" : " "))
         );
+        int paramIndex = 1;
+        if (currentUser != null) {
+            statement.setLong(paramIndex++, currentUser);
 
-        statement.setDouble(1, amenityId);
+        }
+        statement.setLong(paramIndex++, amenityId);
+
 
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
-            reviews.add(fromResultSet(resultSet));
+            Review review = fromResultSet(resultSet);
+            review.setVotes(resultSet.getInt("votes"));
+            if(currentUser != null){
+                review.setVoted(resultSet.getInt("voted"));
+
+            }
+            else{
+                review.setVoted(0);
+            }
+            reviews.add(review);
+
         }
 
         return reviews;
