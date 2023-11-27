@@ -3,21 +3,16 @@ package com.example.demo.servlets.reviews;
 import com.example.demo.Guard;
 import com.example.demo.S3;
 import com.example.demo.Util;
+import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.*;
 import com.example.demo.daos.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @WebServlet(name = "Reviews", value = "/reviews")
 public class ReviewsServlet extends HttpServlet {
@@ -41,6 +36,9 @@ public class ReviewsServlet extends HttpServlet {
                 case "list":
                     list(request, response);
                     break;
+                case "vote":
+                    vote(request, response);
+                    break;
                 case "create":
                     create(request, response);
                     break;
@@ -60,6 +58,65 @@ public class ReviewsServlet extends HttpServlet {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void vote(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+        if (!request.getMethod().equals("POST")) {
+            response.getWriter().println("Invalid method");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        User user = Guard.requireAuthenticationWithMessage(
+                request,
+                response,
+                "You must be logged in to vote."
+        );
+
+        if (user == null) {
+            return;
+        }
+
+        HttpSession session = request.getSession();
+
+        Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if (reviewId == null) {
+            session.setAttribute("alert", new Alert("danger", "Invalid review id"));
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        Optional<Review> review = ReviewDao.get(reviewId);
+
+        if (review.isEmpty()) {
+            session.setAttribute("alert", new Alert("danger", "Invalid review id" ));
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        String action = request.getParameter("action");
+
+        if (action == null) {
+            session.setAttribute("alert", new Alert("danger", "Invalid vote method"));
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        int vote = switch (action) {
+            case "up" -> 1;
+            case "down" -> -1;
+            default -> 0;
+        };
+
+        if (vote == 0) {
+            session.setAttribute("alert", new Alert("danger", "Invalid vote method"));
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        ReviewDao.vote(review.get(), user, vote);
+        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId()  + "#review-" + review.get().getId());
     }
 
     private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
@@ -141,8 +198,6 @@ public class ReviewsServlet extends HttpServlet {
 
     }
 
-
-
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         User user = Guard.requireAuthenticationWithMessage(
                 request,
@@ -154,18 +209,77 @@ public class ReviewsServlet extends HttpServlet {
             return;
         };
 
+        Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
+
+        if(reviewId == null){
+            response.sendRedirect(request.getContextPath() + "/reviews");
+            return;
+        };
+
+        Optional<Review> review = ReviewDao.get(reviewId);
+
+        if(!review.isPresent()){
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        if(!user.getId().equals(review.get().getUserId()) ){
+            response.sendRedirect(request.getContextPath() + "/reviews");
+            return;
+        };
+
+        Optional<Amenity> amenity = AmenityDao.getInstance().get(review.get().getAmenityId());
+
+        if (!amenity.isPresent()){
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        List<AmenityTypeMetricRecordWithName> metrics = ReviewDao.getAllReviewMetricRecordsWithNames(review.get().getId());
+        request.setAttribute("metrics", metrics);
+        request.setAttribute("headerText", "Edit Review");
+        request.setAttribute("submitButtonText", "Save Changes");
+        request.setAttribute("editMode", true);
+
+
+        if (request.getMethod().equals("POST")) {
+            String name = request.getParameter("name");
+            String description = request.getParameter("description");
+
+            if (name == null || name.isEmpty() || description == null || description.isEmpty()) {
+                request.setAttribute("alert", new Alert("danger", "Please fill out all fields."));
+                // TODO fix
+                request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
+                return;
+            }
+
+            review.get().setName(name);
+            review.get().setDescription(description);
+            ReviewDao.update(review.get());
+
+            for (AmenityTypeMetricRecordWithName metric : metrics) {
+                int value = Util.parseIntOrDefault(request.getParameter("metric-" + metric.getAmenityMetricId()), 0);
+
+                if (value < 0) {
+                    value = 0;
+                } else if (value > 5) {
+                    value = 5;
+                }
+
+                ReviewDao.updateReviewRecord(metric.getReviewId(), metric.getAmenityMetricId(), value);
+            }
+
+            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
+            return;
+        } else {
+            request.setAttribute("review", review.get());
+
+            request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
+        }
 
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-
-        System.out.println("\n\n");
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
         User user = Guard.requireAuthenticationWithMessage(
                 request,
                 response,
@@ -190,17 +304,29 @@ public class ReviewsServlet extends HttpServlet {
             return;
         }
 
-        List<AmenityTypeMetric> metrics = AmenityTypeMetricDao.getInstance().getAllByAmenityType(amenity.get().getAmenityTypeId());
-        request.setAttribute("metrics", metrics);
+        request.setAttribute("headerText", "Create Review");
+        request.setAttribute("submitButtonText", "Create");
+        request.setAttribute("editMode", false);
 
         if (request.getMethod().equals("POST")) {
+            List<AmenityTypeMetric> metrics = AmenityTypeMetricDao.getInstance().getAllByAmenityType(amenity.get().getAmenityTypeId());
+
             Review review = new Review();
             review.setUserId(user.getId());
 
             review.setAmenityId(amenityId);
 
-            review.setName(request.getParameter("title"));
-            review.setDescription(request.getParameter("description"));
+            String name = request.getParameter("name");
+            String description = request.getParameter("description");
+
+            if (name == null || name.isEmpty() || description == null || description.isEmpty()) {
+                request.setAttribute("alert", new Alert("danger", "Please fill out all fields."));
+                request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
+                return;
+            }
+
+            review.setName(name);
+            review.setDescription(description);
 
             ReviewDao.create(review);
 
@@ -236,12 +362,25 @@ public class ReviewsServlet extends HttpServlet {
                 }
             }
 
-            response.sendRedirect(request.getContextPath() + "/reviews?f=view&id=" + review.getId());
+            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + amenityId + "#review-" + review.getId());
 
             return;
         }
 
-        request.getRequestDispatcher("/template/reviews/create.jsp").forward(request, response);
+        List<AmenityTypeMetric> metrics = AmenityTypeMetricDao.getInstance().getAllByAmenityType(amenity.get().getAmenityTypeId());
+        List<AmenityTypeMetricRecordWithName> metricsWithNames = new ArrayList<>();
+
+        // because we generalized the template to work with
+        for (AmenityTypeMetric metric : metrics) {
+            AmenityTypeMetricRecordWithName metricWithName = new AmenityTypeMetricRecordWithName();
+            metricWithName.setAmenityMetricId(metric.getId());
+            metricWithName.setName(metric.getName());
+            metricsWithNames.add(metricWithName);
+        }
+
+        request.setAttribute("metrics", metricsWithNames);
+
+        request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
     }
 
     public void getAll(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {

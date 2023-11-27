@@ -18,12 +18,14 @@
 <%@include file="../../includes/nav.jsp" %>
     <div class="container mt-5">
         <h1 class="mb-3">Reviews</h1>
-        <div class="container gy-3">
+        <div class="overflow-hidden">
+            <div class="row gy-3">
             <c:forEach var="review" items="${reviews}">
-                <div class="row">
-                    <hg:reviewCard review="${review}"/>
-                </div>
+                    <div class="col col-12">
+                        <hg:reviewCard review="${review}"/>
+                    </div>
             </c:forEach>
+            </div>
         </div>
     </div>
     <hg:footer/>

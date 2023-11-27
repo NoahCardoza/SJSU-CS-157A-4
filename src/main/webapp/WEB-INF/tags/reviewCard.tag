@@ -6,7 +6,7 @@
 
 <%--@elvariable id="user" type="com.example.demo.beans.entities.User"--%>
 
-<div class="card">
+<div class="card" id="review-${review.id}">
     <div class="card-header d-flex justify-content-between align-items-center" >
         <span class="text-muted">
             <i class="bi bi-person-circle"></i>
@@ -25,11 +25,10 @@
             </div>
         </div>
         <p>${review.description}</p>
-        <div>
+        <div class="row align-items-center gx-1 gy-3">
             <c:forEach var="metric" items="${review.metrics}">
-                <div class="row align-items-center">
-                    <div class="col-4 fw-bold">${metric.name}</div>
-                    <div class="col-8">
+                    <div class="col-12 col-sm-4 fw-bold">${metric.name}</div>
+                    <div class="col-12 col-sm-8">
                         <div class="progress">
                             <div class="progress-bar ${
                                             metric.value <= 1 ? 'bg-danger' :
@@ -37,13 +36,18 @@
                                             metric.value <= 3 ? 'bg-info' :
                                             metric.value <= 4 ? 'bg-primary' :
                                             'bg-success'
-                                        }" role="progressbar" style="width: ${(metric.value / 5) * 100}%" aria-valuenow="${metric.value}" aria-valuemin="0" aria-valuemax="5">${metric.value}/5</div>
+                                        }" role="progressbar" style="width: ${(metric.value / 5) * 100}%" aria-valuenow="${metric.value}" aria-valuemin="0" aria-valuemax="5"
+                            >
+                                    ${metric.value}/5
+                            </div>
                         </div>
-                    </div>
                 </div>
             </c:forEach>
         </div>
-        <div data-bs-toggle="modal" data-bs-target="#review-carousel-modal-${review.id}">
+        <button data-bs-toggle="modal" data-bs-target="#review-carousel-modal-${review.id}" class="btn btn-sm btn-outline-primary mt-2" title="View Images">
+            <i class="bi bi-images"></i>
+        </button>
+        <div >
             <c:forEach var="imageUrl" items="${review.images}">
                 <img src="<hg:cloudimg value="${imageUrl}" size="200" />" class="img-thumbnail" alt="">
             </c:forEach>
@@ -53,8 +57,9 @@
 <%--                <div class="container">--%>
 <%--                    <div id="review-carousel-${review.id}" class="carousel slide">--%>
 <%--                        <div class="carousel-inner">--%>
-<%--                            <c:forEach var="imageUrl" items="${review.images}">--%>
-<%--                                <div class="carousel-item active">--%>
+<%--                            <c:forEach var="imageUrlIndex" begin="0" end="${review.images.size()}">--%>
+<%--                                <c:set var="imageUrl" value="${review.images.get(imageUrlIndex)}" />--%>
+<%--                                <div class="carousel-item ${imageUrlIndex == 0 ? 'active' : ''}">--%>
 <%--                                    <img class="d-block w-100" src="<hg:cloudimg value="${imageUrl}" />" alt="">--%>
 <%--                                </div>--%>
 <%--                            </c:forEach>--%>

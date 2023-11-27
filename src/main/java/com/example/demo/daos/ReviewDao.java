@@ -39,20 +39,7 @@ public class ReviewDao {
 
         return Optional.empty();
     }
-    public static Optional<Review> delete(long id) throws SQLException {
-        Connection conn = Database.getConnection();
-
-        PreparedStatement statement = conn.prepareStatement("DELETE * FROM Review WHERE id = ?");
-        statement.setDouble(1, id);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        if (resultSet.next()) {
-            return Optional.of(fromResultSet(resultSet));
-        }
-
-        return Optional.empty();
-    }
+    
     public static List<AmenityTypeMetricRecordWithName> getAllReviewMetricRecordsWithNames(long reviewId) throws SQLException {
         ArrayList<AmenityTypeMetricRecordWithName> records = new ArrayList<>();
         Connection conn = Database.getConnection();
@@ -146,7 +133,7 @@ public class ReviewDao {
 
 
 
-    public static void edit(Review review) throws SQLException {
+    public static void update(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("UPDATE Review SET description=?, name=? WHERE id = ?");
@@ -155,9 +142,6 @@ public class ReviewDao {
         statement.setLong(3, review.getId());
 
         statement.executeUpdate();
-
-
-
     }
 
 
@@ -236,5 +220,52 @@ public class ReviewDao {
 
         return urls;
 
+    }
+
+    public static void vote(Review review, User user, int value) throws SQLException {
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT value FROM ReviewVote WHERE review_id = ? AND user_id = ?"
+            );
+            statement.setLong(1, review.getId());
+            statement.setLong(2, user.getId());
+            ResultSet resultSet = statement.executeQuery();
+
+            if (!resultSet.next()) {
+                statement = conn.prepareStatement("INSERT INTO ReviewVote (review_id, user_id, value) VALUES (?, ?, ?)");
+                statement.setLong(1, review.getId());
+                statement.setLong(2, user.getId());
+                statement.setInt(3, value);
+                statement.executeUpdate();
+                return;
+            }
+
+            int previousValue = resultSet.getInt(1);
+            if (previousValue == value) {
+                statement = conn.prepareStatement("DELETE FROM ReviewVote WHERE review_id = ? AND user_id = ?");
+                statement.setLong(1, review.getId());
+                statement.setLong(2, user.getId());
+                statement.executeUpdate();
+            } else {
+                statement = conn.prepareStatement("UPDATE ReviewVote SET value = ? WHERE review_id = ? AND user_id = ?");
+                statement.setInt(1, value);
+                statement.setLong(2, review.getId());
+                statement.setLong(3, user.getId());
+                statement.executeUpdate();
+            }
+
+        }
+    }
+
+    public static void updateReviewRecord(Long reviewId, Long amenityMetricId, int value) throws SQLException {
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "UPDATE ReviewMetricRecord SET value = ? WHERE review_id = ? AND amenity_metric_id = ?"
+            );
+            statement.setInt(1, value);
+            statement.setLong(2, reviewId);
+            statement.setLong(3, amenityMetricId);
+            statement.executeUpdate();
+        }
     }
 }
