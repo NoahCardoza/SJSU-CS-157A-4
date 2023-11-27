@@ -196,7 +196,7 @@ public class ReviewsServlet extends HttpServlet {
 
         for (Review review: reviews) {
             review.setMetrics(ReviewDao.getAllReviewMetricRecordsWithNames(review.getId()));
-            review.setImages(ReviewDao.getAllImages(review.getId()));
+            review.setImages(ReviewDao.getAllImagesForReview(review.getId()));
             UserDao.getInstance().get(review.getUserId()).ifPresent(review::setUser);
         }
 

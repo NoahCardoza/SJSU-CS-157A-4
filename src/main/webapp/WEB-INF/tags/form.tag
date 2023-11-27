@@ -19,7 +19,7 @@ return false;
 }"/>
 
 <form id="search-form" onsubmit="${autoSubmit ? onsubmit : ''}" class="${className}" >
-    <div class="form-control mb-2">
+    <div class="mb-2">
         <label for="amenityType" class="form-label">Amenity Type</label>
         <select class="form-select" autocomplete="off" name="amenityTypeId" id="amenityType" onchange="$('#search-form').submit()">
             <option value="0" ${defaultToAllSelected ? 'selected' : ''} >All</option>

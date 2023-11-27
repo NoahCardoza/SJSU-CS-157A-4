@@ -209,7 +209,27 @@ public class ReviewDao {
         return reviews;
     }
 
-    public static List<String> getAllImages(Long amenityId) throws SQLException {
+    public static List<String> getAllImagesForReview(Long reviewId) throws SQLException {
+        ArrayList<String> urls = new ArrayList<>();
+
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "SELECT url FROM ReviewImage WHERE review_id = ?"
+        );
+
+        statement.setDouble(1, reviewId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            urls.add(resultSet.getString("url"));
+        }
+
+        return urls;
+
+    }
+
+    public static List<String> getAllImagesForAmenity(Long amenityId) throws SQLException {
         ArrayList<String> urls = new ArrayList<>();
 
         Connection conn = Database.getConnection();
