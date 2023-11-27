@@ -309,6 +309,14 @@ public class ReviewsServlet extends HttpServlet {
             return;
         }
 
+        Review existingReview = ReviewDao.getReviewByUserAndAmenity(user.getId(), amenityId);
+
+        if (existingReview != null) {
+            request.getSession().setAttribute("alert", new Alert("danger", "You have already reviewed this amenity. Edit your review instead."));
+            response.sendRedirect(request.getContextPath() + "/reviews?f=edit&id=" + existingReview.getId());
+            return;
+        }
+
         request.setAttribute("headerText", "Create Review");
         request.setAttribute("submitButtonText", "Create");
         request.setAttribute("editMode", false);

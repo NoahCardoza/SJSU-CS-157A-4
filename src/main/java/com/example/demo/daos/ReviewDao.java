@@ -115,10 +115,17 @@ public class ReviewDao {
     public static void delete(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("DELETE FROM Review WHERE id = ?");
-
+        PreparedStatement statement = conn.prepareStatement("DELETE FROM ReviewMetricRecord WHERE review_id = ?");
         statement.setLong(1, review.getId());
+        statement.executeUpdate();
 
+        // TODO: delete images from S3
+        statement = conn.prepareStatement("DELETE FROM ReviewImage WHERE review_id = ?");
+        statement.setLong(1, review.getId());
+        statement.executeUpdate();
+
+        statement = conn.prepareStatement("DELETE FROM Review WHERE id = ?");
+        statement.setLong(1, review.getId());
         statement.executeUpdate();
     }
 
@@ -266,6 +273,26 @@ public class ReviewDao {
             statement.setLong(2, reviewId);
             statement.setLong(3, amenityMetricId);
             statement.executeUpdate();
+        }
+    }
+
+    public static Review getReviewByUserAndAmenity(Long id, Long amenityId) {
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT * FROM Review WHERE user_id = ? AND amenity_id = ?"
+            );
+            statement.setLong(1, id);
+            statement.setLong(2, amenityId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return fromResultSet(resultSet);
+            }
+
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
