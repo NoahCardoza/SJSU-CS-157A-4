@@ -1,4 +1,4 @@
-<%@tag description="Prepares URL for CDN" pageEncoding="UTF-8" %>
+<%@tag description="Prepares URL for CDN" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@taglib prefix="hg" tagdir="/WEB-INF/tags" %>
 <%@attribute name="value" type="java.lang.String" %>
@@ -15,4 +15,4 @@
 <c:if test="${not empty size}">
     <c:set var="url" value="${url}?width=${size}&height=${size}"/>
 </c:if>
-https://ctosadjgda.cloudimg.io/${url}
+<%-- output: --%>https://ctosadjgda.cloudimg.io/${url}

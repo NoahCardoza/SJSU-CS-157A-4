@@ -131,16 +131,23 @@ public class AmenitiesServlet extends HttpServlet {
         // gets all reviews for this amenity
         User user = (User)request.getAttribute("user");
         List<Review> reviews = ReviewDao.getAllReviews(
-                amenityId, (Long) request.getSession().getAttribute("user_id"), user == null ? Boolean.FALSE : user.isAdministrator() || user.isModerator() );
-
-        var amenityReview = new AmenitiesReviewGrouper(object, reviews);
-        request.setAttribute(
-                "reviews",
-                amenityReview
-
+                amenityId,
+                (Long) request.getSession().getAttribute("user_id"),
+                user == null ? Boolean.FALSE : user.isAdministrator() || user.isModerator()
         );
 
-        List<String> urls = ReviewDao.getInstance().getAllImages(object.getId());
+        for (Review review: reviews) {
+            review.setMetrics(ReviewDao.getAllReviewMetricRecordsWithNames(review.getId()));
+            review.setImages(ReviewDao.getAllImages(review.getId()));
+            UserDao.getInstance().get(review.getUserId()).ifPresent(review::setUser);
+        }
+
+        request.setAttribute(
+                "reviews",
+                reviews
+        );
+
+        List<String> urls = ReviewDao.getAllImages(object.getId());
 
         request.setAttribute(
                 "images",
