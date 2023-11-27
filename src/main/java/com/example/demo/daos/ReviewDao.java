@@ -107,7 +107,7 @@ public class ReviewDao {
         review.setDescription(row.getString(4));
         review.setName(row.getString(5));
         review.setHidden(row.getBoolean(6));
-        review.setCreatedAt(row.getString(7));
+        review.setCreatedAt(row.getTimestamp(7));
         review.setUpdatedAt(row.getString(8));
 
         return review;

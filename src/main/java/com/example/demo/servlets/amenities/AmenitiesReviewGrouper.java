@@ -38,7 +38,7 @@ public class AmenitiesReviewGrouper {
                 joiner.add(review.getDescription());
             }
 
-            joiner.add(review.getCreatedAt());
+            joiner.add(review.getCreatedAt().toString());
 
         }
 

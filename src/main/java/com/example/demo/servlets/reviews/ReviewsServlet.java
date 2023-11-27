@@ -81,14 +81,11 @@ public class ReviewsServlet extends HttpServlet {
 
         List<Review> reviews = ReviewDao.getAllReviews(reviewId);
 
-        for (Review review:
-             reviews) {
+        for (Review review: reviews) {
             review.setMetrics(ReviewDao.getAllReviewMetricRecordsWithNames(review.getId()));
             review.setImages(ReviewDao.getAllImages(review.getId()));
-
+            UserDao.getInstance().get(review.getUserId()).ifPresent(review::setUser);
         }
-
-
 
         List<AmenityTypeMetricRecordWithName> metrics =  ReviewDao.getAllReviewMetricRecordsWithNames(reviewId);
         request.setAttribute("reviews", reviews);
