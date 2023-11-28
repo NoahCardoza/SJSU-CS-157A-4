@@ -254,6 +254,9 @@ public class AmenitiesServlet extends HttpServlet {
                             request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
                         }
                         return;
+                    }
+                    else if (action.equals("select")) {
+                        // TODO: does anything need to happen here?
                     } else {
                         request.setAttribute("alert", new Alert("danger", "Invalid action"));
                     }
