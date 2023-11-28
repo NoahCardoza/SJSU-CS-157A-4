@@ -193,9 +193,12 @@ public class RevisionDao {
     }
 
     public Long createRevisionForAmenityEdit(Amenity prev, Amenity next, List<AmenityTypeAttributeRecord> nextAttr) throws SQLException {
-        /*ArrayList<String> columns = new ArrayList<>();
+        ArrayList<String> columns = new ArrayList<>();
         ArrayList<String> preValue = new ArrayList<>();
         ArrayList<String> nextValue = new ArrayList<>();
+
+        // Amenity Revision
+        Long userId = next.getUserId();
 
         if (valuesDiffer(prev.getName(), next.getName())) {
             columns.add("name");
@@ -209,39 +212,21 @@ public class RevisionDao {
             nextValue.add(next.getDescription());
         }
 
-        if (valuesDiffer(prev.getAddress(), next.getAddress())) {
-            columns.add("address");
-            preValue.add(prev.getAddress());
-            nextValue.add(next.getAddress());
-        }
-
-        if (valuesDiffer(prev.getLongitude(), next.getLongitude())) {
-            columns.add("longitude");
-            preValue.add(prev.getLongitude().toString());
-            nextValue.add(next.getLongitude().toString());
-        }
-
-        if (valuesDiffer(prev.getLatitude(), next.getLatitude())) {
-            columns.add("latitude");
-            preValue.add(prev.getLatitude().toString());
-            nextValue.add(next.getLatitude().toString());
-        }
-
         if (columns.isEmpty()) {
             return null;
         }
 
-        Revision revision = new Revision();
-        revision.setUserId(userId);
-        revision.setTableName("Location");
-        revision.setPrimaryKey(prev.getId());
-        Long revisionId = RevisionDao.getInstance().create(revision);
+        Revision amenityRevision = new Revision();
+        amenityRevision.setUserId(userId);
+        amenityRevision.setTableName("Amenity");
+        amenityRevision.setPrimaryKey(prev.getId());
+        Long revisionId = RevisionDao.getInstance().create(amenityRevision);
 
         for (int i = 0; i < columns.size(); i++) {
             RevisionEdit edit = new RevisionEdit();
             edit.setRevisionId(revisionId);
 
-            edit.setTableName("Location");
+            edit.setTableName("Amenity");
             edit.setPrimaryKey(prev.getId());
             edit.setColumnName(columns.get(i));
             edit.setPreviousValue(preValue.get(i));
@@ -249,9 +234,26 @@ public class RevisionDao {
             RevisionEditDao.getInstance().create(edit);
         }
 
-        return revisionId;*/
+        // Attribute revision
+        for(AmenityTypeAttributeRecord curNewAttr : nextAttr){
 
-        return 0L;
+            String prevVal = AmenityTypeAttributeDao.getInstance().getValueForAttribute(curNewAttr.getAmenityAttributeId(), curNewAttr.getAmenityId());
+
+            if(!prevVal.equals(curNewAttr.getValue())){
+                RevisionEdit edit = new RevisionEdit();
+                edit.setRevisionId(revisionId);
+
+                edit.setTableName("AmenityAttributeRecord");
+                edit.setPrimaryKey(curNewAttr.getAmenityAttributeId());
+                edit.setPreviousValue(prevVal);
+                edit.setNewValue(curNewAttr.getValue());
+                RevisionEditDao.getInstance().create(edit);
+            }
+        }
+
+
+        return revisionId;
+
     }
 
 

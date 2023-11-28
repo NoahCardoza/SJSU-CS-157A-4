@@ -151,7 +151,6 @@ public class AmenityTypeAttributeDao {
         ResultSet resultSet = statement.executeQuery();
 
         if (resultSet.next()) {
-            System.out.println(resultSet.getString(1));
             attributeValue = resultSet.getString("value");
         }
         return attributeValue;
