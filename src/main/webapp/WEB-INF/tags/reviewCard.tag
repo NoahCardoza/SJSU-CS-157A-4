@@ -52,6 +52,11 @@
                             >
                                     ${metric.value}/5
                             </div>
+                            <c:if test="${metric.value == 0}">
+                                <div class="progress-bar bg-secondary" role="progressbar" style="width: 100%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="5">
+                                    0/5
+                                </div>
+                            </c:if>
                         </div>
                 </div>
             </c:forEach>

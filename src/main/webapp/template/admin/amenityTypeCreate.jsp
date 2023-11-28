@@ -27,8 +27,6 @@
                 <label for="metrics">Metrics</label>
                 <textarea id="metrics" name="metrics" type="" class="form-control" placeholder="metricA:type,metricB:type,etc.">${amenityType.metrics}</textarea>
 
-                <label for="icon">Icon</label>
-                <input id="icon" name="icon" type="text" class="form-control" placeholder="Icon" value="${amenityType.icon}"/>
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
             </form>
         </div>

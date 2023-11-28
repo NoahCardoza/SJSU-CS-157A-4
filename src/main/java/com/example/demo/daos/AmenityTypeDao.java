@@ -29,7 +29,6 @@ public class AmenityTypeDao {
 
         amenityType.setId(resultSet.getLong("id"));
         amenityType.setName(resultSet.getString("name"));
-        amenityType.setIcon(resultSet.getString("icon"));
         amenityType.setDescription(resultSet.getString("description"));
         amenityType.setParentAmenityTypeId(resultSet.getLong("parent_amenity_type_id"));
 
@@ -66,10 +65,9 @@ public class AmenityTypeDao {
 
         Long id = 0L;
 
-        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityType (name, icon, description) VALUES (?, ?, ?)");
+        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityType (name, description) VALUES (?, ?, ?)");
 
         ps.setString(1, escapeHtml(amenityType.getName()));
-        ps.setString(2, escapeHtml(amenityType.getIcon()));
         ps.setString(3, escapeHtml(amenityType.getDescription()));
         //ps.setLong(4, amenityType.getParentAmenityTypeId());
         ps.executeUpdate();
@@ -87,10 +85,9 @@ public class AmenityTypeDao {
     }
 
     public void update(AmenityType amenityType) throws SQLException {
-        var ps = Database.getConnection().prepareStatement("UPDATE AmenityType SET name = ?, icon = ?, description = ?, parent_amenity_type_id = ? WHERE id = ?");
+        var ps = Database.getConnection().prepareStatement("UPDATE AmenityType SET name = ?, description = ?, parent_amenity_type_id = ? WHERE id = ?");
 
         ps.setString(1, escapeHtml(amenityType.getName()));
-        ps.setString(2, escapeHtml(amenityType.getIcon()));
         ps.setString(3, escapeHtml(amenityType.getDescription()));
         ps.setLong(4, amenityType.getParentAmenityTypeId());
         ps.setLong(5, amenityType.getId());

@@ -12,7 +12,6 @@ public class Amenity implements Serializable {
     private Long userId;
     private String description;
     private String name;
-    private Boolean accessible;
     private String createdAt;
     private String updatedAt;
 
@@ -62,14 +61,6 @@ public class Amenity implements Serializable {
         this.name = name;
     }
 
-    public Boolean getAccessible() {
-        return accessible;
-    }
-
-    public void setAccessible(Boolean accessible) {
-        this.accessible = accessible;
-    }
-
     public String getCreatedAt() {
         return createdAt;
     }
@@ -95,7 +86,6 @@ public class Amenity implements Serializable {
                 ", userId=" + userId +
                 ", description='" + description + '\'' +
                 ", name='" + name + '\'' +
-                ", accessible=" + accessible +
                 ", createdAt='" + createdAt + '\'' +
                 ", updatedAt='" + updatedAt + '\'' +
                 '}';

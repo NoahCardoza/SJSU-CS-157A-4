@@ -4,7 +4,6 @@ public class AmenityTypeMetric {
     Long id;
     Long amenityTypeId;
     String name;
-    String icon;
     String type;
 
     public AmenityTypeMetric() {}
@@ -33,14 +32,6 @@ public class AmenityTypeMetric {
         this.name = name;
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
     public String getType() {
         return type;
     }
@@ -55,7 +46,6 @@ public class AmenityTypeMetric {
                 "id=" + id +
                 ", amenityTypeId=" + amenityTypeId +
                 ", name='" + name + '\'' +
-                ", icon='" + icon + '\'' +
                 ", type='" + type + '\'' +
                 '}';
     }

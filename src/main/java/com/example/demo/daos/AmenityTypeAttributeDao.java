@@ -34,7 +34,6 @@ public class AmenityTypeAttributeDao {
         amenityTypeAttribute.setId(resultSet.getLong("id"));
         amenityTypeAttribute.setName(resultSet.getString("name"));
         amenityTypeAttribute.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
-        amenityTypeAttribute.setIcon(resultSet.getString("icon"));
         amenityTypeAttribute.setType(resultSet.getString("type"));
 
         return amenityTypeAttribute;
@@ -58,12 +57,11 @@ public class AmenityTypeAttributeDao {
     }
 
     public void create(AmenityTypeAttribute amenityTypeAttribute) throws SQLException {
-        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityTypeAttribute (amenity_type_id, name, icon, type) VALUES (?, ?, ?, ?)");
+        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityTypeAttribute (amenity_type_id, name, type) VALUES (?, ?, ?)");
 
         ps.setLong(1, amenityTypeAttribute.getAmenityTypeId());
         ps.setString(2, escapeHtml(amenityTypeAttribute.getName()));
-        ps.setString(3, escapeHtml(amenityTypeAttribute.getIcon()));
-        ps.setString(4, escapeHtml(amenityTypeAttribute.getType()));
+        ps.setString(3, escapeHtml(amenityTypeAttribute.getType()));
         ps.executeUpdate();
     }
 

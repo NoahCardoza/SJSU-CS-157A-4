@@ -3,7 +3,6 @@ package com.example.demo.beans.entities;
 public class ReviewImage {
     private Long id;
     private Long reviewId;
-    private String description;
     private String url;
     private String createdAt;
 
@@ -28,14 +27,6 @@ public class ReviewImage {
         this.reviewId = reviewId;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getUrl() {
         return url;
     }
@@ -57,7 +48,6 @@ public class ReviewImage {
         return "ReviewImage{" +
                 "id=" + id +
                 ", reviewId=" + reviewId +
-                ", description='" + description + '\'' +
                 ", url='" + url + '\'' +
                 ", createdAt=" + createdAt +
                 '}';

@@ -28,7 +28,6 @@ public class AmenityDao {
         amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
         amenity.setLocationId(resultSet.getLong("location_id"));
         amenity.setUserId(resultSet.getLong("user_id"));
-        amenity.setAccessible(resultSet.getBoolean("accessible"));
         amenity.setCreatedAt(resultSet.getString("created_at"));
         amenity.setUpdatedAt(resultSet.getString("updated_at"));
 
@@ -256,7 +255,6 @@ public class AmenityDao {
             amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
             amenity.setLocationId(resultSet.getLong("location_id"));
             amenity.setUserId(resultSet.getLong("user_id"));
-            amenity.setAccessible(resultSet.getBoolean("accessible"));
             amenity.setCreatedAt(resultSet.getString("created_at"));
             amenity.setUpdatedAt(resultSet.getString("updated_at"));
             ReviewImage reviewImage = new ReviewImage();
@@ -309,7 +307,6 @@ public class AmenityDao {
             amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
             amenity.setLocationId(resultSet.getLong("location_id"));
             amenity.setUserId(resultSet.getLong("user_id"));
-            amenity.setAccessible(resultSet.getBoolean("accessible"));
             amenity.setCreatedAt(resultSet.getString("created_at"));
             amenity.setUpdatedAt(resultSet.getString("updated_at"));
             ReviewImage reviewImage = new ReviewImage();

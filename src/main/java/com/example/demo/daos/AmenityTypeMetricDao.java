@@ -31,12 +31,11 @@ public class AmenityTypeMetricDao {
     private AmenityTypeMetricDao() {}
 
     public void create(AmenityTypeMetric amenityTypeMetric) throws SQLException {
-        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityTypeMetric (amenity_type_id, name, icon, type) VALUES (?, ?, ?, ?)");
+        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityTypeMetric (amenity_type_id, name, type) VALUES (?, ?, ?)");
 
         ps.setLong(1, amenityTypeMetric.getAmenityTypeId());
         ps.setString(2, escapeHtml(amenityTypeMetric.getName()));
-        ps.setString(3, escapeHtml(amenityTypeMetric.getIcon()));
-        ps.setString(4, escapeHtml(amenityTypeMetric.getType()));
+        ps.setString(3, escapeHtml(amenityTypeMetric.getType()));
         ps.executeUpdate();
     }
 
@@ -46,7 +45,6 @@ public class AmenityTypeMetricDao {
         amenityTypeMetric.setId(resultSet.getLong("id"));
         amenityTypeMetric.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
         amenityTypeMetric.setName(resultSet.getString("name"));
-        amenityTypeMetric.setIcon(resultSet.getString("icon"));
         amenityTypeMetric.setType(resultSet.getString("type"));
 
         return amenityTypeMetric;

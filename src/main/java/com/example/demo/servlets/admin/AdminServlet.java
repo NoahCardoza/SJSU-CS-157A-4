@@ -183,17 +183,9 @@ public class AdminServlet extends HttpServlet {
     }
 
     private void amenityTypeCreatePost(HttpServletRequest request, HttpServletResponse response) {
-
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
         AmenityType amenityType = new AmenityType();
         amenityType.setName(request.getParameter("name"));
         amenityType.setDescription(request.getParameter("description"));
-        amenityType.setIcon(request.getParameter("icon"));
 
         String attributes = request.getParameter("attributes");
         String metrics = request.getParameter("metrics");
@@ -212,7 +204,6 @@ public class AdminServlet extends HttpServlet {
                 newAttribute.setName(attributeWithType.get(0));
                 newAttribute.setAmenityTypeId(amenityType.getId());
                 newAttribute.setType(attributeWithType.get(1));
-                newAttribute.setIcon(amenityType.getIcon());
                 AmenityTypeAttributeDao.getInstance().create(newAttribute);
             }
 
@@ -225,7 +216,6 @@ public class AdminServlet extends HttpServlet {
                 newMetric.setName(metricWithType.get(0));
                 newMetric.setAmenityTypeId(amenityType.getId());
                 newMetric.setType(metricWithType.get((1)));
-                newMetric.setIcon(amenityType.getIcon());
                 AmenityTypeMetricDao.getInstance().create(newMetric);
             }
 
@@ -263,7 +253,6 @@ public class AdminServlet extends HttpServlet {
         amenityType.setParentAmenityTypeId(Util.parseLongOrNull(request.getParameter("parentAmenityTypeId")));
         amenityType.setName(request.getParameter("name"));
         amenityType.setDescription(request.getParameter("description"));
-        amenityType.setIcon(request.getParameter("icon"));
 
         // TODO: validate
 

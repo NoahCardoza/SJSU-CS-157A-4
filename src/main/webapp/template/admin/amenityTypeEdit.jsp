@@ -21,8 +21,6 @@
                 <input id="name" name="name" type="text" class="form-control" placeholder="Name" value="${amenityType.name}"/>
                 <label for="description">Description</label>
                 <textarea id="description" name="description" type="" class="form-control" placeholder="Description">${amenityType.description}</textarea>
-                <label for="icon">Icon</label>
-                <input id="icon" name="icon" type="text" class="form-control" placeholder="Icon" value="${amenityType.icon}"/>
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Update</button>
             </form>
         </div>

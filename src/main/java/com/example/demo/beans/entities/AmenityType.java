@@ -5,7 +5,6 @@ public class AmenityType {
     Long id;
     Long parentAmenityTypeId;
     String name;
-    String icon;
     String description;
 
     public AmenityType() {}
@@ -34,14 +33,6 @@ public class AmenityType {
         this.name = name;
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -56,7 +47,6 @@ public class AmenityType {
                 "id=" + id +
                 ", parentAmenityTypeId=" + parentAmenityTypeId +
                 ", name='" + name + '\'' +
-                ", icon='" + icon + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }

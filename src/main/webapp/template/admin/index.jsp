@@ -24,7 +24,6 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Icon</th>
                                 <th>Description</th>
                                 <th>Actions</th>
                             </tr>
@@ -33,7 +32,6 @@
                             <c:forEach items="${amenityTypes}" var="amenityType">
                                 <tr>
                                     <td scope="row">${amenityType.name}</td>
-                                    <td>${amenityType.icon}</td>
                                     <td>${amenityType.description}</td>
                                     <td>
                                         <a href="<c:url value="/admin?f=amenityTypeEdit&id=${amenityType.id}"/>" class="btn btn-primary">Edit</a>
