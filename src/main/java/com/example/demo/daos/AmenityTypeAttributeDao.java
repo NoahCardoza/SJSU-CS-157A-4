@@ -173,6 +173,52 @@ public class AmenityTypeAttributeDao {
 
     }
 
+    public List<AmenityTypeAttributeRecordWithName> getAmenityAttributeRecords(Amenity amenity) throws SQLException {
+        List<AmenityTypeAttributeRecordWithName> records = new ArrayList<>();
+
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT id AS attribute_id, name, type, amenity_attribute_id, value\n" +
+                    "FROM (\n" +
+                    "    SELECT id, name, type FROM AmenityTypeAttribute WHERE amenity_type_id IN (\n" +
+                    "        WITH RECURSIVE amenity_type_hierarchy AS (\n" +
+                    "            SELECT id, parent_amenity_type_id\n" +
+                    "            FROM AmenityType\n" +
+                    "            WHERE id = ?\n" +
+                    "            UNION ALL\n" +
+                    "            SELECT\n" +
+                    "            e.id,\n" +
+                    "            e.parent_amenity_type_id\n" +
+                    "            FROM AmenityType e, amenity_type_hierarchy\n" +
+                    "            WHERE amenity_type_hierarchy.parent_amenity_type_id = e.id\n" +
+                    "        ) SELECT id FROM amenity_type_hierarchy\n" +
+                    "    )\n" +
+                    ") A\n" +
+                    "LEFT JOIN (\n" +
+                    "    SELECT * FROM AmenityAttributeRecord WHERE amenity_id = ?\n" +
+                    ") B\n" +
+                    "ON A.id=B.amenity_attribute_id;"
+            );
+
+           ps.setLong(1, amenity.getAmenityTypeId());
+            ps.setLong(2, amenity.getId());
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                AmenityTypeAttributeRecordWithName record = new AmenityTypeAttributeRecordWithName();
+                record.setAttributeId(rs.getLong("attribute_id"));
+                record.setName(rs.getString("name"));
+                record.setType(rs.getString("type"));
+                record.setAmenityAttributeId(rs.getLong("amenity_attribute_id"));
+                record.setValue(rs.getString("value"));
+                records.add(record);
+            }
+        }
+
+        return records;
+    }
+
     public Optional<MinMax> getMinMaxIntValuesForAttribute(Long attributeId) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
