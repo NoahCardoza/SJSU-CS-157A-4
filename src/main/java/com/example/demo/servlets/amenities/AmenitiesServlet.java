@@ -369,6 +369,7 @@ public class AmenitiesServlet extends HttpServlet {
 
                 System.out.println(preForm.getAttributes().size());
                 request.setAttribute("form", preForm);
+            request.setAttribute("amenityAttributesWithNames", prevAmenityAttributesWithNames);
                 request.setAttribute("amenityAttributesWithNames", prevAmenityAttributesWithNames);
 
                 request.getRequestDispatcher("/template/amenity/amenityEdit.jsp").forward(request, response);
