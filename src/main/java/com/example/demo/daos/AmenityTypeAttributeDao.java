@@ -137,8 +137,6 @@ public class AmenityTypeAttributeDao {
 
     public String getValueForAttribute(Long attributeId, Long amenityId) throws SQLException {
         String attributeValue = "";
-        System.out.println("attributeId: " + attributeId);
-        System.out.println("amenityId: " + amenityId);
 
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
