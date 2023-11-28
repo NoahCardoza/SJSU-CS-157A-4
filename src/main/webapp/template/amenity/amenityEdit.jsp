@@ -38,27 +38,25 @@
                 <input type="hidden" name="locationName" id="locationName" value="${form.locationName}">
                 <input type="hidden" name="typeId" id="typeId" value="${form.typeId}">
                 <input type="hidden" name="typeName" id="typeName" value="${form.typeName}">
-                <input type="hidden" name="amenityTypeAttributes" id="amenityTypeAttributes" value="${form.attributes}">
 
-                <%--          TODO: @Noah it doesn't work TT     --%>
 
-                <c:if test="${amenityTypeAttributes.size() > 0}">
+                <c:if test="${form.attributes.size() > 0}">
                     <p>Attributes</p>
                     <div class="row">
                         <c:forEach var="amenityTypeAttribute" items="${amenityAttributesWithNames}">
                             <div class="form-group col-12 col-md-6 g-2">
                                 <div class="form-group">
-                                    <label for="amenityTypeAttribute-${amenityTypeAttribute.id}">${amenityTypeAttribute.name}</label>
+                                    <label for="amenityTypeAttribute-${amenityTypeAttribute.amenityAttributeId}">${amenityTypeAttribute.name}</label>
                                     <c:choose>
                                         <c:when test="${amenityTypeAttribute.type == 'text'}">
-                                            <input type="text" id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" class="form-control mb-3" placeholder="${amenityTypeAttribute.generatePlaceholderText()}" />
+                                            <input type="text" id="amenityTypeAttribute-${amenityTypeAttribute.amenityAttributeId}" name="amenityTypeAttribute-${amenityTypeAttribute.amenityAttributeId}" class="form-control mb-3" placeholder="${amenityTypeAttribute.generatePlaceholderText()}" value="${amenityTypeAttribute.value}" />
                                         </c:when>
                                         <c:when test="${amenityTypeAttribute.type == 'number'}">
-                                            <input type="number" id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" class="form-control mb-3" placeholder="${amenityTypeAttribute.generatePlaceholderText()}" />
+                                            <input type="number" id="amenityTypeAttribute-${amenityTypeAttribute.amenityAttributeId}" name="amenityTypeAttribute-${amenityTypeAttribute.amenityAttributeId}" class="form-control mb-3" placeholder="${amenityTypeAttribute.generatePlaceholderText()}" value="${amenityTypeAttribute.value}"/>
                                         </c:when>
                                         <c:when test="${amenityTypeAttribute.type == 'boolean'}">
-                                            <select  id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" class="form-control form-select mb-3">
-                                                <option value="">${amenityTypeAttribute.generatePlaceholderText()}</option>
+                                            <select  id="amenityTypeAttribute-${amenityTypeAttribute.amenityAttributeId}" name="amenityTypeAttribute-${amenityTypeAttribute.amenityAttributeId}" class="form-control form-select mb-3">
+                                                <option value="${amenityTypeAttribute.value}">${amenityTypeAttribute.generatePlaceholderText()}</option>
                                                 <option value="1">Yes</option>
                                                 <option value="0">No</option>
                                             </select>

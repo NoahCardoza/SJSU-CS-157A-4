@@ -286,14 +286,6 @@ public class AmenitiesServlet extends HttpServlet {
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
-        System.out.println("Edit Request Params:");
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-        System.out.println("\n\n\n");
-
         User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
         if (user == null) {
             return;
@@ -318,7 +310,6 @@ public class AmenitiesServlet extends HttpServlet {
         List<AmenityTypeAttributeRecord> postAmenityAttributes = new ArrayList<>();
 
         if(request.getMethod().equals("GET")){
-            System.out.println("\nIN GET METHOD:");
                 preForm = new AmenityForm(amenity.get());
                 preForm.setLocationName("None");
 
@@ -343,11 +334,13 @@ public class AmenitiesServlet extends HttpServlet {
                 String value = "";
                 String name = "";
 
+
                 for(AmenityTypeAttribute attribute : attributes){
                     AmenityTypeAttributeRecordWithName attributeRecord = new AmenityTypeAttributeRecordWithName();
 
                     attributeRecord.setAmenityId(preForm.getTypeId());
                     attributeRecord.setAmenityAttributeId(attribute.getId());
+                    attributeRecord.setType(attribute.getType());
 
                     Long amenityId = amenity.get().getId();
                     Long attributeId = attribute.getId();
@@ -362,17 +355,14 @@ public class AmenitiesServlet extends HttpServlet {
 
                 preForm.setAttributes(prevAmenityAttributesWithNames);
 
-                System.out.println(preForm.getAttributes().size());
                 request.setAttribute("form", preForm);
                 request.setAttribute("amenityAttributesWithNames", prevAmenityAttributesWithNames);
 
                 request.getRequestDispatcher("/template/amenity/amenityEdit.jsp").forward(request, response);
-                System.out.println("GET METHOD FINSIHED");
+
 
         }
         else {
-            System.out.println("\n\nIN POST METHOD");
-
             postForm = new AmenityForm(request);
             List<AmenityTypeAttribute> attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenity.get().getAmenityTypeId());
 
