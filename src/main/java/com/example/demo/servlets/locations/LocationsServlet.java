@@ -406,6 +406,7 @@ public class LocationsServlet extends HttpServlet {
         request.setAttribute("primaryButtonText", "Update");
         request.setAttribute("titleText", "Update");
         request.setAttribute("headerText", "Update Location");
+        request.setAttribute("editMode", true);
 
 
         request.getRequestDispatcher("/template/locations/form.jsp").forward(request, response);

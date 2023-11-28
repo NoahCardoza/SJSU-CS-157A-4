@@ -123,37 +123,48 @@ public class RevisionDao {
         }
     }
 
+    public static Boolean valuesDiffer(Object prev, Object next) {
+        if (prev == null && next == null) {
+            return false;
+        }
+
+        if (prev == null || next == null) {
+            return true;
+        }
+
+        return !prev.equals(next);
+    }
 
     public Long createRevisionForLocationEdit(Long userId, Location prev, Location next) throws SQLException {
         ArrayList<String> columns = new ArrayList<>();
         ArrayList<String> preValue = new ArrayList<>();
         ArrayList<String> nextValue = new ArrayList<>();
 
-        if (!prev.getName().equals(next.getName())) {
+        if (valuesDiffer(prev.getName(), next.getName())) {
             columns.add("name");
             preValue.add(prev.getName());
             nextValue.add(next.getName());
         }
 
-        if (!prev.getDescription().equals(next.getDescription())) {
+        if (valuesDiffer(prev.getDescription(), next.getDescription())) {
             columns.add("description");
             preValue.add(prev.getDescription());
             nextValue.add(next.getDescription());
         }
 
-        if (!prev.getAddress().equals(next.getAddress())) {
+        if (valuesDiffer(prev.getAddress(), next.getAddress())) {
             columns.add("address");
             preValue.add(prev.getAddress());
             nextValue.add(next.getAddress());
         }
 
-        if (!prev.getLongitude().equals(next.getLongitude())) {
+        if (valuesDiffer(prev.getLongitude(), next.getLongitude())) {
             columns.add("longitude");
             preValue.add(prev.getLongitude().toString());
             nextValue.add(next.getLongitude().toString());
         }
 
-        if (!prev.getLatitude().equals(next.getLatitude())) {
+        if (valuesDiffer(prev.getLatitude(), next.getLatitude())) {
             columns.add("latitude");
             preValue.add(prev.getLatitude().toString());
             nextValue.add(next.getLatitude().toString());

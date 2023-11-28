@@ -5,6 +5,8 @@ import com.example.demo.Util;
 import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.Revision;
 import com.example.demo.beans.entities.User;
+import com.example.demo.daos.AmenityDao;
+import com.example.demo.daos.LocationDao;
 import com.example.demo.daos.RevisionDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -62,6 +64,10 @@ public class RevisionsServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
+
+        setEntityUrlAttribute(request, revision.get().getTableName(), revision.get().getPrimaryKey().toString());
+        setEntityNameAttribute(request, revision.get().getTableName(), revision.get().getPrimaryKey().toString());
+        setRevisionUrlAttribute(request, revision.get().getTableName(), revision.get().getPrimaryKey().toString());
 
         RevisionDao.getInstance().getEditsForRevision(revision.get());
         RevisionDao.getInstance().getUserForRevision(revision.get());
@@ -196,11 +202,44 @@ public class RevisionsServlet extends HttpServlet {
             RevisionDao.getInstance().getUserForRevision(revision);
         }
 
+        setEntityUrlAttribute(request, tableName, primaryKey.toString());
+        setEntityNameAttribute(request, tableName, primaryKey.toString());
+
+
         request.setAttribute(
                 "revisions",
                 revisions
         );
 
         request.getRequestDispatcher("template/revisions/list.jsp").forward(request, response);
+    }
+
+    private static void setEntityUrlAttribute(HttpServletRequest request, String tableName, String primaryKey) {
+        request.setAttribute(
+                "entityUrl",
+                switch (tableName) {
+                    case "Location" -> request.getContextPath() + "/locations?f=get&id=" + primaryKey;
+                    case "Amenity" -> request.getContextPath() + "/amenities?f=get&id=" + primaryKey;
+                    default -> null;
+                }
+        );
+    }
+
+    private static void setEntityNameAttribute(HttpServletRequest request, String tableName, String primaryKey) throws SQLException {
+        request.setAttribute(
+                "entityName",
+                switch (tableName) {
+                    case "Location" -> LocationDao.getInstance().get(Long.parseLong(primaryKey)).get().getName();
+                    case "Amenity" -> AmenityDao.getInstance().get(Long.parseLong(primaryKey)).get().getName();
+                    default -> null;
+                }
+        );
+    }
+
+    private static void setRevisionUrlAttribute(HttpServletRequest request, String tableName, String primaryKey) {
+        request.setAttribute(
+                "revisionUrl",
+                request.getContextPath() + "/revisions?f=list&type=" + tableName + "&id=" + primaryKey
+        );
     }
 }

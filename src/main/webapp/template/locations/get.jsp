@@ -16,19 +16,24 @@
 <body>
 <%@include file="../../includes/nav.jsp" %>
 <div class="container mt-5">
-    <h1 class="mb-2">${location.name}</h1>
-    <div class="col">
-        <img width="200" height="200" src="<c:url value="/locations?f=mapImage&id=${location.id}" />"  alt="Map image"/>
+    <div class="d-flex flex-column-reverse flex-sm-row justify-content-sm-between mb-2">
+        <div class="mt-3 mt-sm-0">
+            <h1 class="mb-3">${location.name}</h1>
+            <p>${location.description}</p>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center">
+            <img  class="img-thumbnail" width="200" height="200" src="<c:url value="/locations?f=mapImage&id=${location.id}" />"  alt="Map image"/>
+
+            <div class="btn-group btn-group-sm mt-2">
+                <a class="btn btn-warning" href="<c:url value="/revisions?f=list&type=Location&id=${location.id}"/>">Revisions</a>
+                <a class="btn btn-secondary" href="<c:url value="/locations?f=edit&id=${location.id}"/>">Edit</a>
+            </div>
+        </div>
     </div>
-    <div class="col">
-        <p>${location.description}</p>
-    </div>
-    <a class="btn btn-warning" href="<c:url value="/revisions?f=list&type=Location&id=${location.id}"/>">Revisions</a>
-    <a class="btn btn-secondary" href="<c:url value="/locations?f=edit&id=${location.id}"/>">Edit</a>
 
     <div class="row">
         <c:forEach var="amenity" items="${amenities}">
-            <div class="col-4">
+            <div class="col-12 col-sm-6 col-md-4 g-3">
                 <div class="card">
                     <img class="card-img-top" src="<hg:cloudimg value="${amenity.image.url}" size="200" />" style="height: 200px; width: 100%; object-fit: cover;">
                     <div class="card-body">

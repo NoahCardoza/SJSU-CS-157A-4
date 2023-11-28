@@ -3,6 +3,7 @@
 <%--@elvariable id="pathWithQueryString" type="java.lang.String"--%>
 <%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
 <%--@elvariable id="form" type="List<com.example.demo.beans.forms.LocationForm>"--%>
+<%--@elvariable id="editMode" type="java.lang.Boolean"--%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -19,34 +20,36 @@
             <h1>${headerText}</h1>
             <img src="<c:url value="/locations?f=mapImage&latitude=${form.latitude}&longitude=${form.longitude}"/>">
             <form method="POST" class="mt-5" id="new-location-form">
-                <div class="row">
-                    <%@include file="../../includes/alerts.jsp" %>
-                    <div class="col mb-3 d-flex justify-content-between align-items-center">
-                        <div>
-                            Parent Location:
-                            <b>
-                                <c:choose>
-                                    <c:when test="${empty form.parentName}">
-                                        None
-                                    </c:when>
-                                    <c:otherwise>
-                                        ${form.parentName}
-                                    </c:otherwise>
-                                </c:choose>
-                            </b>
+                <c:if test="${!editMode}">
+                    <div class="row">
+                        <%@include file="../../includes/alerts.jsp" %>
+                        <div class="col mb-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                Parent Location:
+                                <b>
+                                    <c:choose>
+                                        <c:when test="${empty form.parentName}">
+                                            None
+                                        </c:when>
+                                        <c:otherwise>
+                                            ${form.parentName}
+                                        </c:otherwise>
+                                    </c:choose>
+                                </b>
+                            </div>
+                            <button
+                                    class="btn btn-primary float-end"
+                                    onclick="$('#new-location-form').attr('action', '${param['id'] ? '/locations?f=parentSelect&id=' + param['id'] : '/locations?f=parentSelect'}').submit()"
+                            >Select Parent</button>
                         </div>
-                        <button
-                                class="btn btn-primary float-end"
-                                onclick="$('#new-location-form').attr('action', '${param['id'] ? '/locations?f=parentSelect&id=' + param['id'] : '/locations?f=parentSelect'}').submit()"
-                        >Select Parent</button>
                     </div>
-                </div>
+                </c:if>
 
                 <input type="hidden" name="parentId" id="parentId" value="${form.parentId}">
                 <input type="hidden" name="parentName" id="parentName" value="${form.parentName}">
 
                 <label for="name" class="form-label">Name</label>
-                <input type="text" id="name" name="name" value="${form.name}" class="form-control mb-3" placeholder="Name" />
+                <input type="text" id="name" name="name" required="true" value="${form.name}" class="form-control mb-3" placeholder="Name" />
                 <label for="description" class="form-label">Description</label>
                 <textarea id="description" name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
                 <label for="address" class="form-label">Address</label>

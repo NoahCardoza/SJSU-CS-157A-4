@@ -21,7 +21,7 @@
             </div>
             <%@include file="/includes/alerts.jsp" %>
             <div class="row">
-                <div class="w-100 overflow-x-scroll" style="white-space:nowrap">
+                <div class="w-100 overflow-x-auto mb-3" style="white-space:nowrap">
                     <c:forEach var="imageUrlIndex" begin="${1}" end="${images.size()}">
                         <c:set var="imageUrl" value="${images.get(imageUrlIndex - 1)}" />
                         <img
