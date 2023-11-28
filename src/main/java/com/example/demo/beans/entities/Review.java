@@ -80,6 +80,9 @@ public class Review {
     }
 
     public void setDescription(String description) {
+        description = description.trim();
+        description = description.replaceAll("(\\r\\n|\\r|\\n){2,}", "\n\n");
+
         this.description = description;
     }
 

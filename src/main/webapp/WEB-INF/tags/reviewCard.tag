@@ -2,9 +2,11 @@
 <%@ taglib prefix="hg" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ attribute name="review" type="com.example.demo.beans.entities.Review" %>
 
 <%--@elvariable id="user" type="com.example.demo.beans.entities.User"--%>
+<% request.setAttribute("CR","\n"); %>
 
 <div class="card" id="review-${review.id}">
     <div class="card-header d-flex justify-content-between align-items-center" >
@@ -24,7 +26,9 @@
                 <hg:rating value="${review.calculateAverageRating()}" />
             </div>
         </div>
-        <p>${review.description}</p>
+        <p>
+            ${fn:replace(review.description, CR, "<br/>")}
+        </p>
         <hr class="my-2"/>
         <div class="row align-items-center gx-1 gy-3">
             <c:forEach var="metric" items="${review.metrics}">
