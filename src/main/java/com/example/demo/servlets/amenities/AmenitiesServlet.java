@@ -185,6 +185,10 @@ public class AmenitiesServlet extends HttpServlet {
             }
             form.setLocationId(-1L);
             form.setLocationName(tempLocation.getName());
+            request.setAttribute(
+                    "alert",
+                    new Alert("info", "To report a new location, you must provide one new amenity.")
+            );
         } else {
             // TODO: clear out dead code since never create
             // an amenity without a review
@@ -192,20 +196,11 @@ public class AmenitiesServlet extends HttpServlet {
             // 'a-' is used to indicate that this is a temporary session
             // starts with an amenity
             tempSessionUuid = "a-" + UUID.randomUUID().toString();
+
         }
 
         switch (request.getMethod()) {
             case "GET":
-                if (tempSessionUuid == null) {
-                    List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);
-                    request.setAttribute("locations", locations);
-                } else if (request.getAttribute("alert") == null) {
-                    request.setAttribute(
-                            "alert",
-                            new Alert("info", "To report a new location, you must provide one new amenity.")
-                    );
-                }
-
                 List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
                 request.setAttribute("amenityTypes", amenityTypes);
 

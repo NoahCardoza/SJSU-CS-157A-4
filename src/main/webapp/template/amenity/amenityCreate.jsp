@@ -6,7 +6,6 @@
 <%@ taglib prefix="hg" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="form" type="List<com.example.demo.beans.forms.AmenityForm>"--%>
-<%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
 <%--@elvariable id="amenityTypeAttributes" type="java.util.List<com.example.demo.beans.entities.AmenityTypeAttribute>"--%>
 
 <!DOCTYPE html>
