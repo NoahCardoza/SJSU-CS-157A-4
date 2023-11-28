@@ -450,10 +450,13 @@ public class LocationsServlet extends HttpServlet {
                             location.setLongitude(form.getLongitude());
                             location.setParentLocationId(form.getParentId());
 
-                            String tempLocationId = UUID.randomUUID().toString();
+                            // 'l-' is used to indicate that this is a temporary session
+                            // starts with a location
+                            String tempSessionUuid = "l-" + UUID.randomUUID().toString();
+
                             HttpSession session = request.getSession();
-                            session.setAttribute("temp_location_" + tempLocationId, location);
-                            response.sendRedirect(request.getContextPath() + "/amenities?f=create&session=" + tempLocationId);
+                            session.setAttribute("temp_location_" + tempSessionUuid, location);
+                            response.sendRedirect(request.getContextPath() + "/amenities?f=create&session=" + tempSessionUuid);
                             return;
                         } else {
                             // TODO: send all errors

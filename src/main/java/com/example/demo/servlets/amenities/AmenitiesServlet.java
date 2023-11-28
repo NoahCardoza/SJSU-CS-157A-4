@@ -22,10 +22,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -190,6 +187,13 @@ public class AmenitiesServlet extends HttpServlet {
             }
             form.setLocationId(-1L);
             form.setLocationName(tempLocation.getName());
+        } else {
+            // TODO: clear out dead code since never create
+            // an amenity without a review
+
+            // 'a-' is used to indicate that this is a temporary session
+            // starts with an amenity
+            tempSessionUuid = "a-" + UUID.randomUUID().toString();
         }
 
         switch (request.getMethod()) {

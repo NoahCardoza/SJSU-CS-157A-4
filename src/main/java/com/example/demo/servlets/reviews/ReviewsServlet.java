@@ -306,8 +306,6 @@ public class ReviewsServlet extends HttpServlet {
         Long amenityId = Util.parseLongOrNull(request.getParameter("amenityId"));
         String tempSessionId = request.getParameter("session");
 
-        request.getSession().getAttributeNames().asIterator().forEachRemaining(System.out::println);
-
         Optional<Amenity> amenity;
         if (tempSessionId == null) {
             if (amenityId == null) {
@@ -337,10 +335,17 @@ public class ReviewsServlet extends HttpServlet {
             request.setAttribute("imageRequired", true);
 
             if (request.getAttribute("alert") == null) {
-                request.setAttribute(
-                        "alert",
-                        new Alert("info", "To report a new location, you must provide a review with at least one image.")
-                );
+                if (tempSessionId.startsWith("l-")) {
+                    request.setAttribute(
+                            "alert",
+                            new Alert("info", "To report a new location, you must provide a review with at least one image.")
+                    );
+                } else {
+                    request.setAttribute(
+                            "alert",
+                            new Alert("info", "To report a new amenity, you must provide a review with at least one image.")
+                    );
+                }
             }
         }
 
@@ -374,21 +379,31 @@ public class ReviewsServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             if (tempSessionId != null) {
-                Location tempLocation = (Location) session.getAttribute("temp_location_" + tempSessionId);
+                Location tempLocation = null;
+                if (tempSessionId.startsWith("l-")) {
+                    tempLocation = (Location) session.getAttribute("temp_location_" + tempSessionId);
+                    if (tempLocation == null) {
+                        response.sendRedirect(request.getContextPath() + "/");
+                        return;
+                    }
+                    session.removeAttribute("temp_location_" + tempSessionId);
+                }
+
                 Amenity tempAmenity = (Amenity) session.getAttribute("temp_amenity_" + tempSessionId);
                 List<AmenityTypeAttributeRecord> tempAttributes = (List<AmenityTypeAttributeRecord>) session.getAttribute("temp_amenity_attributes_" + tempSessionId);
+                session.removeAttribute("temp_amenity_" + tempSessionId);
+                session.removeAttribute("temp_amenity_attributes_" + tempSessionId);
 
-                if (tempLocation == null || tempAmenity == null || tempAttributes == null) {
+                if (tempAmenity == null || tempAttributes == null) {
                     response.sendRedirect(request.getContextPath() + "/");
                     return;
                 }
 
-                session.removeAttribute("temp_location_" + tempSessionId);
-                session.removeAttribute("temp_amenity_" + tempSessionId);
-                session.removeAttribute("temp_amenity_attributes_" + tempSessionId);
+                if (tempSessionId.startsWith("l-")) {
+                    LocationDao.getInstance().create(tempLocation);
+                    tempAmenity.setLocationId(tempLocation.getId());
+                }
 
-                LocationDao.getInstance().create(tempLocation);
-                tempAmenity.setLocationId(tempLocation.getId());
                 AmenityDao.getInstance().create(tempAmenity);
                 for (AmenityTypeAttributeRecord attribute : tempAttributes) {
                     attribute.setAmenityId(tempAmenity.getId());
