@@ -238,7 +238,7 @@ public class ReviewDao {
 
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
-                "SELECT url FROM ReviewImage x LEFT JOIN Review y ON x.review_id = y.id WHERE amenity_id = ?"
+                "SELECT url FROM ReviewImage x LEFT JOIN Review y ON y.hidden = 0 AND x.review_id = y.id WHERE amenity_id = ?"
         );
 
         statement.setDouble(1, amenityId);
