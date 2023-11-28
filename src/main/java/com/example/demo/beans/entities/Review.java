@@ -14,7 +14,7 @@ public class Review {
     private String name;
     private Boolean hidden;
     private Timestamp createdAt;
-    private String updatedAt;
+    private Timestamp updatedAt;
     private List<String> images;
     private User user;
 
@@ -29,15 +29,6 @@ public class Review {
 
     public User getUser() {
         return user;
-    }
-
-    public void setVoted(Integer voted) {
-        this.voted = voted;
-    }
-
-
-    public void setVotes(Integer votes) {
-        this.votes = votes;
     }
 
     public float calculateAverageRating() {
@@ -110,11 +101,11 @@ public class Review {
         this.createdAt = createdAt;
     }
 
-    public String getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

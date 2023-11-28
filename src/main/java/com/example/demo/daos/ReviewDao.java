@@ -90,7 +90,7 @@ public class ReviewDao {
         review.setName(row.getString(5));
         review.setHidden(row.getBoolean(6));
         review.setCreatedAt(row.getTimestamp(7));
-        review.setUpdatedAt(row.getString(8));
+        review.setUpdatedAt(row.getTimestamp(8));
 
         return review;
     }
@@ -147,7 +147,7 @@ public class ReviewDao {
     public static void update(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET description=?, name=? WHERE id = ?");
+        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET description=?, name=?, updated_at=NOW() WHERE id = ?");
         statement.setString(1, escapeHtml(review.getDescription()));
         statement.setString(2, escapeHtml(review.getName()));
         statement.setLong(3, review.getId());

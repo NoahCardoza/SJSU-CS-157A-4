@@ -29,6 +29,13 @@
         <p>
             ${fn:replace(review.description, CR, "<br/>")}
         </p>
+        <c:if test="${!review.createdAt.equals(review.updatedAt)}">
+            <span class="small text-muted">
+                <fmt:setLocale value="en_US" />
+                Last updated on
+                <fmt:formatDate pattern="d MMMM, YYYY 'at' hh:mm:ss a" value = "${review.updatedAt}" />
+            </span>
+        </c:if>
         <hr class="my-2"/>
         <div class="row align-items-center gx-1 gy-3">
             <c:forEach var="metric" items="${review.metrics}">
