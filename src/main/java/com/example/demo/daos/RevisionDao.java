@@ -1,10 +1,7 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.entities.Location;
-import com.example.demo.beans.entities.Revision;
-import com.example.demo.beans.entities.RevisionEdit;
-import com.example.demo.beans.entities.User;
+import com.example.demo.beans.entities.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -194,6 +191,69 @@ public class RevisionDao {
 
         return revisionId;
     }
+
+    public Long createRevisionForAmenityEdit(Amenity prev, Amenity next, List<AmenityTypeAttributeRecord> nextAttr) throws SQLException {
+        /*ArrayList<String> columns = new ArrayList<>();
+        ArrayList<String> preValue = new ArrayList<>();
+        ArrayList<String> nextValue = new ArrayList<>();
+
+        if (valuesDiffer(prev.getName(), next.getName())) {
+            columns.add("name");
+            preValue.add(prev.getName());
+            nextValue.add(next.getName());
+        }
+
+        if (valuesDiffer(prev.getDescription(), next.getDescription())) {
+            columns.add("description");
+            preValue.add(prev.getDescription());
+            nextValue.add(next.getDescription());
+        }
+
+        if (valuesDiffer(prev.getAddress(), next.getAddress())) {
+            columns.add("address");
+            preValue.add(prev.getAddress());
+            nextValue.add(next.getAddress());
+        }
+
+        if (valuesDiffer(prev.getLongitude(), next.getLongitude())) {
+            columns.add("longitude");
+            preValue.add(prev.getLongitude().toString());
+            nextValue.add(next.getLongitude().toString());
+        }
+
+        if (valuesDiffer(prev.getLatitude(), next.getLatitude())) {
+            columns.add("latitude");
+            preValue.add(prev.getLatitude().toString());
+            nextValue.add(next.getLatitude().toString());
+        }
+
+        if (columns.isEmpty()) {
+            return null;
+        }
+
+        Revision revision = new Revision();
+        revision.setUserId(userId);
+        revision.setTableName("Location");
+        revision.setPrimaryKey(prev.getId());
+        Long revisionId = RevisionDao.getInstance().create(revision);
+
+        for (int i = 0; i < columns.size(); i++) {
+            RevisionEdit edit = new RevisionEdit();
+            edit.setRevisionId(revisionId);
+
+            edit.setTableName("Location");
+            edit.setPrimaryKey(prev.getId());
+            edit.setColumnName(columns.get(i));
+            edit.setPreviousValue(preValue.get(i));
+            edit.setNewValue(nextValue.get(i));
+            RevisionEditDao.getInstance().create(edit);
+        }
+
+        return revisionId;*/
+
+        return 0L;
+    }
+
 
     public void vote(Long revisionId, Long id, int value) throws SQLException {
 

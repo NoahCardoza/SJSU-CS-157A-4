@@ -40,12 +40,12 @@
                 <input type="hidden" name="typeName" id="typeName" value="${form.typeName}">
                 <input type="hidden" name="amenityTypeAttributes" id="amenityTypeAttributes" value="${form.attributes}">
 
-                <%--          TODO: @Megan verify this works LOL     --%>
+                <%--          TODO: @Noah it doesn't work TT     --%>
 
                 <c:if test="${amenityTypeAttributes.size() > 0}">
                     <p>Attributes</p>
                     <div class="row">
-                        <c:forEach var="amenityTypeAttribute" items="${amenityTypeAttributes}">
+                        <c:forEach var="amenityTypeAttribute" items="${amenityAttributesWithNames}">
                             <div class="form-group col-12 col-md-6 g-2">
                                 <div class="form-group">
                                     <label for="amenityTypeAttribute-${amenityTypeAttribute.id}">${amenityTypeAttribute.name}</label>

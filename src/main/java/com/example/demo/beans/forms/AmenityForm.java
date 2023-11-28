@@ -5,10 +5,12 @@ import com.example.demo.Validation;
 import com.example.demo.beans.entities.Amenity;
 import com.example.demo.beans.entities.AmenityTypeAttribute;
 import com.example.demo.beans.entities.AmenityTypeAttributeRecord;
+import com.example.demo.beans.entities.AmenityTypeAttributeRecordWithName;
 import com.example.demo.daos.AmenityTypeAttributeDao;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class AmenityForm {
     String locationName = "None";
     String name = "";
     String description = "";
-    List<AmenityTypeAttribute> attributes;
+    List<AmenityTypeAttributeRecordWithName> attributes;
 
 
     public AmenityForm() {}
@@ -34,7 +36,7 @@ public class AmenityForm {
         this.description = request.getParameter("description");
 
         if(this.typeId != null){
-            this.attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(this.typeId);
+            this.attributes = new ArrayList<>();
         }
     }
 
@@ -125,15 +127,15 @@ public class AmenityForm {
     }
 
 
-    public void addAttribute(AmenityTypeAttribute attribute) {
+    public void addAttribute(AmenityTypeAttributeRecordWithName attribute) {
         this.attributes.add(attribute);
     }
 
-    public List<AmenityTypeAttribute> getAttributes() {
+    public List<AmenityTypeAttributeRecordWithName> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(List<AmenityTypeAttribute> attributes) {
+    public void setAttributes(List<AmenityTypeAttributeRecordWithName> attributes) {
         this.attributes = attributes;
     }
 
