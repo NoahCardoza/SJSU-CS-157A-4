@@ -175,7 +175,7 @@ public class ReviewsServlet extends HttpServlet {
 
         ReviewDao.toggleHide(review.get());
 
-        if (review.get().isHidden()) {
+        if (!review.get().isHidden()) {
             Optional<User> reviewUser = UserDao.getInstance().get(review.get().getUserId());
             if (reviewUser.isPresent()) {
                 Emailer.sendReviewHiddenNotice(reviewUser.get(), review.get());

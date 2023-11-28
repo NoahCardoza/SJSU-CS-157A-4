@@ -13,7 +13,7 @@ import java.net.http.HttpResponse;
 public class Emailer {
     static private void sendEmail(JSONObject payload) throws IOException, InterruptedException {
         if (payload.getJSONArray("to").getJSONObject(0).getString("email").endsWith("@testing.com")) {
-            System.out.println("Emailer.sendEmail: " + payload.toString());
+            System.out.println("Emailer.sendEmail: " + payload);
             return;
         }
 
