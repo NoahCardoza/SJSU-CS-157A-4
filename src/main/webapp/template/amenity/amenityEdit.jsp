@@ -6,7 +6,7 @@
 
 <%--@elvariable id="form" type="List<com.example.demo.beans.forms.AmenityForm>"--%>
 <%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
-<%--@elvariable id="amenityTypeAttributes" type="com.example.demo.servlets.search.AmenityTypeAttributeGrouper"--%>
+<%--@elvariable id="amenityTypeAttributes" type="java.util.List<com.example.demo.beans.entities.AmenityTypeAttribute>"--%>
 
 <!DOCTYPE html>
 <html>
@@ -40,15 +40,35 @@
                 <input type="hidden" name="typeName" id="typeName" value="${form.typeName}">
                 <input type="hidden" name="amenityTypeAttributes" id="amenityTypeAttributes" value="${form.attributes}">
 
-                <div class="form-group col-md-6 mb-3">
+                <%--          TODO: @Megan verify this works LOL     --%>
+
+                <c:if test="${amenityTypeAttributes.size() > 0}">
                     <p>Attributes</p>
-                    <c:forEach var="amenityAttributeWithName" items="${amenityAttributesWithNames}">
-                        <div class="form-group">
-                            <label for="amenityTypeAttribute-${amenityAttributeWithName.amenityAttributeId}">${amenityAttributeWithName.name}</label>
-                            <input class="form-control" type="text" id="amenityTypeAttribute-${amenityAttributeWithName.amenityAttributeId}" name="amenityTypeAttribute-${amenityAttributeWithName.amenityAttributeId}" value="${amenityAttributeWithName.value}"/>
-                        </div>
-                    </c:forEach>
-                </div>
+                    <div class="row">
+                        <c:forEach var="amenityTypeAttribute" items="${amenityTypeAttributes}">
+                            <div class="form-group col-12 col-md-6 g-2">
+                                <div class="form-group">
+                                    <label for="amenityTypeAttribute-${amenityTypeAttribute.id}">${amenityTypeAttribute.name}</label>
+                                    <c:choose>
+                                        <c:when test="${amenityTypeAttribute.type == 'text'}">
+                                            <input type="text" id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" class="form-control mb-3" placeholder="${amenityTypeAttribute.generatePlaceholderText()}" />
+                                        </c:when>
+                                        <c:when test="${amenityTypeAttribute.type == 'number'}">
+                                            <input type="number" id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" class="form-control mb-3" placeholder="${amenityTypeAttribute.generatePlaceholderText()}" />
+                                        </c:when>
+                                        <c:when test="${amenityTypeAttribute.type == 'boolean'}">
+                                            <select  id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" class="form-control form-select mb-3">
+                                                <option value="">${amenityTypeAttribute.generatePlaceholderText()}</option>
+                                                <option value="1">Yes</option>
+                                                <option value="0">No</option>
+                                            </select>
+                                        </c:when>
+                                    </c:choose>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </div>
+               </c:if>
 
                 <label for="name" class="form-label">Name</label>
                 <input type="text" id="name" name="name" value="${form.name}" class="form-control mb-3" placeholder="Name" />

@@ -51,6 +51,14 @@ public class AmenityTypeAttribute {
         this.type = type;
     }
 
+    public String generatePlaceholderText() {
+        return switch (this.type) {
+            case "number" -> "Enter a number";
+            case "text" -> "Enter text";
+            case "boolean" -> "Select yes or no";
+            default -> "Enter a value";
+        };
+    }
     @Override
     public String toString() {
         return "AmenityTypeAttribute{" +

@@ -164,9 +164,20 @@ public class AmenitiesServlet extends HttpServlet {
 
         AmenityForm form = new AmenityForm(request);
 
-        HttpSession session = request.getSession();
+        Long locationId = Util.parseLongOrNull(request.getParameter("location_id"));
+        if (locationId != null) {
+            Location location = LocationDao.getInstance().get(locationId).orElse(null);
+            if (location == null) {
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
+            }
 
-//        session.getAttributeNames().asIterator().forEachRemaining(System.out::println);
+            form.setLocationId(locationId);
+            form.setLocationName(location.getName());
+            request.setAttribute("disableLocationSelect", true);
+        }
+
+        HttpSession session = request.getSession();
 
         String tempSessionUuid = request.getParameter("session");
 
