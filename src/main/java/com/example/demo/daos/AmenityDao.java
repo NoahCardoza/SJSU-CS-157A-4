@@ -54,7 +54,7 @@ public class AmenityDao {
     public void delete(long id) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("DELETE * FROM Amenity WHERE id = ?");
+        PreparedStatement statement = conn.prepareStatement("DELETE FROM Amenity WHERE id = ?");
         statement.setDouble(1, id);
 
         statement.executeQuery();

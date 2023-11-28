@@ -223,8 +223,6 @@ public class AmenitiesServlet extends HttpServlet {
                                     AmenityDao.getInstance().create(amenity);
                                 } else {
                                     session.setAttribute("temp_amenity_" + tempSessionUuid, amenity);
-                                    System.out.println("temp_amenity_" + tempSessionUuid);
-                                    System.out.println(session.getAttribute("temp_amenity_" + tempSessionUuid));
                                 }
 
                                 List<AmenityTypeAttribute> attributeForRecords = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenity.getAmenityTypeId());
@@ -240,12 +238,11 @@ public class AmenitiesServlet extends HttpServlet {
 
                                 if (tempSessionUuid == null) {
                                     attributeRecords.forEach(AmenityDao.getInstance()::createAmenityRecord);
+                                    response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.getId());
                                 } else {
                                     session.setAttribute("temp_amenity_attributes_" + tempSessionUuid, attributeRecords.toList());
+                                    response.sendRedirect(request.getContextPath() + "/reviews?f=create&session=" + tempSessionUuid);
                                 }
-
-                                response.sendRedirect(request.getContextPath() + "/reviews?f=create&session=" + tempSessionUuid);
-//                                response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.getId());
                                 return;
                             } catch (SQLException e) {
                                 request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
@@ -449,6 +446,22 @@ public class AmenitiesServlet extends HttpServlet {
     public void delete(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
         User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to delete an amenity.");
+
+        if (user == null) {
+            return;
+        }
+
+        if (!user.isAdministrator()) {
+            Guard.redirectToLogin(
+                    request,
+                    response,
+                    new Alert(
+                            "danger",
+                            "You must be an administrator to delete an amenity."
+                    )
+            );
+            return;
+        }
 
         Long amenityId = Util.parseLongOrNull(request.getParameter("id"));
 

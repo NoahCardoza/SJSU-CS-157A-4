@@ -124,6 +124,7 @@ public class ReviewsServlet extends HttpServlet {
     private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
         User user = Guard.requireAuthenticationWithMessage(request, response, "Must be logged in to delete.");
         if (user == null) return;
+
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
 
         if(reviewId == null){
@@ -152,6 +153,7 @@ public class ReviewsServlet extends HttpServlet {
     public void hide(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, InterruptedException {
         User user = Guard.requireAuthenticationWithMessage(request, response, "Must be logged in to hide a review.");
         if (user == null) return;
+
         Long reviewId = Util.parseLongOrNull(request.getParameter("id"));
 
         if(reviewId == null){
@@ -284,12 +286,10 @@ public class ReviewsServlet extends HttpServlet {
 
             response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
             return;
-        } else {
-            request.setAttribute("review", review.get());
-
-            request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
         }
 
+        request.setAttribute("review", review.get());
+        request.getRequestDispatcher("/template/reviews/form.jsp").forward(request, response);
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -419,7 +419,7 @@ public class ReviewsServlet extends HttpServlet {
             }
 
             for (Part part : request.getParts()) {
-                if (part.getName().equals("images")) {
+                if (part.getName().equals("images") && part.getSize() > 0) {
                     try {
                         String imageUrl = S3.uploadFile(
                                 "little-hidden-gems",

@@ -1,4 +1,6 @@
 <%--@elvariable id="revisions" type="java.util.List<com.example.demo.beans.entities.Revision>"--%>
+<%--@elvariable id="location" type="com.example.demo.beans.entities.Location"--%>
+<%--@elvariable id="amenities" type="java.util.List<com.example.demo.beans.entities.AmenityWithImage>"--%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>

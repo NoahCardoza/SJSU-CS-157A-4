@@ -45,20 +45,22 @@
                 </div>
             </c:forEach>
         </div>
-        <hr class="my-2"/>
-        <div>
-            <c:forEach var="imageUrlIndex" begin="${1}" end="${review.images.size()}">
-                <c:set var="imageUrl" value="${review.images.get(imageUrlIndex - 1)}" />
-                <button class="img-thumbnail">
-                    <img
-                            src="<hg:cloudimg value="${imageUrl}" size="50" />"
-                            class="review-image-preview"
-                            onclick="$('#review-carousel-${review.id}').carousel(${imageUrlIndex - 1}); $('#review-carousel-modal-${review.id}').modal('show');"
-                            alt="Review ${review.id}: Image ${imageUrlIndex}"
-                    />
-                </button>
-            </c:forEach>
-        </div>
+        <c:if test="${review.images.size() > 0}">
+            <hr class="my-2"/>
+            <div>
+                <c:forEach var="imageUrlIndex" begin="${1}" end="${review.images.size()}">
+                    <c:set var="imageUrl" value="${review.images.get(imageUrlIndex - 1)}" />
+                    <button class="img-thumbnail">
+                        <img
+                                src="<hg:cloudimg value="${imageUrl}" size="50" />"
+                                class="review-image-preview"
+                                onclick="$('#review-carousel-${review.id}').carousel(${imageUrlIndex - 1}); $('#review-carousel-modal-${review.id}').modal('show');"
+                                alt="Review ${review.id}: Image ${imageUrlIndex}"
+                        />
+                    </button>
+                </c:forEach>
+            </div>
+        </c:if>
     </div>
     <div class="card-footer d-flex justify-content-between">
         <form action="<c:url value="/reviews?f=vote"/>" class="d-inline" method="post">

@@ -449,19 +449,11 @@ public class LocationsServlet extends HttpServlet {
                             location.setLongitude(form.getLongitude());
                             location.setParentLocationId(form.getParentId());
 
-//                            try {
                             String tempLocationId = UUID.randomUUID().toString();
                             HttpSession session = request.getSession();
                             session.setAttribute("temp_location_" + tempLocationId, location);
                             response.sendRedirect(request.getContextPath() + "/amenities?f=create&session=" + tempLocationId);
-//                                LocationDao.getInstance().create(location);
-//                                response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + location.getId());
                             return;
-//                            } catch (SQLException e) {
-//                                request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
-//                                e.printStackTrace();
-//                            }
-//                            return;
                         } else {
                             // TODO: send all errors
                             request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
@@ -470,7 +462,6 @@ public class LocationsServlet extends HttpServlet {
                         request.setAttribute("alert", new Alert("danger", "Invalid action"));
                     }
                 }
-
 
                 request.setAttribute("form", form);
 
