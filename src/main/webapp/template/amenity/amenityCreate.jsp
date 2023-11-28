@@ -1,3 +1,4 @@
+<%--@elvariable id="disableLocationSelect" type="java.lang.Boolean"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
@@ -20,8 +21,10 @@
             <h1>Add an Amenity</h1>
 
            <form method="POST" class="mt-5" id="new-location-form">
+               <div class="row">
+                   <%@include file="../../includes/alerts.jsp" %>
+               </div>
                 <div class="row">
-                    <%@include file="../../includes/alerts.jsp" %>
                     <div class="col mb-3 d-flex justify-content-between align-items-center">
                         <div>
                             Location:
@@ -38,13 +41,13 @@
                         </div>
                         <button
                                 class="btn btn-primary float-end"
+                                ${disableLocationSelect ? 'disabled' : ''}
                                 onclick="$('#new-location-form').attr('action', '${param['id'] ? '/amenities?f=locationSelect&id=' + param['id'] : '/amenities?f=locationSelect'}').submit()"
                         >Select Location</button>
                     </div>
                 </div>
 
                 <div class="row">
-                    <%@include file="../../includes/alerts.jsp" %>
                     <div class="col mb-3 d-flex justify-content-between align-items-center">
                         <div>
                             Amenity Type:

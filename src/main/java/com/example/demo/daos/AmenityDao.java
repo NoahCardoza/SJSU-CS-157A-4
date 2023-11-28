@@ -97,18 +97,22 @@ public class AmenityDao {
 
     }
 
-    public void createAmenityRecord(AmenityTypeAttributeRecord record) throws SQLException {
+    public void createAmenityRecord(AmenityTypeAttributeRecord record) {
+        PreparedStatement ps = null;
+        try {
+            ps = Database.getConnection().prepareStatement(
+                    "INSERT INTO AmenityAttributeRecord (amenity_attribute_id, amenity_id, value) VALUES (?, ?, ?)",
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
 
-        PreparedStatement ps = Database.getConnection().prepareStatement(
-                "INSERT INTO AmenityAttributeRecord (amenity_attribute_id, amenity_id, value) VALUES (?, ?, ?)",
-                PreparedStatement.RETURN_GENERATED_KEYS
-        );
+            ps.setLong(1, record.getAmenityAttributeId());
+            ps.setLong(2, record.getAmenityId());
+            ps.setString(3, escapeHtml(record.getValue()));
 
-        ps.setLong(1, record.getAmenityAttributeId());
-        ps.setLong(2, record.getAmenityId());
-        ps.setString(3, escapeHtml(record.getValue()));
-
-        ps.executeUpdate();
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //TODO: need to update this statement with amenity

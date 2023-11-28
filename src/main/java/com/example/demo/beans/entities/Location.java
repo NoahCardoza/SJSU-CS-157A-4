@@ -1,9 +1,14 @@
 package com.example.demo.beans.entities;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.sql.*;
 import java.util.List;
 
-public class Location {
+public class Location implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     private Long userId;
     private Long parentLocationId;

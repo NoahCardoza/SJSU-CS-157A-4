@@ -54,7 +54,7 @@
                         <input
                                 name="images"
                                 multiple
-                            <%-- TODO:                            ,.heic,.heif --%>
+                                ${imageRequired ? 'required' : ''}
                                 accept="image/*,.heic,.heif"
                                 class="form-control"
                                 type="file"

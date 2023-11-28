@@ -1,6 +1,11 @@
 package com.example.demo.beans.entities;
 
-public class Amenity {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Amenity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Long id;
     private Long amenityTypeId;
     private Long locationId;

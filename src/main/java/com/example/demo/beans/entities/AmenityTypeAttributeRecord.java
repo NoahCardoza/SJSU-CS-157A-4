@@ -1,6 +1,11 @@
 package com.example.demo.beans.entities;
 
-public class AmenityTypeAttributeRecord {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class AmenityTypeAttributeRecord implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     Long amenityAttributeId;
     Long amenityId;

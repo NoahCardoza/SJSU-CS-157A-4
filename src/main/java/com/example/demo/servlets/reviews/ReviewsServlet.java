@@ -118,7 +118,7 @@ public class ReviewsServlet extends HttpServlet {
         }
 
         ReviewDao.vote(review.get(), user, vote);
-        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId()  + "#review-" + review.get().getId());
+        response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId()  + "#review-" + review.get().getId());
     }
 
     private void delete(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
@@ -145,7 +145,7 @@ public class ReviewsServlet extends HttpServlet {
         };
 
         ReviewDao.delete(review.get());
-        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId());
+        response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId());
 
     }
 
@@ -179,7 +179,7 @@ public class ReviewsServlet extends HttpServlet {
                 Emailer.sendReviewHiddenNotice(reviewUser.get(), review.get());
             }
         }
-        response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
+        response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
 
     }
 
@@ -231,13 +231,13 @@ public class ReviewsServlet extends HttpServlet {
 
         if(!user.getId().equals(review.get().getUserId()) ){
             request.getSession().setAttribute("alert", new Alert("danger", "You can only edit your own reviews."));
-            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
+            response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
             return;
         };
 
         if (review.get().isHidden()) {
             request.getSession().setAttribute("alert", new Alert("danger", "You cannot edit a hidden review."));
-            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId());
+            response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId());
             return;
         }
 
@@ -282,7 +282,7 @@ public class ReviewsServlet extends HttpServlet {
                 ReviewDao.updateReviewRecord(metric.getReviewId(), metric.getAmenityMetricId(), value);
             }
 
-            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
+            response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId() + "#review-" + review.get().getId());
             return;
         } else {
             request.setAttribute("review", review.get());
@@ -304,26 +304,51 @@ public class ReviewsServlet extends HttpServlet {
         }
 
         Long amenityId = Util.parseLongOrNull(request.getParameter("amenityId"));
+        String tempSessionId = request.getParameter("session");
 
-        if (amenityId == null) {
-            response.sendRedirect(request.getContextPath() + "/");
-            return;
+        request.getSession().getAttributeNames().asIterator().forEachRemaining(System.out::println);
+
+        Optional<Amenity> amenity;
+        if (tempSessionId == null) {
+            if (amenityId == null) {
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
+            }
+
+            amenity = AmenityDao.getInstance().get(amenityId);
+
+            Review existingReview = ReviewDao.getReviewByUserAndAmenity(user.getId(), amenityId);
+
+            if (existingReview != null) {
+                request.getSession().setAttribute("alert", new Alert("danger", "You have already reviewed this amenity. Edit your review instead."));
+                response.sendRedirect(request.getContextPath() + "/reviews?f=edit&id=" + existingReview.getId());
+                return;
+            }
+
+        } else {
+            Amenity tempAmenity = (Amenity) request.getSession().getAttribute("temp_amenity_" + tempSessionId);
+
+            if (tempAmenity == null) {
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
+            }
+
+            amenity = Optional.of(tempAmenity);
+            request.setAttribute("imageRequired", true);
+
+            if (request.getAttribute("alert") == null) {
+                request.setAttribute(
+                        "alert",
+                        new Alert("info", "To report a new location, you must provide a review with at least one image.")
+                );
+            }
         }
-
-        Optional<Amenity> amenity = AmenityDao.getInstance().get(amenityId);
 
         if (!amenity.isPresent()){
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
 
-        Review existingReview = ReviewDao.getReviewByUserAndAmenity(user.getId(), amenityId);
-
-        if (existingReview != null) {
-            request.getSession().setAttribute("alert", new Alert("danger", "You have already reviewed this amenity. Edit your review instead."));
-            response.sendRedirect(request.getContextPath() + "/reviews?f=edit&id=" + existingReview.getId());
-            return;
-        }
 
         request.setAttribute("headerText", "Create Review");
         request.setAttribute("submitButtonText", "Create");
@@ -334,8 +359,6 @@ public class ReviewsServlet extends HttpServlet {
 
             Review review = new Review();
             review.setUserId(user.getId());
-
-            review.setAmenityId(amenityId);
 
             String name = request.getParameter("name");
             String description = request.getParameter("description");
@@ -348,6 +371,33 @@ public class ReviewsServlet extends HttpServlet {
 
             review.setName(name);
             review.setDescription(description);
+
+            HttpSession session = request.getSession();
+            if (tempSessionId != null) {
+                Location tempLocation = (Location) session.getAttribute("temp_location_" + tempSessionId);
+                Amenity tempAmenity = (Amenity) session.getAttribute("temp_amenity_" + tempSessionId);
+                List<AmenityTypeAttributeRecord> tempAttributes = (List<AmenityTypeAttributeRecord>) session.getAttribute("temp_amenity_attributes_" + tempSessionId);
+
+                if (tempLocation == null || tempAmenity == null || tempAttributes == null) {
+                    response.sendRedirect(request.getContextPath() + "/");
+                    return;
+                }
+
+                session.removeAttribute("temp_location_" + tempSessionId);
+                session.removeAttribute("temp_amenity_" + tempSessionId);
+                session.removeAttribute("temp_amenity_attributes_" + tempSessionId);
+
+                LocationDao.getInstance().create(tempLocation);
+                tempAmenity.setLocationId(tempLocation.getId());
+                AmenityDao.getInstance().create(tempAmenity);
+                for (AmenityTypeAttributeRecord attribute : tempAttributes) {
+                    attribute.setAmenityId(tempAmenity.getId());
+                    AmenityDao.getInstance().createAmenityRecord(attribute);
+                }
+                amenityId = tempAmenity.getId();
+            }
+
+            review.setAmenityId(amenityId);
 
             ReviewDao.create(review);
 
@@ -383,7 +433,11 @@ public class ReviewsServlet extends HttpServlet {
                 }
             }
 
-            response.sendRedirect(request.getContextPath() + "/reviews?f=list&id=" + amenityId + "#review-" + review.getId());
+            if (tempSessionId == null) {
+                response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenityId + "#review-" + review.getId());
+            } else {
+                response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenityId);
+            }
 
             return;
         }

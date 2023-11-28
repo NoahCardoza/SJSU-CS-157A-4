@@ -18,6 +18,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Enumeration;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @WebServlet(name = "Amenities", value = "/amenities")
 
@@ -162,15 +164,39 @@ public class AmenitiesServlet extends HttpServlet {
 
         AmenityForm form = new AmenityForm(request);
 
+        HttpSession session = request.getSession();
+
+//        session.getAttributeNames().asIterator().forEachRemaining(System.out::println);
+
+        String tempSessionUuid = request.getParameter("session");
+
+        if (tempSessionUuid != null) {
+            request.setAttribute("disableLocationSelect", true);
+            Location tempLocation = (Location) session.getAttribute("temp_location_" + tempSessionUuid);
+            if (tempLocation == null) {
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
+            }
+            form.setLocationId(-1L);
+            form.setLocationName(tempLocation.getName());
+        }
+
         switch (request.getMethod()) {
             case "GET":
-                List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);
-                List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
+                if (tempSessionUuid == null) {
+                    List<Location> locations = LocationDao.getInstance().getParentLocationsOf(null);
+                    request.setAttribute("locations", locations);
+                } else if (request.getAttribute("alert") == null) {
+                    request.setAttribute(
+                            "alert",
+                            new Alert("info", "To report a new location, you must provide one new amenity.")
+                    );
+                }
 
-                request.setAttribute("hasParent", false);
-                request.setAttribute("locations", locations);
+                List<AmenityType> amenityTypes = AmenityTypeDao.getInstance().getAll();
                 request.setAttribute("amenityTypes", amenityTypes);
 
+                request.setAttribute("hasParent", false);
                 request.setAttribute("form", form);
 
                 request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
@@ -185,6 +211,7 @@ public class AmenitiesServlet extends HttpServlet {
                         Validation v = form.validate();
                         if (v.isValid()) {
                             Amenity amenity = new Amenity();
+                            amenity.setLocationId(form.getLocationId());
                             amenity.setUserId(user.getId());
                             amenity.setName(form.getName());
                             amenity.setDescription(form.getDescription());
@@ -192,21 +219,33 @@ public class AmenitiesServlet extends HttpServlet {
                             amenity.setAmenityTypeId(form.getTypeId());
 
                             try {
-                                AmenityDao.getInstance().create(amenity);
+                                if (tempSessionUuid == null) {
+                                    AmenityDao.getInstance().create(amenity);
+                                } else {
+                                    session.setAttribute("temp_amenity_" + tempSessionUuid, amenity);
+                                    System.out.println("temp_amenity_" + tempSessionUuid);
+                                    System.out.println(session.getAttribute("temp_amenity_" + tempSessionUuid));
+                                }
 
                                 List<AmenityTypeAttribute> attributeForRecords = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenity.getAmenityTypeId());
 
-
-                                for (AmenityTypeAttribute attribute : attributeForRecords){
+                                Stream<AmenityTypeAttributeRecord> attributeRecords = attributeForRecords.stream().map(attribute -> {
                                     AmenityTypeAttributeRecord attributeRecord = new AmenityTypeAttributeRecord();
                                     attributeRecord.setAmenityId(amenity.getId());
                                     attributeRecord.setAmenityAttributeId(attribute.getId());
                                     attributeRecord.setValue(request.getParameter("amenityTypeAttribute-" + attribute.getId()));
+                                    return attributeRecord;
+                                });
 
-                                    AmenityDao.getInstance().createAmenityRecord(attributeRecord);
+
+                                if (tempSessionUuid == null) {
+                                    attributeRecords.forEach(AmenityDao.getInstance()::createAmenityRecord);
+                                } else {
+                                    session.setAttribute("temp_amenity_attributes_" + tempSessionUuid, attributeRecords.toList());
                                 }
 
-                                response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.getId());
+                                response.sendRedirect(request.getContextPath() + "/reviews?f=create&session=" + tempSessionUuid);
+//                                response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.getId());
                                 return;
                             } catch (SQLException e) {
                                 request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));

@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -157,8 +158,6 @@ public class LocationsServlet extends HttpServlet {
         }
     }
 
-
-
     protected void mapImage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             Long locationId = Util.parseLongOrNull(request.getParameter("id"));
@@ -230,7 +229,6 @@ public class LocationsServlet extends HttpServlet {
         }
     }
 
-
     public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
         Long locationId = Util.parseLongOrNull(request.getParameter("id"));
@@ -272,14 +270,8 @@ public class LocationsServlet extends HttpServlet {
 
         request.getRequestDispatcher("template/locations/get.jsp").forward(request, response);
     }
+
     public void parentSelect(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
         LocationForm form = new LocationForm(request);
 
         // if parent id is 0, it means that the user has selected "None"
@@ -457,15 +449,19 @@ public class LocationsServlet extends HttpServlet {
                             location.setLongitude(form.getLongitude());
                             location.setParentLocationId(form.getParentId());
 
-                            try {
-                                LocationDao.getInstance().create(location);
-                                response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + location.getId());
-                                return;
-                            } catch (SQLException e) {
-                                request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
-                                e.printStackTrace();
-                            }
+//                            try {
+                            String tempLocationId = UUID.randomUUID().toString();
+                            HttpSession session = request.getSession();
+                            session.setAttribute("temp_location_" + tempLocationId, location);
+                            response.sendRedirect(request.getContextPath() + "/amenities?f=create&session=" + tempLocationId);
+//                                LocationDao.getInstance().create(location);
+//                                response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + location.getId());
                             return;
+//                            } catch (SQLException e) {
+//                                request.setAttribute("alert", new Alert("danger", "An error occurred while creating the location."));
+//                                e.printStackTrace();
+//                            }
+//                            return;
                         } else {
                             // TODO: send all errors
                             request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
