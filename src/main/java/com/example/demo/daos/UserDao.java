@@ -124,12 +124,18 @@ public class UserDao {
 
     public void ban(Long userId) throws SQLException{
         try (Connection con = Database.getConnection()) {
+            PreparedStatement statement = con.prepareStatement("UPDATE User SET banned = 1 WHERE id = ?");
+            statement.setLong(1, userId);
+            statement.executeUpdate();
 
         }
     }
 
     public void unban(Long userId) throws SQLException {
         try (Connection con = Database.getConnection()) {
+            PreparedStatement statement = con.prepareStatement("UPDATE User SET banned = 0 WHERE id = ?");
+            statement.setLong(1, userId);
+            statement.executeUpdate();
 
         }
     }
