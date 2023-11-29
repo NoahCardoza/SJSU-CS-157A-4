@@ -239,7 +239,7 @@ public class RevisionDao {
 
             String prevVal = AmenityTypeAttributeDao.getInstance().getValueForAttribute(curNewAttr.getAmenityAttributeId(), curNewAttr.getAmenityId());
 
-            if(!prevVal.equals(curNewAttr.getValue())){
+            if(valuesDiffer(prevVal, curNewAttr.getValue())){
                 RevisionEdit edit = new RevisionEdit();
                 edit.setRevisionId(revisionId);
 
@@ -295,28 +295,42 @@ public class RevisionDao {
 
         getEditsForRevision(revision);
 
-        for (RevisionEdit edit : revision.getEdits()) {
+        try (Connection conn = Database.getConnection()) {
+            for (RevisionEdit edit : revision.getEdits()) {
             String tableName = edit.getTableName();
             String columnName = edit.getColumnName();
             String newValue = edit.getPreviousValue();
             Long primaryKey = edit.getPrimaryKey();
 
-            PreparedStatement statement = Database.getConnection().prepareStatement(
-                    "UPDATE " + tableName + " SET " + columnName + " = ? WHERE id = ?"
+            PreparedStatement statement;
+            if (tableName.equals("AmenityAttributeRecord")) {
+                statement = conn.prepareStatement(
+                        "UPDATE " + tableName + " SET " + columnName + " = ? WHERE amenity_id = ? AND amenity_attribute_id = ?"
+                );
+                statement.setString(1, newValue);
+                statement.setLong(2, revision.getPrimaryKey());
+                statement.setLong(3, primaryKey);
+            } else {
+                statement = conn.prepareStatement(
+                        "UPDATE " + tableName + " SET " + columnName + " = ? WHERE id = ?"
+                );
+
+                statement.setString(1, newValue);
+                statement.setLong(2, primaryKey);
+                }
+
+                statement.executeUpdate();
+            }
+
+             // TODO: track who reverted the revision
+            revision.setReverted(true);
+
+            PreparedStatement statement = conn.prepareStatement(
+                    "UPDATE Revision SET reverted = ? WHERE id = ?"
             );
-            statement.setString(1, newValue);
-            statement.setLong(2, primaryKey);
+            statement.setBoolean(1, true);
+            statement.setLong(2, revision.getId());
             statement.executeUpdate();
         }
-
-        // TODO: track who reverted the revision
-        revision.setReverted(true);
-
-        PreparedStatement statement = Database.getConnection().prepareStatement(
-                "UPDATE Revision SET reverted = ? WHERE id = ?"
-        );
-        statement.setBoolean(1, true);
-        statement.setLong(2, revision.getId());
-        statement.executeUpdate();
     }
 }
