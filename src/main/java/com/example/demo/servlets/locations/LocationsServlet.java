@@ -371,21 +371,15 @@ public class LocationsServlet extends HttpServlet {
 
             String action = request.getParameter("action");
             if (action != null && action.equals("submit")) {
-                Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
-                if (user.isEmpty()) {
-                    Guard.redirectToLogin(
-                            request,
-                            response,
-                            new Alert("danger", "You must be logged in to edit a location.")
-                    );
-                    return;
-                }
+                User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to edit a location.");
+                if (user == null) return;
+
                 Validation v = form.validate();
 
                 if (v.isValid()) {
                     Location newLocation = new Location();
                     newLocation.setId(locationId);
-                    newLocation.setUserId(user.get().getId());
+                    newLocation.setUserId(user.getId());
                     newLocation.setName(form.getName());
                     newLocation.setDescription(form.getDescription());
                     newLocation.setAddress(form.getAddress());
@@ -396,7 +390,7 @@ public class LocationsServlet extends HttpServlet {
                     // TODO: implement diff and track changes
                     LocationDao.getInstance().update(newLocation);
 
-                    RevisionDao.getInstance().createRevisionForLocationEdit(user.get().getId(), location.get(), newLocation);
+                    RevisionDao.getInstance().createRevisionForLocationEdit(user.getId(), location.get(), newLocation);
 
 
                     response.sendRedirect(request.getContextPath() + "/locations?f=get&id=" + locationId);

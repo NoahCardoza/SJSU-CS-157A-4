@@ -13,6 +13,11 @@ import java.util.Optional;
 import static com.example.demo.Security.escapeHtml;
 
 public class UserDao {
+    private static final String UPDATE_USER_VERIFIED = "UPDATE User SET verified = 1 WHERE id = ?";
+    private static final String DELETE_USER = "DELETE FROM User WHERE id = ?";
+    private static final String SELECT_ALL = "SELECT * FROM User";
+    private static final String SELECT_FUZZY_SEARCH = "SELECT * FROM User WHERE username LIKE ? OR email LIKE ? OR normalized_email LIKE ?";
+    private static final String INSERT = "INSERT INTO User (username, email, normalized_email, password, verified) VALUES (?, ?, ?, ?, ?)";
     static UserDao instance = null;
     static public UserDao getInstance() {
         if (instance == null) {
@@ -52,24 +57,13 @@ public class UserDao {
         user.setCreatedAt(resultSet.getTimestamp("created_at"));
         user.setVerified(resultSet.getBoolean("verified"));
 
-
-
         return user;
     }
-
-    public Optional<User> fromSession(HttpSession session) throws SQLException {
-        Long userId = (Long) session.getAttribute("user_id");
-
-        if (userId == null) return Optional.empty();
-
-        return get((Long) session.getAttribute("user_id"));
-    }
-
 
     public Long create(User user) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO User (username, email, normalized_email, password, verified) VALUES (?, ?, ?, ?, ?)");
+        PreparedStatement statement = conn.prepareStatement(INSERT);
         statement.setString(1, escapeHtml(user.getUsername()));
         statement.setString(2, user.getEmail());
         statement.setString(3, user.getNormalizedEmail());
@@ -110,13 +104,15 @@ public class UserDao {
 
     public void delete(User user) throws SQLException {
         try (Connection con = Database.getConnection()) {
-            con.prepareStatement("DELETE FROM User WHERE id = ?" + user.getId()).executeUpdate();
+            PreparedStatement ps = con.prepareStatement(DELETE_USER);
+            ps.setLong(1, user.getId());
+            ps.executeUpdate();
         }
     }
 
     public void verifyEmail(Long userId) throws SQLException {
         try (Connection con = Database.getConnection()) {
-            PreparedStatement statement = con.prepareStatement("UPDATE User SET verified = 1 WHERE id = ?");
+            PreparedStatement statement = con.prepareStatement(UPDATE_USER_VERIFIED);
             statement.setLong(1, userId);
             statement.executeUpdate();
         }
@@ -158,7 +154,7 @@ public class UserDao {
 
     public List<User> fuzzySearch(String q) throws SQLException {
         try (Connection con = Database.getConnection()) {
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM User WHERE username LIKE ? OR email LIKE ? OR normalized_email LIKE ?");
+            PreparedStatement statement = con.prepareStatement(SELECT_FUZZY_SEARCH);
             statement.setString(1, "%" + q + "%");
             statement.setString(2, "%" + q + "%");
             statement.setString(3, "%" + q + "%");
@@ -176,7 +172,7 @@ public class UserDao {
 
     public List<User> getAll() throws SQLException {
         try (Connection con = Database.getConnection()) {
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM User");
+            PreparedStatement statement = con.prepareStatement(SELECT_ALL);
 
             ResultSet resultSet = statement.executeQuery();
 

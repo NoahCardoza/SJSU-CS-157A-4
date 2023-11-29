@@ -100,20 +100,14 @@ public class AdminServlet extends HttpServlet {
                 String action = request.getParameter("action");
 
                 if (action != null && action.equals("submit")) {
-                    Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
-                    if (!user.isPresent()) {
-                        Guard.redirectToLogin(
-                                request,
-                                response,
-                                new Alert("danger", "You must be logged in to create a location.")
-                        );
-                        return;
-                    }
+                    User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
+                    if (user == null) return;
+
                     Validation v = form.validate();
 
                     if (v.isValid()) {
                         Location location = new Location();
-                        location.setUserId(user.get().getId());
+                        location.setUserId(user.getId());
                         location.setName(form.getName());
                         location.setDescription(form.getDescription());
                         location.setAddress(form.getAddress());
