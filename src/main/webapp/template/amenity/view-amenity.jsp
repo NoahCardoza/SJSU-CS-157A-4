@@ -24,13 +24,13 @@
                     <%@include file="/includes/alerts.jsp" %>
                 </div>
                 <div class="col-12">
-                    <h1 class="">${amenity.name}</h1>
+                    <h1>${amenity.name}</h1>
                 </div>
                 <c:if test="${recordedMetrics.size() > 0}">
-                <div class="col-12">
-                    <div class="d-flex justify-content-around flex-wrap ">
-                        <c:forEach var="metric" items="${recordedMetrics}">
-                            <c:if test="${not empty metric.value}">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-around flex-wrap ">
+                            <c:forEach var="metric" items="${recordedMetrics}">
+                                <c:if test="${not empty metric.value}">
                                     <div class="mx-2">
                                         <label class="form-label" for="attribute-${metric.amenityTypeMetricId}" >${metric.name}</label>
                                         <c:choose>
@@ -42,10 +42,10 @@
                                             </c:otherwise>
                                         </c:choose>
                                     </div>
-                            </c:if>
-                        </c:forEach>
+                                </c:if>
+                            </c:forEach>
+                        </div>
                     </div>
-                </div>
                     <hr/>
                 </c:if>
                 <div class="col-12">
@@ -85,13 +85,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-8">
-                    <c:forEach var="review" items="${reviews}">
-                        <div class="col-12">
-                            <hg:reviewCard review="${review}"/>
-                        </div>
-                    </c:forEach>
-                </div>
+            </div>
+            <div class="row flex-md-row-reverse mt-3 g-3">
                 <div class="col-12 col-md-4">
                     <div class="row gy-2 justify-content-center">
                     <div class="col-12 d-flex justify-content-center">
@@ -171,6 +166,17 @@
                         <hr/>
                     </c:if>
                 </div>
+                </div>
+                <div class="col-12 col-md-8">
+                    <c:if test="${reviews.size() > 0}">
+                        <div class="row g-3">
+                            <c:forEach var="review" items="${reviews}">
+                                <div class="col-12">
+                                    <hg:reviewCard review="${review}"/>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </c:if>
                 </div>
             </div>
         </div>
