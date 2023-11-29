@@ -163,7 +163,7 @@
                                     <label class="form-label" for="attribute-${attribute.attributeId}" >${attribute.name}</label>
                                     <c:choose>
                                         <c:when test="${not empty attribute.value}">
-                                            <input type="number" class="form-control form-control-sm" value="${attribute.value}" disabled id="attribute-${attribute.attributeId}">
+                                            <input type="text" class="form-control form-control-sm" value="${attribute.value}" disabled id="attribute-${attribute.attributeId}">
                                         </c:when>
                                         <c:otherwise>
                                             <input type="text" class="form-control form-control-sm" value="N/A" disabled id="attribute-${attribute.attributeId}">
