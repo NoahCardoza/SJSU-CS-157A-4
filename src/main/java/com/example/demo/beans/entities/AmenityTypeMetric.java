@@ -4,8 +4,6 @@ public class AmenityTypeMetric {
     Long id;
     Long amenityTypeId;
     String name;
-    String type;
-
     public AmenityTypeMetric() {}
 
     public Long getId() {
@@ -31,22 +29,12 @@ public class AmenityTypeMetric {
     public void setName(String name) {
         this.name = name;
     }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     @Override
     public String toString() {
         return "AmenityTypeMetric{" +
                 "id=" + id +
                 ", amenityTypeId=" + amenityTypeId +
                 ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
                 '}';
     }
 }

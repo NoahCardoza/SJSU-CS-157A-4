@@ -25,7 +25,7 @@
                 <textarea id="attributes" name="attributes" type="" class="form-control" placeholder="attributeA:type,attributeB:type,etc.">${amenityType.attributes}</textarea>
 
                 <label for="metrics">Metrics</label>
-                <textarea id="metrics" name="metrics" type="" class="form-control" placeholder="metricA:type,metricB:type,etc.">${amenityType.metrics}</textarea>
+                <textarea id="metrics" name="metrics" type="" class="form-control" placeholder="metricA,metricB,etc.">${amenityType.metrics}</textarea>
 
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
             </form>

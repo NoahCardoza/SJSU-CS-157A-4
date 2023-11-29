@@ -209,13 +209,9 @@ public class AdminServlet extends HttpServlet {
 
             List<String> metricList = Arrays.asList(metrics.split(","));
             for(String metric:metricList){
-
-                List<String> metricWithType = Arrays.asList(metric.split(":"));
-
                 AmenityTypeMetric newMetric = new AmenityTypeMetric();
-                newMetric.setName(metricWithType.get(0));
+                newMetric.setName(metric);
                 newMetric.setAmenityTypeId(amenityType.getId());
-                newMetric.setType(metricWithType.get((1)));
                 AmenityTypeMetricDao.getInstance().create(newMetric);
             }
 
