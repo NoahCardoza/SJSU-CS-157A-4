@@ -56,7 +56,7 @@
                             <c:set var="imageUrl" value="${images.get(imageUrlIndex - 1)}" />
                             <img
                                     class="d-inline img-thumbnail"
-                                    src="<hg:cloudimg value="${imageUrl}" size="400" />"
+                                    src="<hg:cloudimg value="${imageUrl}" width="400" height="400" />"
                                     onclick="$('#amenity-img-carousel').carousel(${imageUrlIndex - 1}); $('#amenity-img-carousel-modal').modal('show');"
                                     alt=""
                                     style=" max-height: 100px;">
@@ -70,7 +70,7 @@
                                         <c:forEach var="imageUrlIndex" begin="${1}" end="${images.size()}">
                                             <c:set var="imageUrl" value="${images.get(imageUrlIndex - 1)}" />
                                             <div class="carousel-item ${imageUrlIndex == 1 ? 'active' : ''}" id="review-img-${imageUrlIndex}">
-                                                <img class="d-block mx-auto"  style="max-height: calc(100vh - 4rem); max-width: calc(100vw - 12rem);" src="<hg:cloudimg value="${imageUrl}" size="800" />" alt="">
+                                                <img class="d-block mx-auto"  style="max-height: calc(100vh - 4rem); max-width: calc(100vw - 12rem);" src="<hg:cloudimg value="${imageUrl}" func="fit" width="800" height="800" />" alt="">
                                             </div>
                                         </c:forEach>
                                     </div>

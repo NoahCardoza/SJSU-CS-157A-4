@@ -1,27 +1,32 @@
 package com.example.demo.taglib;
+import com.example.demo.CloudImg;
 import jakarta.servlet.jsp.tagext.SimpleTagSupport;
 public class ToCdnUrlTag extends SimpleTagSupport {
     private String url;
-    private int size = 0;
+    CloudImg urlBuilder;
+
+    public ToCdnUrlTag() {
+        super();
+        urlBuilder = new CloudImg();
+    }
 
     public void setUrl(String url) {
         this.url = url;
     }
-    public void setSize(int size) {
-        this.size = size;
+
+    public void setWidth(int width) {
+        urlBuilder.setWidth(width);
     }
-    public String getUrl() {
-        return url;
+    public void setHeight(int height) {
+        urlBuilder.setHeight(height);
     }
-    public int getSize() {
-        return size;
+    public void setFunc(String func) {
+        urlBuilder.setFunc(func);
     }
-    public String getCdnUrl() {
-        return com.example.demo.CloudImg.getCdnUrl(url, size);
-    }
+
     public void doTag() {
         try {
-            getJspContext().getOut().write(getCdnUrl());
+            getJspContext().getOut().write(urlBuilder.getCdnUrl(url));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

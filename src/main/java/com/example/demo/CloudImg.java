@@ -1,14 +1,24 @@
 package com.example.demo;
 
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
+
+import java.util.StringJoiner;
+
 public class CloudImg {
     private static final String CLOUD_IMG_CDN_ID = "ctosadjgda";
     private static final String CLOUD_IMG_BASE_URL = "https://" + CLOUD_IMG_CDN_ID +".cloudimg.io/";
 
-    public static String getCdnUrl(String url) {
-        return getCdnUrl(url, 0);
+    private Integer width;
+    private Integer height;
+    private String func;
+
+    public CloudImg() {
+        this.width = null;
+        this.height = null;
+        this.func = null;
     }
 
-    public static String getCdnUrl(String url, int size) {
+    public String getCdnUrl(String url) {
         if (url == null || url.isEmpty() || url.isBlank()) {
             return "";
         }
@@ -20,10 +30,46 @@ public class CloudImg {
             path = path.substring(0, queryIndex);
         }
 
-        if (size > 0) {
-            path = path + "?width=" + size + "&height=" + size;
+        StringJoiner params = new StringJoiner("&");
+
+        if (func != null) {
+            params.add("func=" + func);
+        }
+        if (width != null) {
+            params.add("width=" + width);
+        }
+        if (height != null) {
+            params.add("height=" + height);
+        }
+
+        if (params.length() > 0) {
+            path += "?" + params;
         }
 
         return CLOUD_IMG_BASE_URL + path;
+    }
+
+    public Integer getWidth() {
+        return width;
+    }
+
+    public void setWidth(Integer width) {
+        this.width = width;
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    public String getFunc() {
+        return func;
+    }
+
+    public void setFunc(String func) {
+        this.func = func;
     }
 }

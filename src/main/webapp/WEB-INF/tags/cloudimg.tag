@@ -4,5 +4,8 @@
 <%@taglib uri="/WEB-INF/custom-functions.tld" prefix="cfn" %>
 <%@taglib prefix="hg" tagdir="/WEB-INF/tags" %>
 <%@attribute name="value" type="java.lang.String" %>
-<%@attribute name="size" type="java.lang.Integer" %>
-<cfn:to-cdn-url url="${value}" size="${size}"/>
+<%@attribute name="height" type="java.lang.Integer" required="false" %>
+<%@attribute name="width" type="java.lang.Integer" required="false" %>
+<%@attribute name="func" type="java.lang.String" required="false" %>
+
+<cfn:to-cdn-url url="${value}" height="${height}" func="${func}" width="${width}" />

@@ -35,7 +35,7 @@
         <c:forEach var="amenity" items="${amenities}">
             <div class="col-12 col-sm-6 col-md-4 g-3">
                 <div class="card">
-                    <img class="card-img-top" src="<hg:cloudimg value="${amenity.image.url}" size="200" />" style="height: 200px; width: 100%; object-fit: cover;">
+                    <img class="card-img-top" src="<hg:cloudimg value="${amenity.image.url}" width="200" height="200" />" style="height: 200px; width: 100%; object-fit: cover;">
                     <div class="card-body">
                         <h5 class="card-title">${amenity.name}</h5>
                         <p class="card-text">${amenity.description}</p>
