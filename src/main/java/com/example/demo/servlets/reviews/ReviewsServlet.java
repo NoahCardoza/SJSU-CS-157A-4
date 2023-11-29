@@ -8,6 +8,7 @@ import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.*;
 import com.example.demo.daos.*;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -16,6 +17,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 @WebServlet(name = "Reviews", value = "/reviews")
+@MultipartConfig
 public class ReviewsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)  {
         doRequest(request, response);
