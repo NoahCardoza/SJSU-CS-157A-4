@@ -122,13 +122,11 @@ public class ReviewDao {
             urls.add(resultSet.getString("url"));
         }
 
-        System.out.println(urls);
-
         S3.deleteFiles(urls.stream().filter(url -> url.contains("/review-image-")).toList());
 
-//        statement = conn.prepareStatement(DELETE_REVIEW);
-//        statement.setLong(1, review.getId());
-//        statement.executeUpdate();
+        statement = conn.prepareStatement(DELETE_REVIEW);
+        statement.setLong(1, review.getId());
+        statement.executeUpdate();
     }
 
     public static void toggleHide(Review review) throws SQLException {
