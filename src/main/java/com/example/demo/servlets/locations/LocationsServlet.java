@@ -462,6 +462,8 @@ public class LocationsServlet extends HttpServlet {
                             // TODO: send all errors
                             request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
                         }
+                    } else if (action.equals("select")) {
+                        request.setAttribute("alert", new Alert("success", "Amenity type selected!"));
                     } else {
                         request.setAttribute("alert", new Alert("danger", "Invalid action"));
                     }

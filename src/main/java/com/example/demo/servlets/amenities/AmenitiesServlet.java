@@ -258,7 +258,7 @@ public class AmenitiesServlet extends HttpServlet {
                         return;
                     }
                     else if (action.equals("select")) {
-                        // TODO: does anything need to happen here?
+                        request.setAttribute("alert", new Alert("success", "Amenity type selected!"));
                     } else {
                         request.setAttribute("alert", new Alert("danger", "Invalid action"));
                     }
