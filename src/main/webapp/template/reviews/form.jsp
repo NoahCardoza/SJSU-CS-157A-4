@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+
 <%--@elvariable id="metrics" type="java.util.List<com.example.demo.beans.entities.AmenityTypeMetricRecordWithName>"--%>
 <%--@elvariable id="review" type="com.example.demo.beans.entities.Review"--%>
 <%--@elvariable id="submitButtonText" type="java.lang.String"--%>

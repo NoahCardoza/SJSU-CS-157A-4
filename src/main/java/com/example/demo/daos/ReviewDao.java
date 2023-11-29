@@ -181,7 +181,7 @@ public class ReviewDao {
                                 ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted "
                                 : " "
                         ) +
-                        "FROM Review WHERE amenity_id = ?" + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0" : " ")) +
+                        "FROM Review WHERE amenity_id = ? " + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0 " : " ")) +
                         "ORDER BY created_at DESC"
         );
         int paramIndex = 1;
@@ -330,7 +330,7 @@ public class ReviewDao {
                                     ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted "
                                     : " "
                             ) +
-                            "FROM Review WHERE user_id = ?" + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0" : " ")) +
+                            "FROM Review WHERE user_id = ?" + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0 " : " ")) +
                             "ORDER BY created_at DESC"
 
             );

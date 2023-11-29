@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 
 <%--@elvariable id="User" type="List<com.example.demo.daos.UserDao>"--%>
 <%--@elvariable id="form" type="List<com.example.demo.beans.forms.SignupForm>"--%>

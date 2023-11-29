@@ -1,12 +1,6 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: kalan
-  Date: 11/24/2023
-  Time: 5:03 PM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+
 <%--@elvariable id="metrics" type="java.util.List<com.example.demo.beans.entities.AmenityTypeMetric>"--%>
 
 <!DOCTYPE html>
@@ -18,6 +12,7 @@
 </head>
 <body>
 <%@include file="../../includes/nav.jsp" %>
+
 <c:forEach var="image" items="${images}">
     <div class="col-4 mb-4">
         <div class="card">

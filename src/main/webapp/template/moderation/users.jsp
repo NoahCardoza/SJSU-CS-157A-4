@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 
 <%--@elvariable id="users" type="java.util.List<com.example.demo.beans.entities.User>"--%>
 <%--@elvariable id="user" type="com.example.demo.beans.entities.User"--%>

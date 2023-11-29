@@ -1,6 +1,6 @@
 <%--@elvariable id="revisions" type="java.util.List<com.example.demo.beans.entities.Revision>"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="hg" tagdir="/WEB-INF/tags" %>
 <%--@elvariable id="amenityTypeAttributes" type="com.example.demo.servlets.amenities.AttributeGrouper"--%>
 <%--@elvariable id="amenityTypes" type="java.util.List<com.example.demo.beans.entities.AmenityType>"--%>

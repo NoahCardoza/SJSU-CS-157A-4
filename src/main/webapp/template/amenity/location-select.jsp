@@ -2,7 +2,7 @@
 <%@ page import="com.example.demo.Util" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 
 <%
     request.setAttribute("postParams", Util.getPostParameters(request));
