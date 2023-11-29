@@ -65,10 +65,10 @@ public class AmenityTypeDao {
 
         Long id = 0L;
 
-        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityType (name, description) VALUES (?, ?, ?)");
+        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityType (name, description) VALUES (?, ?)");
 
         ps.setString(1, escapeHtml(amenityType.getName()));
-        ps.setString(3, escapeHtml(amenityType.getDescription()));
+        ps.setString(2, escapeHtml(amenityType.getDescription()));
         //ps.setLong(4, amenityType.getParentAmenityTypeId());
         ps.executeUpdate();
 

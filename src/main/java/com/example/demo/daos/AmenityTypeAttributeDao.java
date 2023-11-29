@@ -2,7 +2,9 @@ package com.example.demo.daos;
 
 import com.example.demo.Database;
 import com.example.demo.beans.MinMax;
+import com.example.demo.beans.entities.Amenity;
 import com.example.demo.beans.entities.AmenityTypeAttribute;
+import com.example.demo.beans.entities.AmenityTypeAttributeRecordWithName;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -95,6 +97,7 @@ public class AmenityTypeAttributeDao {
         return amenityTypes;
     }
 
+
     public List<String> getAllTextValuesForAttribute(Long attributeId) throws SQLException {
         ArrayList<String> attributeValues = new ArrayList<>();
 
@@ -124,6 +127,7 @@ public class AmenityTypeAttributeDao {
 
         statement.setDouble(1, attributeId);
         statement.setDouble(2, amenityId);
+
 
 
         ResultSet resultSet = statement.executeQuery();

@@ -11,14 +11,15 @@ import java.util.*;
 import static com.example.demo.daos.AmenityTypeAttributeDao.TYPE_NUMBER_ID_PREFIX;
 
 public class AmenityTypeAttributeNumberGroup {
-    ServletRequest request;
-    List<AmenityTypeAttribute> attributes;
+    private ServletRequest request;
+    private List<AmenityTypeAttribute> attributes;
 
     public AmenityTypeAttributeNumberGroup(ServletRequest request) {
-
         this.request = request;
         this.attributes = new ArrayList<>();
     }
+
+
 
     public void add(AmenityTypeAttribute attribute) {
         this.attributes.add(attribute);

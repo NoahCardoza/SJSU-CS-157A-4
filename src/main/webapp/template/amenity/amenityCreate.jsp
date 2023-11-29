@@ -91,8 +91,8 @@
                                        <c:when test="${amenityTypeAttribute.type == 'boolean'}">
                                            <select required id="amenityTypeAttribute-${amenityTypeAttribute.id}" name="amenityTypeAttribute-${amenityTypeAttribute.id}" class="form-control form-select mb-3">
                                                <option value="" style="display:none;">${amenityTypeAttribute.generatePlaceholderText()}</option>
-                                               <option value="1">Yes</option>
-                                               <option value="0">No</option>
+                                               <option value="T">Yes</option>
+                                               <option value="F">No</option>
                                            </select>
                                        </c:when>
                                    </c:choose>

@@ -101,23 +101,17 @@ public class AmenitiesServlet extends HttpServlet {
         }
 
         if (object.getAmenityTypeId() != null) {
-            List<AmenityTypeAttribute> amenityTypeAttributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(object.getAmenityTypeId());
-
-            var amenitiesTypeAttributeGrouper = new AmenitiesTypeAttributeGrouper(object, amenityTypeAttributes);
 
             request.setAttribute(
                     "amenityTypeAttributes",
-                    amenitiesTypeAttributeGrouper
+                    new AttributeGrouper(AmenityTypeAttributeDao.getInstance().getAmenityAttributeRecords(amenity.get()))
             );
 
-            List<AmenityTypeMetric> amenityTypeMetricsList = AmenityTypeMetricDao.getInstance().getAllByAmenityType(object.getAmenityTypeId());
-
-            var amenityTypeMetrics = new AmenitiesTypeMetricsGroup(object, amenityTypeMetricsList);
-
+            List<AmenityTypeMetricRecordAveragesWithName> recordedMetrics = AmenityTypeMetricDao.getInstance().getAmenityMetricAverages(amenity.get());
 
             request.setAttribute(
-                    "amenityTypeMetrics",
-                    amenityTypeMetrics
+                    "recordedMetrics",
+                    recordedMetrics
             );
         }
 

@@ -23,6 +23,10 @@ public class AmenitiesTypeAttributeNumberGroup {
         this.attributes = new ArrayList<>();
     }
 
+    public List<AmenityTypeAttribute> getAttributes(){
+        return attributes;
+    }
+
     public void add(AmenityTypeAttribute attribute) {
         this.attributes.add(attribute);
     }

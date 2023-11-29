@@ -1,10 +1,7 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.MinMax;
-import com.example.demo.beans.entities.AmenityTypeAttribute;
-import com.example.demo.beans.entities.AmenityTypeMetric;
-import com.example.demo.beans.entities.AmenityTypeMetricRecord;
+import com.example.demo.beans.entities.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.example.demo.Security.escapeHtml;
 

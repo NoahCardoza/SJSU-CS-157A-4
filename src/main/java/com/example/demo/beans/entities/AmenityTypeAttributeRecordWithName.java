@@ -1,17 +1,20 @@
 package com.example.demo.beans.entities;
 
-public class AmenityTypeAttributeRecordWithName extends AmenityTypeAttributeRecord{
-
+public class AmenityTypeAttributeRecordWithName extends AmenityTypeAttributeRecord {
+    private Long attributeId;;
     private String name;
-
     private String type;
-
     public String getName() {
         return name;
     }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name) {
-        this.name = name;
+    public Long getAttributeId() {
+        return attributeId;
+    }
+
+    public void setAttributeId(Long attributeId) {
+        this.attributeId = attributeId;
     }
 
     public String getType() {
