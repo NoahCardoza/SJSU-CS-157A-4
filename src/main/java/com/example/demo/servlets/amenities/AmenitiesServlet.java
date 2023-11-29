@@ -87,7 +87,6 @@ public class AmenitiesServlet extends HttpServlet {
         }
 
         Optional<Amenity> amenity = AmenityDao.getInstance().get(amenityId);
-        Amenity object = amenity.get();
 
         if (amenity.isPresent()) {
             request.setAttribute(
@@ -95,10 +94,12 @@ public class AmenitiesServlet extends HttpServlet {
                     amenity.get()
             );
         } else {
-            System.out.println("Amenity not found");
-            response.sendRedirect(request.getContextPath() + "/amenities");
+            request.getSession().setAttribute("alert", new Alert("danger", "Amenity not found"));
+            response.sendRedirect(request.getContextPath() + "/");
             return;
         }
+
+        Amenity object = amenity.get();
 
         if (object.getAmenityTypeId() != null) {
 

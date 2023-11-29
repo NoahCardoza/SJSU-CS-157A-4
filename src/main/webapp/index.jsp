@@ -25,7 +25,9 @@
     <body>
         <%@include file="includes/nav.jsp" %>
         <main>
-            <%@include file="./includes/alerts.jsp" %>
+            <div class="container col-xxl-8 px-4 py-5">
+                <%@include file="./includes/alerts.jsp" %>
+            </div>
             <div class="container col-xxl-8 px-4 py-5">
                 <div class="px-4 py-5 my-5 text-center">
                     <img class="d-block mx-auto mb-4" src="<c:url value="/img/logo-sm.png"/>" alt="Little Hidden Gems" width="80" height="80">
