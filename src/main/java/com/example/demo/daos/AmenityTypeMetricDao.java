@@ -82,7 +82,7 @@ public class AmenityTypeMetricDao {
         Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("""
-            SELECT amenity_type_id, name, type, AVG(value) AS value
+            SELECT amenity_type_id, name, AVG(value) AS value
             FROM (
                     SELECT * FROM AmenityTypeMetric WHERE amenity_type_id IN (
                     WITH RECURSIVE amenity_type_hierarchy AS (
@@ -102,7 +102,7 @@ public class AmenityTypeMetricDao {
                 SELECT * FROM ReviewMetricRecord WHERE review_id IN (SELECT id FROM Review WHERE amenity_id=? AND hidden=0)
             ) B
             ON A.id=B.amenity_metric_id
-            GROUP BY amenity_type_id, name, type
+            GROUP BY amenity_type_id, name
         """);
 
         statement.setDouble(1, amenity.getAmenityTypeId());

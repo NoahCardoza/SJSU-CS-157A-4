@@ -144,8 +144,21 @@ public class ReviewsServlet extends HttpServlet {
         if(!user.getId().equals(review.get().getUserId()) ){
             response.sendRedirect(request.getContextPath() + "/reviews");
             return;
-
         };
+
+        Amenity amenity = AmenityDao.getInstance().get(review.get().getAmenityId()).get();
+
+        if (review.get().getUserId().equals(amenity.getUserId())) {
+            request.getSession().setAttribute(
+                    "alert",
+                    new Alert(
+                            "danger",
+                            "You cannot delete the initial review for an amenity you reported. This feature is coming soon."
+                    )
+            );
+            response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId());
+            return;
+        }
 
         ReviewDao.delete(review.get());
         response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + review.get().getAmenityId());
