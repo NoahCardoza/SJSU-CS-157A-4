@@ -1,6 +1,7 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
+import com.example.demo.S3;
 import com.example.demo.beans.entities.*;
 
 import java.sql.*;
@@ -12,6 +13,8 @@ import static com.example.demo.Security.escapeHtml;
 
 public class ReviewDao {
 
+    public static final String SELECT_ALL_IMAGE_URLS_FROM_REVIEW = "SELECT url FROM ReviewImage WHERE review_id = ?";
+    public static final String DELETE_REVIEW = "DELETE FROM Review WHERE id = ?";
     static ReviewDao instance = null;
     static public ReviewDao getInstance() {
         if (instance == null) {
@@ -21,9 +24,6 @@ public class ReviewDao {
     }
 
     private ReviewDao() {}
-
-
-
 
     public static Optional<Review> get(long id) throws SQLException {
         Connection conn = Database.getConnection();
@@ -77,9 +77,6 @@ public class ReviewDao {
         }
     }
 
-
-
-
     static private Review fromResultSet(ResultSet row) throws SQLException {
         Review review = new Review();
 
@@ -115,22 +112,23 @@ public class ReviewDao {
     public static void delete(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("DELETE FROM ReviewMetricRecord WHERE review_id = ?");
+        PreparedStatement statement = conn.prepareStatement(SELECT_ALL_IMAGE_URLS_FROM_REVIEW);
         statement.setLong(1, review.getId());
-        statement.executeUpdate();
 
-        // TODO: delete images from S3
-        statement = conn.prepareStatement("DELETE FROM ReviewImage WHERE review_id = ?");
-        statement.setLong(1, review.getId());
-        statement.executeUpdate();
+        ResultSet resultSet = statement.executeQuery();
 
-        statement = conn.prepareStatement("DELETE FROM ReviewVote WHERE review_id = ?");
-        statement.setLong(1, review.getId());
-        statement.executeUpdate();
+        ArrayList<String> urls = new ArrayList<>();
+        while (resultSet.next()) {
+            urls.add(resultSet.getString("url"));
+        }
 
-        statement = conn.prepareStatement("DELETE FROM Review WHERE id = ?");
-        statement.setLong(1, review.getId());
-        statement.executeUpdate();
+        System.out.println(urls);
+
+        S3.deleteFiles(urls.stream().filter(url -> url.contains("/review-image-")).toList());
+
+//        statement = conn.prepareStatement(DELETE_REVIEW);
+//        statement.setLong(1, review.getId());
+//        statement.executeUpdate();
     }
 
     public static void toggleHide(Review review) throws SQLException {
