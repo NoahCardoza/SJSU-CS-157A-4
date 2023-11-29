@@ -127,11 +127,17 @@ public class LocationsServlet extends HttpServlet {
 
                 String formHtml = Util.captureTemplateOutput(request, response, "/template/locations/ajaxForm.jsp");
 
-                List<Amenity> amenities = (List<Amenity>) request.getAttribute("amenities");
+                List<AmenityWithImage> amenities = (List<AmenityWithImage>) request.getAttribute("amenities");
+
+                CloudImg cdnImageBuilder = new CloudImg();
+                cdnImageBuilder.setWidth(200);
+                cdnImageBuilder.setHeight(200);
 
                 // group amenities by location id
                 HashMap<Long, List<Amenity>> locationIds = new HashMap<>();
-                for (Amenity amenity : amenities) {
+                for (AmenityWithImage amenity : amenities) {
+                    amenity.getImage().setUrl(cdnImageBuilder.getCdnUrl(amenity.getImage().getUrl()));
+
                     if (!locationIds.containsKey(amenity.getLocationId())) {
                         locationIds.put(amenity.getLocationId(), new ArrayList<>());
                     }
