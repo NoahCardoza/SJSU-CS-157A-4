@@ -44,4 +44,24 @@ public class Guard {
         }
         return user;
     }
+
+    public static void redirectToHome(HttpServletRequest request, HttpServletResponse response, int status, Alert alert) throws IOException {
+        redirectTo(request, response, status, "/", alert);
+    }
+
+    public static Long getLongParameter(HttpServletRequest request, HttpServletResponse response, String key) throws IOException {
+        Long value = Util.parseLongOrNull(request.getParameter(key));
+        if (value == null) {
+            redirectToHome(request, response, 400, new Alert("danger", "Invalid " + key + " parameter"));
+        }
+        return value;
+    }
+
+    public static void redirectTo(HttpServletRequest request, HttpServletResponse response, int status, String path, Alert alert) throws IOException {
+        response.setStatus(status);
+        if (alert != null) {
+            request.getSession().setAttribute("alert", alert);
+        }
+        response.sendRedirect(request.getContextPath() + path);
+    }
 }

@@ -44,14 +44,18 @@
                     <li class="nav-item ms-lg-auto">
                         <a class="nav-link <%= path.startsWith("/login") ? "active" : "" %>" href="<c:url value="/login" />">Login</a>
                     </li>
-                </c:if>
-                <c:if test="${!isLoggedIn}">
                     <li class="nav-item">
                         <a class="nav-link <%= path.equals("/signup") ? "active" : "" %>" href="signup">Signup</a>
                     </li>
                 </c:if>
                 <c:if test="${isLoggedIn}">
                     <li class="nav-item ms-lg-auto">
+                        <a class="nav-link" href="<c:url value="/users?f=get&id=${user.id}" />">
+                            <i class="bi bi-person-circle"></i>
+                            ${user.username}
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="<c:url value="/login?f=logout" />">Logout</a>
                     </li>
                 </c:if>

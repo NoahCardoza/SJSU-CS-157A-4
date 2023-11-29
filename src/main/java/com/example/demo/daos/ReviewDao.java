@@ -181,7 +181,8 @@ public class ReviewDao {
                                 ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted "
                                 : " "
                         ) +
-                        "FROM Review WHERE amenity_id = ?" + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0" : " "))
+                        "FROM Review WHERE amenity_id = ?" + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0" : " ")) +
+                        "ORDER BY created_at DESC"
         );
         int paramIndex = 1;
         if (currentUser != null) {
@@ -314,5 +315,48 @@ public class ReviewDao {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<Review> getReviewsByUser(User user, Long currentUser, Boolean showHidden) throws SQLException {
+        ArrayList<Review> reviews = new ArrayList<>();
+
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT *, COALESCE((" +
+                            "SELECT SUM(value) " +
+                            "FROM ReviewVote " +
+                            "WHERE review_id = Review.id), 0) AS votes " +
+                            (currentUser != null
+                                    ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted "
+                                    : " "
+                            ) +
+                            "FROM Review WHERE user_id = ?" + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0" : " ")) +
+                            "ORDER BY created_at DESC"
+
+            );
+
+            int paramIndex = 1;
+            if (currentUser != null) {
+                statement.setLong(paramIndex++, currentUser);
+            }
+            statement.setLong(paramIndex++, user.getId());
+
+            ResultSet resultSet = statement.executeQuery();
+
+
+            while (resultSet.next()) {
+                Review review = fromResultSet(resultSet);
+                review.setVotes(resultSet.getInt("votes"));
+                if(currentUser != null){
+                    review.setVoted(resultSet.getInt("voted"));
+                }
+                else{
+                    review.setVoted(0);
+                }
+                reviews.add(review);
+            }
+        }
+
+        return reviews;
     }
 }

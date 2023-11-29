@@ -2,6 +2,7 @@ package com.example.demo.daos;
 
 import com.example.demo.Database;
 import com.example.demo.beans.entities.User;
+import com.example.demo.beans.entities.UserStats;
 import jakarta.servlet.http.HttpSession;
 
 import javax.xml.crypto.Data;
@@ -182,6 +183,30 @@ public class UserDao {
                 users.add(user);
             }
             return users;
+        }
+    }
+
+    public UserStats getUserStats(User user) throws SQLException {
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("""
+                SELECT (SELECT COUNT(*) AS reviews FROM Review WHERE user_id = ?) as reviews,
+                       (SELECT COUNT(*) AS amenities FROM Amenity WHERE user_id = ?) as amenities,
+                       (SELECT COUNT(*) AS locations FROM Location WHERE user_id = ?) as locations
+            """);
+            statement.setLong(1, user.getId());
+            statement.setLong(2, user.getId());
+            statement.setLong(3, user.getId());
+            ResultSet resultSet = statement.executeQuery();
+
+            resultSet.next();
+
+            UserStats userStats = new UserStats();
+            userStats.setId(user.getId());
+            userStats.setReviews(resultSet.getInt("reviews"));
+            userStats.setAmenities(resultSet.getInt("amenities"));
+            userStats.setLocations(resultSet.getInt("locations"));
+
+            return userStats;
         }
     }
 }
