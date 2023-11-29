@@ -15,8 +15,8 @@
                 ${review.user.username}
         </span>
         <span class="small text-muted">
-            <fmt:setLocale value="en_US" />
-            <fmt:formatDate pattern="d MMMM, YYYY 'at' hh:mm:ss a" value = "${review.createdAt}" />
+            <%-- TODO: make timeZone dynamic --%>
+            <fmt:formatDate pattern="d MMMM, YYYY 'at' hh:mm:ss a" value = "${review.createdAt}" timeZone="GMT-8" />
         </span>
     </div>
     <div class="card-body">
@@ -31,9 +31,9 @@
         </p>
         <c:if test="${!review.createdAt.equals(review.updatedAt)}">
             <span class="small text-muted">
-                <fmt:setLocale value="en_US" />
                 Last updated on
-                <fmt:formatDate pattern="d MMMM, YYYY 'at' hh:mm:ss a" value = "${review.updatedAt}" />
+                <%-- TODO: make timeZone dynamic --%>
+                <fmt:formatDate pattern="d MMMM, YYYY 'at' hh:mm:ss a" value = "${review.updatedAt}" timeZone="GMT-8" />
             </span>
         </c:if>
         <hr class="my-2"/>
