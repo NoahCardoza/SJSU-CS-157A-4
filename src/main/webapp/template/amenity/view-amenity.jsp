@@ -8,6 +8,7 @@
 <%--@elvariable id="amenity" type="com.example.demo.beans.entities.Amenity"--%>
 <%--@elvariable id="images" type="java.util.List<java.lang.String>"--%>
 <%--@elvariable id="recordedMetrics" type="java.util.List<com.example.demo.beans.entities.AmenityTypeMetricRecordAveragesWithName>"--%>
+<%--@elvariable id="reviews" type="java.util.List<com.example.demo.beans.entities.Review>"--%>
 
 <!DOCTYPE html>
 <html>
@@ -20,11 +21,33 @@
         <div class="container mt-5" style="max-width: 800px">
             <div class="row g-3">
                 <div class="col-12">
-                    <h1 class="">${amenity.name}</h1>
-                </div>
-                <div class="col-12">
                     <%@include file="/includes/alerts.jsp" %>
                 </div>
+                <div class="col-12">
+                    <h1 class="">${amenity.name}</h1>
+                </div>
+                <c:if test="${recordedMetrics.size() > 0}">
+                <div class="col-12">
+                    <div class="d-flex justify-content-around flex-wrap ">
+                        <c:forEach var="metric" items="${recordedMetrics}">
+                            <c:if test="${not empty metric.value}">
+                                    <div class="mx-2">
+                                        <label class="form-label" for="attribute-${metric.amenityTypeMetricId}" >${metric.name}</label>
+                                        <c:choose>
+                                            <c:when test="${not empty metric.value}">
+                                                <hg:rating value="${metric.value}" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="text" class="form-control form-control-sm" value="N/A" disabled id="attribute-${metric.amenityTypeMetricId}">
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+                </div>
+                    <hr/>
+                </c:if>
                 <div class="col-12">
                     <div class="w-100 overflow-x-auto" style="white-space:nowrap">
                         <c:forEach var="imageUrlIndex" begin="${1}" end="${images.size()}">
@@ -62,105 +85,92 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 d-flex justify-content-center">
-                    <div class="btn-group btn-group-sm">
-                    <a class="btn btn-secondary" href="<c:url value="/amenities?f=edit&id=${amenity.id}"/>">Edit</a>
-                    <a class="btn btn-warning" href="<c:url value="/revisions?f=list&type=Amenity&id=${amenity.id}"/>">Revisions</a>
-                    <a class="btn btn-secondary" href="<c:url value="/reviews?f=create&amenityId=${amenity.id}"/>">Create Review</a>
-
-    <%--                TODO: implement amenity delete if time permits, we need to deal with a lot of constrains    --%>
-    <%--                <c:if test="${user.administrator}">--%>
-    <%--                    <a class="btn btn-danger" href="<c:url value="/amenities?f=delete&id=${amenity.id}"/>">Delete</a>--%>
-    <%--                </c:if>--%>
-    <%--                <a class="btn btn-secondary" href="<c:url value="/reviews?f=list&id=${amenity.id}"/>">Reviews</a>--%>
-                    </div>
-                </div>
-
-                <c:if test="${amenityTypeAttributes.booleanAttributes.size() > 0}">
-                     <c:forEach var="attribute" items="${amenityTypeAttributes.booleanAttributes}">
-                        <div class="d-flex col-12 col-sm-6 col-md-4 justify-content-center">
-                            <span class="badge rounded-pill text-bg-light">
-                                <c:choose>
-                                    <c:when test="${attribute.value == 'T'}">
-                                        <i class="bi bi-check2-circle text-success"></i>
-                                    </c:when>
-                                    <c:when test="${attribute.value == 'F'}">
-                                        <i class="bi bi-x-circle text-danger"></i>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <i class="bi bi-question-circle text-warning"></i>
-                                    </c:otherwise>
-                                </c:choose>
-                                <span class="ms-2">${attribute.name}</span>
-                            </span>
+                <div class="col-12 col-md-8">
+                    <c:forEach var="review" items="${reviews}">
+                        <div class="col-12">
+                            <hg:reviewCard review="${review}"/>
                         </div>
-                     </c:forEach>
-                    <hr/>
-                </c:if>
-                <c:if test="${amenityTypeAttributes.numberAttributes.size() > 0}">
-                     <c:forEach var="attribute" items="${amenityTypeAttributes.numberAttributes}">
-                            <div class="d-flex col-12 col-sm-6 col-md-4 justify-content-center">
+                    </c:forEach>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="row gy-2 justify-content-center">
+                    <div class="col-12 d-flex justify-content-center">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-primary" href="<c:url value="/amenities?f=edit&id=${amenity.id}"/>" title="Edit">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                            <a class="btn btn-primary" href="<c:url value="/revisions?f=list&type=Amenity&id=${amenity.id}"/>" title="Revisions">
+                                <i class="bi bi-clock-history"></i> Revisions
+                            </a>
+                            <a class="btn btn-primary" href="<c:url value="/reviews?f=create&amenityId=${amenity.id}"/>" title="Create Review">
+                                <i class="bi bi-plus-circle"></i> Review
+                            </a>
+                            <%--                TODO: implement amenity delete if time permits, we need to deal with a lot of constrains    --%>
+                            <%--                <c:if test="${user.administrator}">--%>
+                            <%--                    <a class="btn btn-danger" href="<c:url value="/amenities?f=delete&id=${amenity.id}"/>">Delete</a>--%>
+                            <%--                </c:if>--%>
+                        </div>
+                    </div>
+                    <c:if test="${amenityTypeAttributes.booleanAttributes.size() > 0}">
+
+                                <c:forEach var="attribute" items="${amenityTypeAttributes.booleanAttributes}">
+                                    <div>
+                                        <span class="badge rounded-pill text-bg-light">
+                                            <c:choose>
+                                                <c:when test="${attribute.value == 'T'}">
+                                                    <i class="bi bi-check2-circle text-success"></i>
+                                                </c:when>
+                                                <c:when test="${attribute.value == 'F'}">
+                                                    <i class="bi bi-x-circle text-danger"></i>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <i class="bi bi-question-circle text-warning"></i>
+                                                </c:otherwise>
+                                            </c:choose>
+                                            <span class="ms-2">${attribute.name}</span>
+                                        </span>
+                                    </div>
+                                </c:forEach>
+                    </c:if>
+
+
+                    <c:if test="${amenityTypeAttributes.numberAttributes.size() > 0}">
+                         <c:forEach var="attribute" items="${amenityTypeAttributes.numberAttributes}">
+                                <div class="col-12">
+                                    <div>
+                                        <label class="form-label" for="attribute-${attribute.attributeId}">${attribute.name}</label>
+                                         <c:choose>
+                                            <c:when test="${not empty attribute.value}">
+                                                <input type="number" class="form-control form-control-sm" value="${attribute.value}" disabled id="attribute-${attribute.attributeId}">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="text" class="form-control form-control-sm" value="N/A" disabled id="attribute-${attribute.attributeId}">
+                                            </c:otherwise>
+                                         </c:choose>
+                                    </div>
+                                </div>
+                        </c:forEach>
+                        <hr/>
+                    </c:if>
+                    <c:if test="${amenityTypeAttributes.textAttributes.size() > 0}">
+                        <c:forEach var="attribute" items="${amenityTypeAttributes.textAttributes}">
+                            <div class="col-12">
                                 <div>
-                                    <label class="form-label" for="attribute-${attribute.attributeId}">${attribute.name}</label>
-                                     <c:choose>
+                                    <label class="form-label" for="attribute-${attribute.attributeId}" >${attribute.name}</label>
+                                    <c:choose>
                                         <c:when test="${not empty attribute.value}">
                                             <input type="number" class="form-control form-control-sm" value="${attribute.value}" disabled id="attribute-${attribute.attributeId}">
                                         </c:when>
                                         <c:otherwise>
                                             <input type="text" class="form-control form-control-sm" value="N/A" disabled id="attribute-${attribute.attributeId}">
                                         </c:otherwise>
-                                     </c:choose>
-                                </div>
-                            </div>
-                    </c:forEach>
-                    <hr/>
-                </c:if>
-                <c:if test="${amenityTypeAttributes.textAttributes.size() > 0}">
-                    <c:forEach var="attribute" items="${amenityTypeAttributes.textAttributes}">
-                        <div class="d-flex col-12 col-sm-6 col-md-4 justify-content-center">
-                            <div>
-                                <label class="form-label" for="attribute-${attribute.attributeId}" >${attribute.name}</label>
-                                <c:choose>
-                                    <c:when test="${not empty attribute.value}">
-                                        <input type="number" class="form-control form-control-sm" value="${attribute.value}" disabled id="attribute-${attribute.attributeId}">
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input type="text" class="form-control form-control-sm" value="N/A" disabled id="attribute-${attribute.attributeId}">
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-                        </div>
-                    </c:forEach>
-                    <hr/>
-                </c:if>
-                <c:if test="${recordedMetrics.size() > 0}">
-
-                    <c:forEach var="metric" items="${recordedMetrics}">
-                        <c:if test="${not empty metric.value}">
-                            <div class="d-flex col-12 col-sm-6 col-md-4 justify-content-center">
-                                <div>
-                                    <label class="form-label" for="attribute-${metric.amenityTypeMetricId}" >${metric.name}</label>
-                                    <c:choose>
-                                        <c:when test="${not empty metric.value}">
-                                            <hg:rating value="${metric.value}" />
-                                        </c:when>
-                                        <c:otherwise>
-                                            <input type="text" class="form-control form-control-sm" value="N/A" disabled id="attribute-${metric.amenityTypeMetricId}">
-                                        </c:otherwise>
                                     </c:choose>
                                 </div>
                             </div>
-                        </c:if>
-                    </c:forEach>
-                    <hr/>
-                </c:if>
-
-                <div class="col-12">
-                    <c:forEach var="review" items="${reviews}">
-                        <div class="col col-12">
-                            <hg:reviewCard review="${review}"/>
-                        </div>
-                    </c:forEach>
+                        </c:forEach>
+                        <hr/>
+                    </c:if>
+                </div>
                 </div>
             </div>
         </div>

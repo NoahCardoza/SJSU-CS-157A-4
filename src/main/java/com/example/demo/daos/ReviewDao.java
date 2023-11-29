@@ -284,7 +284,6 @@ public class ReviewDao {
                 statement.setLong(3, user.getId());
                 statement.executeUpdate();
             }
-
         }
     }
 
