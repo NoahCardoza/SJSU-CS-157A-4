@@ -453,7 +453,7 @@ public class ReviewsServlet extends HttpServlet {
                     try {
                         String imageUrl = S3.uploadFile(
                                 "little-hidden-gems",
-                                "review-image-" + review.getId() + "-" + UUID.randomUUID(),
+                                ReviewDao.S3_REVIEW_IMAGE_PREFIX + review.getId() + "-" + UUID.randomUUID(),
                                 part
                         );
                         ReviewDao.createReviewImage(review.getId(), imageUrl);

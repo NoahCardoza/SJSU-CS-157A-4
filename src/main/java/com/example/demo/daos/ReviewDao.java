@@ -15,6 +15,7 @@ public class ReviewDao {
 
     public static final String SELECT_ALL_IMAGE_URLS_FROM_REVIEW = "SELECT url FROM ReviewImage WHERE review_id = ?";
     public static final String DELETE_REVIEW = "DELETE FROM Review WHERE id = ?";
+    public static final String S3_REVIEW_IMAGE_PREFIX = "review-image-";
     static ReviewDao instance = null;
     static public ReviewDao getInstance() {
         if (instance == null) {
@@ -122,7 +123,7 @@ public class ReviewDao {
             urls.add(resultSet.getString("url"));
         }
 
-        S3.deleteFiles(urls.stream().filter(url -> url.contains("/review-image-")).toList());
+        S3.deleteFiles(urls.stream().filter(url -> url.contains("/" + S3_REVIEW_IMAGE_PREFIX)).toList());
 
         statement = conn.prepareStatement(DELETE_REVIEW);
         statement.setLong(1, review.getId());
