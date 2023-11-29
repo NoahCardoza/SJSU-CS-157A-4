@@ -116,6 +116,10 @@ public class AmenityDao {
 
     //TODO: need to update this statement with amenity
     public void update(Amenity amenity) throws SQLException {
+
+        System.out.println("UPDATE METHOD");
+        System.out.println(amenity);
+
         Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("UPDATE hidden_gems.Amenity SET user_id = ?, description=?, name=? WHERE id = ?");
@@ -123,39 +127,41 @@ public class AmenityDao {
         statement.setLong(1, amenity.getUserId());
         statement.setString(2, escapeHtml(amenity.getDescription()));
         statement.setString(3, escapeHtml(amenity.getName()));
-        statement.setLong(1, amenity.getId());
+        statement.setLong(4, amenity.getId());
 
         statement.executeUpdate();
-
-        ResultSet rs = statement.getGeneratedKeys();
-
-        rs.next();
-
-        amenity.setId(rs.getLong(1));
     }
 
     public void updateAmenityRecord(AmenityTypeAttributeRecord record) throws SQLException {
 
-        PreparedStatement initialStatement = Database.getConnection().prepareStatement(
-                "SELECT * FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?;"
-        );
-
-        ResultSet rs = initialStatement.executeQuery();
-
-        if(rs.getString(3).isEmpty()){
-            createAmenityRecord(record);
-        }
-        else {
-            PreparedStatement ps = Database.getConnection().prepareStatement(
-                    "UPDATE hidden_gems.AmenityAttributeRecord SET value = ? WHERE amenity_attribute_id = ? AND amenity_id = ?;"
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement initialStatement = conn.prepareStatement(
+                "SELECT * FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?"
             );
 
-            ps.setString(1, escapeHtml(record.getValue()));
-            ps.setLong(2, record.getAmenityAttributeId());
-            ps.setLong(3, record.getAmenityId());
+            initialStatement.setLong(1, record.getAmenityAttributeId());
+            initialStatement.setLong(2, record.getAmenityId());
 
-            ps.executeUpdate();
+            ResultSet rs = initialStatement.executeQuery();
+
+            if(!rs.next()){
+                createAmenityRecord(record);
+            }
+            else {
+                PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE hidden_gems.AmenityAttributeRecord SET value = ? WHERE amenity_attribute_id = ? AND amenity_id = ?"
+                );
+
+                ps.setString(1, escapeHtml(record.getValue()));
+                ps.setLong(2, record.getAmenityAttributeId());
+                ps.setLong(3, record.getAmenityId());
+
+                ps.executeUpdate();
+            }
+
         }
+
+
     }
 
     public List<AmenityWithImage> getWithFilter(AmenityFilter filter, List<Location> locations) throws SQLException {

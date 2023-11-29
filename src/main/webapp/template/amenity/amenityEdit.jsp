@@ -73,7 +73,7 @@
                 <label for="description" class="form-label">Description</label>
                 <textarea id="description" name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
                 <input type="hidden" name="redirect" value="${pathWithQueryString}">
-                <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Create</button>
+                <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Submit</button>
         </div>
     </body>
 </html>

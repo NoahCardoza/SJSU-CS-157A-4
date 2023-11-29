@@ -280,6 +280,12 @@ public class AmenitiesServlet extends HttpServlet {
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
+        Enumeration<String> params = request.getParameterNames();
+        while(params.hasMoreElements()){
+            String paramName = params.nextElement();
+            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
+        }
+
         User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
         if (user == null) {
             return;
@@ -357,19 +363,28 @@ public class AmenitiesServlet extends HttpServlet {
 
         }
         else {
+            System.out.println("POST METHOD");
+
             postForm = new AmenityForm(request);
+            postForm.setLocationId(amenity.get().getLocationId());
             List<AmenityTypeAttribute> attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(amenity.get().getAmenityTypeId());
 
             String action = request.getParameter("action");
+
+            System.out.println(action);
+
             if (action != null) {
                 if (action.equals("submit")) {
                     Validation v = postForm.validate();
+                    System.out.println(v.getMessages());
                     if (v.isValid()) {
                         Amenity amenitySubmitted = new Amenity();
                         amenitySubmitted.setUserId(user.getId());
                         amenitySubmitted.setName(postForm.getName());
                         amenitySubmitted.setDescription(postForm.getDescription());
                         amenitySubmitted.setId(amenity.get().getId());
+
+                        System.out.println("\n\n\nhere!\n\n\n");
 
                         AmenityDao.getInstance().update(amenitySubmitted);
 
@@ -523,12 +538,14 @@ public class AmenitiesServlet extends HttpServlet {
                 form.setLocationId(locationOpt.get().getParentLocationId());
                 if (locationOpt.get().getParentLocationId() == null) {
                     // if the parent of the parent is null, it means that the parent is the root
+                    form.setLocationId(null);
                     form.setLocationName("None");
                 } else {
                     // get the name of the parent
                     locationOpt = LocationDao.getInstance().get(locationOpt.get().getParentLocationId());
                     if (locationOpt.isPresent()) {
                         form.setLocationName(locationOpt.get().getName());
+                        form.setLocationId(locationOpt.get().getId());
                     } else {
                         // just to be safe, this shouldn't happen unless something is removed
                         // from the database while the user is using the app
