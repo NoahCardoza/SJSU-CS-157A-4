@@ -45,8 +45,10 @@
                                 </c:if>
                             </c:forEach>
                         </div>
+                        <div class="col-12">
+                            <hr/>
+                        </div>
                     </div>
-                    <hr/>
                 </c:if>
                 <div class="col-12">
                     <div class="w-100 overflow-x-auto" style="white-space:nowrap">
@@ -107,7 +109,9 @@
                         </div>
                     </div>
                     <c:if test="${amenityTypeAttributes.booleanAttributes.size() > 0}">
-
+                        <div class="col-12">
+                            <hr/>
+                        </div>
                                 <c:forEach var="attribute" items="${amenityTypeAttributes.booleanAttributes}">
                                     <div>
                                         <span class="badge rounded-pill text-bg-light">
@@ -126,6 +130,9 @@
                                         </span>
                                     </div>
                                 </c:forEach>
+                        <div class="col-12">
+                            <hr/>
+                        </div>
                     </c:if>
 
 
@@ -145,7 +152,9 @@
                                     </div>
                                 </div>
                         </c:forEach>
-                        <hr/>
+                        <div class="col-12">
+                            <hr/>
+                        </div>
                     </c:if>
                     <c:if test="${amenityTypeAttributes.textAttributes.size() > 0}">
                         <c:forEach var="attribute" items="${amenityTypeAttributes.textAttributes}">
@@ -163,7 +172,6 @@
                                 </div>
                             </div>
                         </c:forEach>
-                        <hr/>
                     </c:if>
                 </div>
                 </div>
