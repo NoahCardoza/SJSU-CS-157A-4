@@ -239,9 +239,6 @@ public class RevisionDao {
 
             String newVal = AmenityTypeAttributeDao.getInstance().getValueForAttribute(oldAttr.getAmenityAttributeId(), oldAttr.getAmenityId());
 
-            System.out.println(newVal);
-            System.out.println(oldAttr.getValue());
-
             if(valuesDiffer(newVal, oldAttr.getValue())){
                 RevisionEdit edit = new RevisionEdit();
                 edit.setRevisionId(revisionId);
