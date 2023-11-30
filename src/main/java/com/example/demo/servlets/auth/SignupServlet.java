@@ -62,7 +62,7 @@ public class SignupServlet extends HttpServlet {
 
             if (v.isValid()) {
                 User user = new User();
-
+                user.setName(form.getName());
                 user.setUsername(form.getUsername());
                 user.setPassword(Security.hashPassword(form.getPassword()));
                 user.setEmail(form.getEmail());

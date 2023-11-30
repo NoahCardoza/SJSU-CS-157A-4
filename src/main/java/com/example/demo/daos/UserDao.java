@@ -70,6 +70,7 @@ public class UserDao {
         statement.setString(3, user.getNormalizedEmail());
         statement.setString(4, user.getPassword());
         statement.setBoolean(5, user.isVerified() == null ? false : user.isVerified());
+        statement.setString(6, escapeHtml(user.getName()));
 
         statement.executeUpdate();
 

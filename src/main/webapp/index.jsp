@@ -99,6 +99,10 @@
                                 <label for="username">Username</label>
                             </div>
                             <div class="form-floating mb-3">
+                                <input type="text" name="name" class="form-control" id="name" placeholder="">
+                                <label for="name">Name</label>
+                            </div>
+                            <div class="form-floating mb-3">
                                 <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="">
                                 <label for="email" >Email</label>
                                 <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
