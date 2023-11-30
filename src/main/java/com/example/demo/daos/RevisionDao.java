@@ -245,7 +245,7 @@ public class RevisionDao {
 
                 edit.setTableName("AmenityAttributeRecord");
                 edit.setPrimaryKey(oldAttr.getAmenityAttributeId());
-                edit.setColumnName(oldAttr.getName());
+                edit.setColumnName("value");
                 edit.setPreviousValue(oldAttr.getValue());
                 edit.setNewValue(newVal);
                 RevisionEditDao.getInstance().create(edit);
