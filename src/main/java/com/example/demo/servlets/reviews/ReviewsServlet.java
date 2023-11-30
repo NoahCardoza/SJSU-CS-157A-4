@@ -401,13 +401,10 @@ public class ReviewsServlet extends HttpServlet {
                         response.sendRedirect(request.getContextPath() + "/");
                         return;
                     }
-                    session.removeAttribute("temp_location_" + tempSessionId);
                 }
 
                 Amenity tempAmenity = (Amenity) session.getAttribute("temp_amenity_" + tempSessionId);
                 List<AmenityTypeAttributeRecord> tempAttributes = (List<AmenityTypeAttributeRecord>) session.getAttribute("temp_amenity_attributes_" + tempSessionId);
-                session.removeAttribute("temp_amenity_" + tempSessionId);
-                session.removeAttribute("temp_amenity_attributes_" + tempSessionId);
 
                 if (tempAmenity == null || tempAttributes == null) {
                     response.sendRedirect(request.getContextPath() + "/");
@@ -416,7 +413,9 @@ public class ReviewsServlet extends HttpServlet {
 
                 if (tempSessionId.startsWith("l-")) {
                     LocationDao.getInstance().create(tempLocation);
+                    session.removeAttribute("temp_location_" + tempSessionId);
                     tempAmenity.setLocationId(tempLocation.getId());
+                    session.setAttribute("temp_amenity_" + tempSessionId, tempAmenity);
                 }
 
                 AmenityDao.getInstance().create(tempAmenity);
@@ -425,15 +424,16 @@ public class ReviewsServlet extends HttpServlet {
                     AmenityDao.getInstance().createAmenityRecord(attribute);
                 }
                 amenityId = tempAmenity.getId();
+                session.removeAttribute("temp_amenity_" + tempSessionId);
+                session.removeAttribute("temp_amenity_attributes_" + tempSessionId);
             }
 
             review.setAmenityId(amenityId);
 
-            ReviewDao.create(review);
-
+            // make sure all values are parsed correctly before inserting
+            List<AmenityTypeMetricRecord> metricRecords = new ArrayList<>();
             for (AmenityTypeMetric metric : metrics) {
                 AmenityTypeMetricRecord metricRecord = new AmenityTypeMetricRecord();
-                metricRecord.setReviewId(review.getId());
                 metricRecord.setAmenityMetricId(metric.getId());
                 int value = Util.parseIntOrDefault(request.getParameter("metric-" + metric.getId()), 0);
 
@@ -445,6 +445,12 @@ public class ReviewsServlet extends HttpServlet {
 
                 metricRecord.setValue(value);
 
+                metricRecords.add(metricRecord);
+            }
+
+            ReviewDao.create(review);
+            for (AmenityTypeMetricRecord metricRecord : metricRecords) {
+                metricRecord.setReviewId(review.getId());
                 ReviewDao.createReviewRecord(metricRecord);
             }
 

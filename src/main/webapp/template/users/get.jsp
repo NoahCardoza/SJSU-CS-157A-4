@@ -52,22 +52,22 @@
             </div>
             <div class="col-12">
                 <div class="card">
-                    <form action="<c:url value="/users?f=edit" />" method="post">
+                    <form method="post">
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" name="username"
-                                       value="${profile.username}" required>
+                                       value="${form.username}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email"
-                                       value="${profile.email}" disabled>
+                                <input type="hidden" class="form-control" name="email" value="${form.email}">
+                                <input type="email" class="form-control" id="email" name="email" value="${form.email}" disabled>
                                 <div id="emailHelp" class="form-text">This feature is coming soon.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="oldPassword" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="oldPassword" name="password" required>
+                                <input type="password" class="form-control" id="oldPassword" name="oldPassword">
                             </div>
                             <div class="mb-3">
                                 <label for="newPassword" class="form-label">New Password</label>

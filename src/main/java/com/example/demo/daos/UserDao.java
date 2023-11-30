@@ -209,4 +209,31 @@ public class UserDao {
             return userStats;
         }
     }
+
+    public void update(User user) throws SQLException {
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("""
+                UPDATE User SET
+                    username = ?,
+                    email = ?,
+                    normalized_email = ?,
+                    administrator = ?,
+                    banned = ?,
+                    moderator = ?,
+                    password = ?,
+                    verified = ?
+                WHERE id = ?
+            """);
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getEmail());
+            statement.setString(3, user.getNormalizedEmail());
+            statement.setBoolean(4, user.isAdministrator());
+            statement.setBoolean(5, user.isBanned());
+            statement.setBoolean(6, user.isModerator());
+            statement.setString(7, user.getPassword());
+            statement.setBoolean(8, user.isVerified());
+            statement.setLong(9, user.getId());
+            statement.executeUpdate();
+        }
+    }
 }

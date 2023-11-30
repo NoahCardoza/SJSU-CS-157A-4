@@ -29,7 +29,7 @@ public class ReviewDao {
     public static Optional<Review> get(long id) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Review WHERE id = ?");
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Review WHERE id = ?"); //display all reviews based on the userID
         statement.setDouble(1, id);
 
         ResultSet resultSet = statement.executeQuery();
@@ -96,7 +96,7 @@ public class ReviewDao {
     public static Long create(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (amenity_id,user_id, description,name) VALUES (?, ?, ?, ?)");
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (amenity_id,user_id, description,name) VALUES (?, ?, ?, ?)"); //insert review description and name based on the userID and amenityID selected
 
         statement.setLong(1, review.getAmenityId());
         statement.setLong(2, review.getUserId());
@@ -133,7 +133,7 @@ public class ReviewDao {
     public static void toggleHide(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET hidden = NOT hidden WHERE id = ?");
+        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET hidden = NOT hidden WHERE id = ?"); //set hidden to NOT hidden(1) when selected
 
         statement.setLong(1, review.getId());
         statement.executeUpdate();
@@ -144,7 +144,9 @@ public class ReviewDao {
     public static void update(Review review) throws SQLException {
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET description=?, name=?, updated_at=NOW() WHERE id = ?");
+
+        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET description=?, name=?, updated_at=NOW() WHERE id = ?"); //updates value of the previous description in review
+
         statement.setString(1, escapeHtml(review.getDescription()));
         statement.setString(2, escapeHtml(review.getName()));
         statement.setLong(3, review.getId());
@@ -173,16 +175,17 @@ public class ReviewDao {
 
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement(
-                "SELECT *, COALESCE((" +
+                "SELECT *, COALESCE((" +        // if the value is empty, coalesce replaces any null value with 0
                         "SELECT SUM(value) " +
                         "FROM ReviewVote " +
                         "WHERE review_id = Review.id), 0) AS votes " +
                         (currentUser != null
-                                ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted "
+                                ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted " //if not null, replace Vote value and pair with review and user ID
                                 : " "
                         ) +
-                        "FROM Review WHERE amenity_id = ? " + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0 " : " ")) +
+                        "FROM Review WHERE amenity_id = ? " + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0 " : " ")) +  // match review with amenityID
                         "ORDER BY created_at DESC"
+
         );
         int paramIndex = 1;
         if (currentUser != null) {
@@ -254,14 +257,14 @@ public class ReviewDao {
     public static void vote(Review review, User user, int value) throws SQLException {
         try (Connection conn = Database.getConnection()) {
             PreparedStatement statement = conn.prepareStatement(
-                    "SELECT value FROM ReviewVote WHERE review_id = ? AND user_id = ?"
+                    "SELECT value FROM ReviewVote WHERE review_id = ? AND user_id = ?" // Select current value info if user has made a review
             );
             statement.setLong(1, review.getId());
             statement.setLong(2, user.getId());
             ResultSet resultSet = statement.executeQuery();
 
             if (!resultSet.next()) {
-                statement = conn.prepareStatement("INSERT INTO ReviewVote (review_id, user_id, value) VALUES (?, ?, ?)");
+                statement = conn.prepareStatement("INSERT INTO ReviewVote (review_id, user_id, value) VALUES (?, ?, ?)"); // if nothing select it here
                 statement.setLong(1, review.getId());
                 statement.setLong(2, user.getId());
                 statement.setInt(3, value);
@@ -271,12 +274,12 @@ public class ReviewDao {
 
             int previousValue = resultSet.getInt(1);
             if (previousValue == value) {
-                statement = conn.prepareStatement("DELETE FROM ReviewVote WHERE review_id = ? AND user_id = ?");
+                statement = conn.prepareStatement("DELETE FROM ReviewVote WHERE review_id = ? AND user_id = ?"); // if user clicks button, deletes value of their vote
                 statement.setLong(1, review.getId());
                 statement.setLong(2, user.getId());
                 statement.executeUpdate();
             } else {
-                statement = conn.prepareStatement("UPDATE ReviewVote SET value = ? WHERE review_id = ? AND user_id = ?");
+                statement = conn.prepareStatement("UPDATE ReviewVote SET value = ? WHERE review_id = ? AND user_id = ?"); //update value based on their new
                 statement.setInt(1, value);
                 statement.setLong(2, review.getId());
                 statement.setLong(3, user.getId());

@@ -42,7 +42,11 @@ public class Util {
             return null;
         }
 
-        return Integer.parseInt(s);
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     static public Long parseLongOrNull(String s) {
@@ -52,7 +56,11 @@ public class Util {
             return null;
         }
 
-        return Long.parseLong(s);
+        try {
+            return Long.parseLong(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     static public Long nullIfZero(Long l) {
