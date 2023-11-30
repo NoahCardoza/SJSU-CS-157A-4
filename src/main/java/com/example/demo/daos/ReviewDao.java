@@ -27,42 +27,44 @@ public class ReviewDao {
     private ReviewDao() {}
 
     public static Optional<Review> get(long id) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Review WHERE id = ?"); //display all reviews based on the userID
-        statement.setDouble(1, id);
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Review WHERE id = ?"); //display all reviews based on the userID
+            statement.setDouble(1, id);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        if (resultSet.next()) {
-            return Optional.of(fromResultSet(resultSet));
+            if (resultSet.next()) {
+                return Optional.of(fromResultSet(resultSet));
+            }
+
+            return Optional.empty();
         }
-
-        return Optional.empty();
     }
     
     public static List<AmenityTypeMetricRecordWithName> getAllReviewMetricRecordsWithNames(long reviewId) throws SQLException {
         ArrayList<AmenityTypeMetricRecordWithName> records = new ArrayList<>();
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT name, amenity_metric_id, review_id, value FROM AmenityTypeMetric JOIN (SELECT * FROM ReviewMetricRecord WHERE review_id = ?) MetricRecord ON AmenityTypeMetric.id = MetricRecord.amenity_metric_id"
-        );
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT name, amenity_metric_id, review_id, value FROM AmenityTypeMetric JOIN (SELECT * FROM ReviewMetricRecord WHERE review_id = ?) MetricRecord ON AmenityTypeMetric.id = MetricRecord.amenity_metric_id"
+            );
 
-        statement.setDouble(1, reviewId);
+            statement.setDouble(1, reviewId);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            AmenityTypeMetricRecordWithName record = new AmenityTypeMetricRecordWithName();
-            record.setName(resultSet.getString("name"));
-            record.setAmenityMetricId(resultSet.getLong("amenity_metric_id"));
-            record.setReviewId(resultSet.getLong("review_id"));
-            record.setValue(resultSet.getInt("value"));
-            records.add(record);
+            while (resultSet.next()) {
+                AmenityTypeMetricRecordWithName record = new AmenityTypeMetricRecordWithName();
+                record.setName(resultSet.getString("name"));
+                record.setAmenityMetricId(resultSet.getLong("amenity_metric_id"));
+                record.setReviewId(resultSet.getLong("review_id"));
+                record.setValue(resultSet.getInt("value"));
+                records.add(record);
+            }
+
+            return records;
         }
-
-        return records;
     }
 
     public static void createReviewImage(Long id, String imageUrl) throws SQLException {
@@ -94,20 +96,21 @@ public class ReviewDao {
     }
 
     public static Long create(Review review) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (amenity_id,user_id, description,name) VALUES (?, ?, ?, ?)"); //insert review description and name based on the userID and amenityID selected
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (amenity_id,user_id, description,name) VALUES (?, ?, ?, ?)"); //insert review description and name based on the userID and amenityID selected
 
-        statement.setLong(1, review.getAmenityId());
-        statement.setLong(2, review.getUserId());
-        statement.setString(3, escapeHtml(review.getDescription()));
-        statement.setString(4, escapeHtml(review.getName()));
+            statement.setLong(1, review.getAmenityId());
+            statement.setLong(2, review.getUserId());
+            statement.setString(3, escapeHtml(review.getDescription()));
+            statement.setString(4, escapeHtml(review.getName()));
 
-        statement.executeUpdate();
+            statement.executeUpdate();
 
-        review.setId(Database.getLastInsertedId("Review"));
+            review.setId(Database.getLastInsertedId("Review"));
 
-        return review.getId();
+            return review.getId();
+        }
     }
 
     public static void delete(Review review) throws SQLException {
@@ -131,27 +134,29 @@ public class ReviewDao {
     }
 
     public static void toggleHide(Review review) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET hidden = NOT hidden WHERE id = ?"); //set hidden to NOT hidden(1) when selected
+            PreparedStatement statement = conn.prepareStatement("UPDATE Review SET hidden = NOT hidden WHERE id = ?"); //set hidden to NOT hidden(1) when selected
 
-        statement.setLong(1, review.getId());
-        statement.executeUpdate();
+            statement.setLong(1, review.getId());
+            statement.executeUpdate();
+        }
     }
 
 
 
     public static void update(Review review) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
 
-        PreparedStatement statement = conn.prepareStatement("UPDATE Review SET description=?, name=?, updated_at=NOW() WHERE id = ?"); //updates value of the previous description in review
+            PreparedStatement statement = conn.prepareStatement("UPDATE Review SET description=?, name=?, updated_at=NOW() WHERE id = ?"); //updates value of the previous description in review
 
-        statement.setString(1, escapeHtml(review.getDescription()));
-        statement.setString(2, escapeHtml(review.getName()));
-        statement.setLong(3, review.getId());
+            statement.setString(1, escapeHtml(review.getDescription()));
+            statement.setString(2, escapeHtml(review.getName()));
+            statement.setLong(3, review.getId());
 
-        statement.executeUpdate();
+            statement.executeUpdate();
+        }
     }
 
 
@@ -172,45 +177,44 @@ public class ReviewDao {
 
     public static List<Review> getAllReviews(Long amenityId, Long currentUser, Boolean showHidden) throws SQLException {
         ArrayList<Review> reviews = new ArrayList<>();
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT *, COALESCE((" +        // if the value is empty, coalesce replaces any null value with 0
+                            "SELECT SUM(value) " +
+                            "FROM ReviewVote " +
+                            "WHERE review_id = Review.id), 0) AS votes " +
+                            (currentUser != null
+                                    ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted " //if not null, replace Vote value and pair with review and user ID
+                                    : " "
+                            ) +
+                            "FROM Review WHERE amenity_id = ? " + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0 " : " ")) +  // match review with amenityID
+                            "ORDER BY created_at DESC"
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT *, COALESCE((" +        // if the value is empty, coalesce replaces any null value with 0
-                        "SELECT SUM(value) " +
-                        "FROM ReviewVote " +
-                        "WHERE review_id = Review.id), 0) AS votes " +
-                        (currentUser != null
-                                ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted " //if not null, replace Vote value and pair with review and user ID
-                                : " "
-                        ) +
-                        "FROM Review WHERE amenity_id = ? " + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0 " : " ")) +  // match review with amenityID
-                        "ORDER BY created_at DESC"
-
-        );
-        int paramIndex = 1;
-        if (currentUser != null) {
-            statement.setLong(paramIndex++, currentUser);
-
-        }
-        statement.setLong(paramIndex++, amenityId);
-
-
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            Review review = fromResultSet(resultSet);
-            review.setVotes(resultSet.getInt("votes"));
-            if(currentUser != null){
-                review.setVoted(resultSet.getInt("voted"));
+            );
+            int paramIndex = 1;
+            if (currentUser != null) {
+                statement.setLong(paramIndex++, currentUser);
 
             }
-            else{
-                review.setVoted(0);
+            statement.setLong(paramIndex++, amenityId);
+
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Review review = fromResultSet(resultSet);
+                review.setVotes(resultSet.getInt("votes"));
+                if(currentUser != null){
+                    review.setVoted(resultSet.getInt("voted"));
+
+                }
+                else{
+                    review.setVoted(0);
+                }
+                reviews.add(review);
+
             }
-            reviews.add(review);
-
         }
-
         return reviews;
     }
 
