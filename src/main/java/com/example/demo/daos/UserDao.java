@@ -3,9 +3,7 @@ package com.example.demo.daos;
 import com.example.demo.Database;
 import com.example.demo.beans.entities.User;
 import com.example.demo.beans.entities.UserStats;
-import jakarta.servlet.http.HttpSession;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +58,7 @@ public class UserDao {
         user.setPassword(resultSet.getString("password"));
         user.setCreatedAt(resultSet.getTimestamp("created_at"));
         user.setVerified(resultSet.getBoolean("verified"));
+        user.setPrivateProfile(resultSet.getBoolean("private"));
 
         return user;
     }
@@ -226,7 +225,8 @@ public class UserDao {
                     banned = ?,
                     moderator = ?,
                     password = ?,
-                    verified = ?
+                    verified = ?,
+                    private = ?
                 WHERE id = ?
             """);
             statement.setString(1, user.getUsername());
@@ -237,7 +237,9 @@ public class UserDao {
             statement.setBoolean(6, user.isModerator());
             statement.setString(7, user.getPassword());
             statement.setBoolean(8, user.isVerified());
-            statement.setLong(9, user.getId());
+            statement.setBoolean(9, user.getPrivateProfile());
+            statement.setLong(10, user.getId());
+            
             statement.executeUpdate();
         }
     }

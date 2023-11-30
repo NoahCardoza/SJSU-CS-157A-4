@@ -8,6 +8,7 @@ public class UserForm {
     private String name;
     private String oldPassword;
     private String newPassword;
+    private Boolean isPrivateProfile;
 
     private boolean passwordChanged = false;
 
@@ -17,6 +18,7 @@ public class UserForm {
         this.name = request.getParameter("name");
         this.oldPassword = request.getParameter("oldPassword");
         this.newPassword = request.getParameter("newPassword");
+        this.isPrivateProfile = request.getParameter("isPrivate") != null;
     }
 
     public String validate() {
@@ -49,6 +51,13 @@ public class UserForm {
         return null;
     }
 
+    public Boolean getPrivateProfile() {
+        return isPrivateProfile;
+    }
+
+    public void setPrivateProfile(Boolean aPrivate) {
+        isPrivateProfile = aPrivate;
+    }
 
     public String getName() {
         return name;

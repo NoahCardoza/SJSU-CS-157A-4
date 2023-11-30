@@ -14,8 +14,22 @@ public class User {
     private String password;
     private Timestamp createdAt;
     private Boolean verified;
+    private Boolean isPrivateProfile;
+
 
     // Getters and Setters for each field
+
+    public Boolean getVerified() {
+        return verified;
+    }
+
+    public Boolean getPrivateProfile() {
+        return isPrivateProfile;
+    }
+
+    public void setPrivateProfile(Boolean aPrivate) {
+        isPrivateProfile = aPrivate;
+    }
 
     public Long getId() {
         return id;
@@ -118,6 +132,7 @@ public class User {
                 ", password='" + password + '\'' +
                 ", createdAt='" + createdAt + '\'' +
                 ", verified=" + verified +
+                ", isPrivateProfile=" + isPrivateProfile +
                 '}';
     }
 }

@@ -33,7 +33,6 @@ public class UsersServlet extends HttpServlet {
         try {
             switch (function) {
                 case "get" -> get(request, response);
-                case "edit" -> edit(request, response);
                 default -> {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     response.sendRedirect(request.getContextPath() + "/");
@@ -115,6 +114,8 @@ public class UsersServlet extends HttpServlet {
 
             profile.get().setUsername(form.getUsername());
             profile.get().setName(form.getName());
+            profile.get().setPrivateProfile(form.getPrivateProfile());
+            System.out.println(profile.get());
             if (form.isPasswordChanged()) {
                 if (Security.checkPassword(form.getOldPassword(), profile.get().getPassword())) {
                     profile.get().setPassword(Security.hashPassword(form.getNewPassword()));
@@ -139,6 +140,7 @@ public class UsersServlet extends HttpServlet {
                                 }
                         )
                 );
+                e.printStackTrace();
                 request.getRequestDispatcher("/template/users/get.jsp").forward(request, response);
                 return;
             }
@@ -164,18 +166,5 @@ public class UsersServlet extends HttpServlet {
 
         request.setAttribute("reviews", reviews);
         request.getRequestDispatcher("/template/users/get.jsp").forward(request, response);
-    }
-
-    public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-
-
-//
-//        if ()
-//
-//        profile.get().setUsername(request.getParameter("username"));
-//
-//        request.setAttribute("profile", profile.get());
-//
-//        request.getRequestDispatcher("/template/users/form.jsp").forward(request, response);
     }
 }

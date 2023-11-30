@@ -6,6 +6,7 @@
 <%--@elvariable id="profile" type="com.example.demo.beans.entities.User"--%>
 <%--@elvariable id="reviews" type="java.util.List<com.example.demo.beans.entities.Review>"--%>
 <%--@elvariable id="user" type="com.example.demo.beans.entities.User"--%>
+<%--@elvariable id="form" type="com.example.demo.beans.forms.UserForm"--%>
 
 <!DOCTYPE html>
 <html>
@@ -28,7 +29,16 @@
                         <i class="bi bi-person-fill" style="font-size: 64px"></i>
                     </div>
                     <div class="mt-3 mb-4">
-                        <h4 class="mb-2">${profile.name}</h4>
+
+                        <h4 class="mb-2">
+                            ${profile.privateProfile ? '<i class="bi bi-lock-fill"></i>' : ''}
+                            ${
+                            user.id == profile.id
+                                ? profile.name
+                                : profile.privateProfile
+                                    ? 'Private Profile'
+                                    : profile.username
+                        }</h4>
                     </div>
                     <p class="text-muted mb-4">@${profile.username}</p>
                     <div class="d-flex justify-content-around text-center mt-5 mb-2">
@@ -71,7 +81,12 @@
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>
                                 <input type="text" name="name" class="form-control" id="name" aria-describedby="nameHelp" value="${form.name}">
-                                <div id="nameHelp" class="form-text">By default your name is not shared with other users.</div>
+                            </div>
+                            <div class="mb-3">
+                                <input type="checkbox" class="form-check-input" id="isPrivate" name="isPrivate" ${form.privateProfile ? 'checked' : ''}>
+<!--                                ${form}-->
+                                <label for="isPrivate" class="form-check-label">Private Profile</label>
+                                <div id="isPrivateHelp" class="form-text">If this is unchecked people will be able to see your name.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="oldPassword" class="form-label">Password</label>
