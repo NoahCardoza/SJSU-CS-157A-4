@@ -71,7 +71,9 @@ public class AmenityForm {
             v.addMessage("Location is required.");
         }
 
-        description = description == null ? "" : description.trim();
+        if (typeId == null) {
+            v.addMessage("An amenity type is required.");
+        }
 
         if (description.length() > 255) {
             v.addMessage("Description must be less than 255 characters.");

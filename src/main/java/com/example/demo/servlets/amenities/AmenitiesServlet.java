@@ -254,7 +254,9 @@ public class AmenitiesServlet extends HttpServlet {
                             return;
                         } else {
                             // TODO: send all errors
+                            request.setAttribute("form", form);
                             request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
+                            request.getRequestDispatcher("/template/amenity/amenityCreate.jsp").forward(request, response);
                         }
                         return;
                     }
