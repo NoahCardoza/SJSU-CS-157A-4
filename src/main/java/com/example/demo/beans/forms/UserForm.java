@@ -8,6 +8,8 @@ public class UserForm {
     private String oldPassword;
     private String newPassword;
 
+    private boolean passwordChanged = false;
+
     public UserForm(String username, String email, String oldPassword, String newConfirmation) {
         this.username = username;
         this.email = email;
@@ -39,10 +41,16 @@ public class UserForm {
             if (newPassword.equals(oldPassword)) {
                 return "Password and new password cannot be the same.";
             }
+
+            passwordChanged = true;
+        } else if (!(oldPassword == null || oldPassword.isBlank())) {
+            return "New password was not entered.";
         }
 
         return null;
     }
+
+
 
     public String getUsername() {
         return username;
@@ -74,5 +82,23 @@ public class UserForm {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    public boolean isPasswordChanged() {
+        return passwordChanged;
+    }
+
+    public void setPasswordChanged(boolean passwordChanged) {
+        this.passwordChanged = passwordChanged;
+    }
+
+    @Override
+    public String toString() {
+        return "UserForm{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", oldPassword='" + oldPassword + '\'' +
+                ", newPassword='" + newPassword + '\'' +
+                '}';
     }
 }

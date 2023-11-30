@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
 <%@taglib prefix="hg" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="stats" type="com.example.demo.beans.entities.UserStats"--%>
@@ -23,8 +23,10 @@
         <div class="col-12">
             <div class="card" style="border-radius: 15px;">
                 <div class="card-body text-center">
-                    <img alt="" src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp"
-                         class="rounded-circle img-fluid" style="width: 100px;">
+                    <div class="rounded-circle img-fluid bg-dark-subtle text-bg-light mx-auto"
+                         style="width: 100px; height: 100px">
+                        <i class="bi bi-person-fill" style="font-size: 64px"></i>
+                    </div>
                     <div class="mt-3 mb-4">
                         <h4 class="mb-2">Jane Doe</h4>
                     </div>
@@ -62,7 +64,8 @@
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="hidden" class="form-control" name="email" value="${form.email}">
-                                <input type="email" class="form-control" id="email" name="email" value="${form.email}" disabled>
+                                <input type="email" class="form-control" id="email" name="email" value="${form.email}"
+                                       disabled>
                                 <div id="emailHelp" class="form-text">This feature is coming soon.</div>
                             </div>
                             <div class="mb-3">
@@ -85,23 +88,21 @@
             <h3 class="text-center">Reviews</h3>
         </div>
         <c:choose>
-        <c:when test="${reviews.size() > 0}">
-        <c:forEach var="review" items="${reviews}">
-        <div class="col-12">
-            <hg:reviewCard review="${review}"/>
-            <div
-            </c:forEach>
-            </c:when>
-            <c:otherwise>
-                <div class="col-12">
-                    <h3 class="text-center small text-muted">No Reviews</h3>
-                </div>
-            </c:otherwise>
+            <c:when test="${reviews.size() > 0}">
+                    <c:forEach var="review" items="${reviews}">
+                        <div class="col-12">
+                            <hg:reviewCard review="${review}"/>
+                        </div>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <div class="col-12">
+                        <h3 class="text-center small text-muted">No Reviews</h3>
+                    </div>
+                </c:otherwise>
             </c:choose>
-
         </div>
     </div>
-</div>
 <hg:footer/>
 </body>
 </html>

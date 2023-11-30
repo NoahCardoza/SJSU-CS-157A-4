@@ -114,7 +114,7 @@ public class UsersServlet extends HttpServlet {
             }
 
             profile.get().setUsername(form.getUsername());
-            if (form.getNewPassword() != null) {
+            if (form.isPasswordChanged()) {
                 if (Security.checkPassword(form.getOldPassword(), profile.get().getPassword())) {
                     profile.get().setPassword(Security.hashPassword(form.getNewPassword()));
                 } else {
