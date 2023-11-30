@@ -81,7 +81,7 @@ public class AmenityTypeDao {
             ps.executeUpdate();
 
 
-            var ret = Database.getConnection().prepareStatement("SELECT id FROM AmenityType WHERE name = ?");
+            var ret = conn.prepareStatement("SELECT id FROM AmenityType WHERE name = ?");
             ret.setString(1, escapeHtml(amenityType.getName()));
             ResultSet  rs = ret.executeQuery();
 

@@ -30,17 +30,18 @@ public class UserDao {
     private UserDao() {}
 
     public Optional<User> get(Long id) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM User WHERE id = ?");
-        statement.setDouble(1, id);
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM User WHERE id = ?");
+            statement.setDouble(1, id);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        if (resultSet.next()) {
-            User user = fromResultSet(resultSet);
-            user.setName(resultSet.getString("name"));
-            return Optional.of(user);
+            if (resultSet.next()) {
+                User user = fromResultSet(resultSet);
+                user.setName(resultSet.getString("name"));
+                return Optional.of(user);
+            }
         }
 
         return Optional.empty();
@@ -64,26 +65,27 @@ public class UserDao {
     }
 
     public Long create(User user) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        PreparedStatement statement = conn.prepareStatement(INSERT);
-        statement.setString(1, escapeHtml(user.getUsername()));
-        statement.setString(2, user.getEmail());
-        statement.setString(3, user.getNormalizedEmail());
-        statement.setString(4, user.getPassword());
-        statement.setBoolean(5, user.isVerified() == null ? false : user.isVerified());
-        statement.setString(6, escapeHtml(user.getName()));
+            PreparedStatement statement = conn.prepareStatement(INSERT);
+            statement.setString(1, escapeHtml(user.getUsername()));
+            statement.setString(2, user.getEmail());
+            statement.setString(3, user.getNormalizedEmail());
+            statement.setString(4, user.getPassword());
+            statement.setBoolean(5, user.isVerified() == null ? false : user.isVerified());
+            statement.setString(6, escapeHtml(user.getName()));
 
-        statement.executeUpdate();
+            statement.executeUpdate();
 
-        user.setId(Database.getLastInsertedId("User"));
-        // get the id of the newly created user
-        return user.getId();
+            user.setId(Database.getLastInsertedId("User"));
+            // get the id of the newly created user
+            return user.getId();
+        }
     }
 
     public boolean isUnique(User user) throws SQLException {
 
-        try(Connection conn = Database.getConnection()) {
+        try (Connection conn = Database.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM User WHERE username=? OR email=? OR normalized_email=?");
 
             ps.setString(1, user.getUsername());

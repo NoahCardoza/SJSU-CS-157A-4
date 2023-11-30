@@ -24,39 +24,37 @@ public class LoginServlet extends HttpServlet {
         LoginBean bean = new LoginBean(request.getParameter("email"), request.getParameter("password"));
         Long userId;
         try {
-            Connection conn = Database.getConnection();
+            try (Connection conn = Database.getConnection()) {
+                PreparedStatement ps = conn.prepareStatement("SELECT id, password, verified FROM User WHERE email=?");
+                ps.setString(1, bean.getEmail());
+                ResultSet rs = ps.executeQuery();
 
-            PreparedStatement ps = conn.prepareStatement("SELECT id, password, verified FROM User WHERE email=?");
-
-            ps.setString(1, bean.getEmail());
-
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()){
-                if (!rs.getBoolean("verified")) {
+                if (rs.next()) {
+                    if (!rs.getBoolean("verified")) {
+                        request.setAttribute(
+                                "alert",
+                                new Alert("danger", "You must verify your email before logging in.")
+                        );
+                        request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
+                        return;
+                    }
+                    if (!Security.checkPassword(bean.getPassword(), rs.getString("password"))) {
+                        request.setAttribute(
+                                "alert",
+                                new Alert("danger", "That email/password combination cannot be found in our records")
+                        );
+                        request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
+                        return;
+                    }
+                    userId = rs.getLong("id");
+                } else {
                     request.setAttribute(
-                        "alert",
-                        new Alert("danger", "You must verify your email before logging in.")
+                            "alert",
+                            new Alert("danger", "That email/password combination cannot be found in our records")
                     );
                     request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
                     return;
                 }
-                if (!Security.checkPassword(bean.getPassword(), rs.getString("password"))) {
-                    request.setAttribute(
-                        "alert",
-                        new Alert("danger", "That email/password combination cannot be found in our records")
-                    );
-                    request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
-                    return;
-                }
-                userId = rs.getLong("id");
-            } else {
-                request.setAttribute(
-                        "alert",
-                        new Alert("danger", "That email/password combination cannot be found in our records")
-                );
-                request.getRequestDispatcher("template/auth/login.jsp").forward(request, response);
-                return;
             }
 
             HttpSession session = request.getSession();

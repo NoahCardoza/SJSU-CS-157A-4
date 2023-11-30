@@ -114,23 +114,24 @@ public class ReviewDao {
     }
 
     public static void delete(Review review) throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        PreparedStatement statement = conn.prepareStatement(SELECT_ALL_IMAGE_URLS_FROM_REVIEW);
-        statement.setLong(1, review.getId());
+            PreparedStatement statement = conn.prepareStatement(SELECT_ALL_IMAGE_URLS_FROM_REVIEW);
+            statement.setLong(1, review.getId());
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        ArrayList<String> urls = new ArrayList<>();
-        while (resultSet.next()) {
-            urls.add(resultSet.getString("url"));
+            ArrayList<String> urls = new ArrayList<>();
+            while (resultSet.next()) {
+                urls.add(resultSet.getString("url"));
+            }
+
+            S3.deleteFiles(urls.stream().filter(url -> url.contains("/" + S3_REVIEW_IMAGE_PREFIX)).toList());
+
+            statement = conn.prepareStatement(DELETE_REVIEW);
+            statement.setLong(1, review.getId());
+            statement.executeUpdate();
         }
-
-        S3.deleteFiles(urls.stream().filter(url -> url.contains("/" + S3_REVIEW_IMAGE_PREFIX)).toList());
-
-        statement = conn.prepareStatement(DELETE_REVIEW);
-        statement.setLong(1, review.getId());
-        statement.executeUpdate();
     }
 
     public static void toggleHide(Review review) throws SQLException {
@@ -162,16 +163,18 @@ public class ReviewDao {
 
 
     public static void createReviewRecord(AmenityTypeMetricRecord record) throws SQLException {
-        PreparedStatement ps = Database.getConnection().prepareStatement(
-                "INSERT INTO ReviewMetricRecord (amenity_metric_id, review_id, value) VALUES (?, ?, ?)",
-                PreparedStatement.RETURN_GENERATED_KEYS
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO ReviewMetricRecord (amenity_metric_id, review_id, value) VALUES (?, ?, ?)",
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
 
-        ps.setLong(1, record.getAmenityMetricId());
-        ps.setLong(2, record.getReviewId());
-        ps.setDouble(3, record.getValue());
+            ps.setLong(1, record.getAmenityMetricId());
+            ps.setLong(2, record.getReviewId());
+            ps.setDouble(3, record.getValue());
 
-        ps.executeUpdate();
+            ps.executeUpdate();
+        }
     }
 
 
@@ -221,17 +224,18 @@ public class ReviewDao {
     public static List<String> getAllImagesForReview(Long reviewId) throws SQLException {
         ArrayList<String> urls = new ArrayList<>();
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT url FROM ReviewImage WHERE review_id = ?"
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT url FROM ReviewImage WHERE review_id = ?"
+            );
 
-        statement.setDouble(1, reviewId);
+            statement.setDouble(1, reviewId);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            urls.add(resultSet.getString("url"));
+            while (resultSet.next()) {
+                urls.add(resultSet.getString("url"));
+            }
         }
 
         return urls;

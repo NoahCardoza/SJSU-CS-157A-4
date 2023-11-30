@@ -34,76 +34,82 @@ public class RevisionDao {
     }
 
     public Optional<Revision> get(long id) throws SQLException {
-        PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM Revision WHERE id = ?");
-        ps.setLong(1, id);
-        ResultSet resultSet = ps.executeQuery();
-        if (resultSet.next()) {
-            return Optional.of(fromResultSet(resultSet));
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM Revision WHERE id = ?");
+            ps.setLong(1, id);
+            ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                return Optional.of(fromResultSet(resultSet));
+            }
         }
         return Optional.empty();
     }
 
     public Long create(Revision revision) throws SQLException {
-        PreparedStatement ps = Database.getConnection().prepareStatement(
-                "INSERT INTO Revision (user_id, table_name, primary_key) VALUES (?, ?, ?)",
-                PreparedStatement.RETURN_GENERATED_KEYS
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO Revision (user_id, table_name, primary_key) VALUES (?, ?, ?)",
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
 
-        ps.setLong(1, revision.getUserId());
-        ps.setString(2, revision.getTableName());
-        ps.setLong(3, revision.getPrimaryKey());
+            ps.setLong(1, revision.getUserId());
+            ps.setString(2, revision.getTableName());
+            ps.setLong(3, revision.getPrimaryKey());
 
-        ps.executeUpdate();
+            ps.executeUpdate();
 
-        ResultSet rs = ps.getGeneratedKeys();
+            ResultSet rs = ps.getGeneratedKeys();
 
-        rs.next();
+            rs.next();
 
-        revision.setId(rs.getLong(1));
+            revision.setId(rs.getLong(1));
 
-        return revision.getId();
+            return revision.getId();
+        }
     }
 
     public ArrayList<Revision> getEntityRevisions(String tableName, Long primaryKey, Long currentUser) throws SQLException {
         ArrayList<Revision> revisions = new ArrayList<>();
-        Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT *, COALESCE((" +
-                        "SELECT SUM(value) " +
-                        "FROM RevisionVote " +
-                        "WHERE revision_id = Revision.id), 0) AS votes " +
-                        (currentUser != null
-                                ? ", COALESCE((SELECT value FROM RevisionVote WHERE user_id = ? AND revision_id = Revision.id), 0) AS voted "
-                                : " "
-                        ) +
-                    "FROM Revision " +
-                    "WHERE table_name = ? AND primary_key = ? " +
-                    "ORDER BY created_at DESC"
-        );
-        int paramIndex = 1;
-        if (currentUser != null) {
-            statement.setLong(paramIndex++, currentUser);
-
-        }
-        statement.setString(paramIndex++, tableName);
-        statement.setLong(paramIndex++, primaryKey);
-        
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            Revision revision = fromResultSet(resultSet);
-            revision.setEdits(RevisionEditDao.getInstance().getAllByRevisionId(revision.getId()));
-            revision.setVotes(resultSet.getInt("votes"));
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT *, COALESCE((" +
+                            "SELECT SUM(value) " +
+                            "FROM RevisionVote " +
+                            "WHERE revision_id = Revision.id), 0) AS votes " +
+                            (currentUser != null
+                                    ? ", COALESCE((SELECT value FROM RevisionVote WHERE user_id = ? AND revision_id = Revision.id), 0) AS voted "
+                                    : " "
+                            ) +
+                            "FROM Revision " +
+                            "WHERE table_name = ? AND primary_key = ? " +
+                            "ORDER BY created_at DESC"
+            );
+            int paramIndex = 1;
             if (currentUser != null) {
-                revision.setVoted(resultSet.getInt("voted"));
-            } else {
-                revision.setVoted(0);
-            }
-            revisions.add(revision);
-        }
+                statement.setLong(paramIndex++, currentUser);
 
+            }
+            statement.setString(paramIndex++, tableName);
+            statement.setLong(paramIndex++, primaryKey);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Revision revision = fromResultSet(resultSet);
+                revision.setEdits(RevisionEditDao.getInstance().getAllByRevisionId(revision.getId()));
+                revision.setVotes(resultSet.getInt("votes"));
+                if (currentUser != null) {
+                    revision.setVoted(resultSet.getInt("voted"));
+                } else {
+                    revision.setVoted(0);
+                }
+                revisions.add(revision);
+            }
+
+        }
         return revisions;
+
     }
 
     public ArrayList<Revision> getRevisionsForLocation(Long locationId, Long currentUser) throws SQLException {
@@ -264,33 +270,34 @@ public class RevisionDao {
 
     public void vote(Long revisionId, Long id, int value) throws SQLException {
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT value FROM RevisionVote WHERE revision_id = ? AND user_id = ?"
-        );
-        statement.setLong(1, revisionId);
-        statement.setLong(2, id);
-        ResultSet resultSet = statement.executeQuery();
-        if (!resultSet.next()) {
-            statement = conn.prepareStatement("INSERT INTO RevisionVote (revision_id, user_id, value) VALUES (?, ?, ?)");
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT value FROM RevisionVote WHERE revision_id = ? AND user_id = ?"
+            );
             statement.setLong(1, revisionId);
             statement.setLong(2, id);
-            statement.setInt(3, value);
-            statement.executeUpdate();
-            return;
-        } else {
-            int previousValue = resultSet.getInt(1);
-            if (previousValue == value) {
-                statement = conn.prepareStatement("DELETE FROM RevisionVote WHERE revision_id = ? AND user_id = ?");
+            ResultSet resultSet = statement.executeQuery();
+            if (!resultSet.next()) {
+                statement = conn.prepareStatement("INSERT INTO RevisionVote (revision_id, user_id, value) VALUES (?, ?, ?)");
                 statement.setLong(1, revisionId);
                 statement.setLong(2, id);
+                statement.setInt(3, value);
                 statement.executeUpdate();
+                return;
             } else {
-                statement = conn.prepareStatement("UPDATE RevisionVote SET value = ? WHERE revision_id = ? AND user_id = ?");
-                statement.setInt(1, value);
-                statement.setLong(2, revisionId);
-                statement.setLong(3, id);
-                statement.executeUpdate();
+                int previousValue = resultSet.getInt(1);
+                if (previousValue == value) {
+                    statement = conn.prepareStatement("DELETE FROM RevisionVote WHERE revision_id = ? AND user_id = ?");
+                    statement.setLong(1, revisionId);
+                    statement.setLong(2, id);
+                    statement.executeUpdate();
+                } else {
+                    statement = conn.prepareStatement("UPDATE RevisionVote SET value = ? WHERE revision_id = ? AND user_id = ?");
+                    statement.setInt(1, value);
+                    statement.setLong(2, revisionId);
+                    statement.setLong(3, id);
+                    statement.executeUpdate();
+                }
             }
         }
     }

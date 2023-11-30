@@ -53,11 +53,5 @@ public class UserSessionFilter implements Filter {
         }
 
         chain.doFilter(request, response);
-
-        try {
-            Database.closeConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

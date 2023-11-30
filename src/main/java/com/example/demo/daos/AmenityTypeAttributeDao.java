@@ -47,12 +47,13 @@ public class AmenityTypeAttributeDao {
 
     public List<AmenityTypeAttribute> getAll() throws SQLException {
         ArrayList<AmenityTypeAttribute> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM AmenityType");
-        ResultSet resultSet = statement.executeQuery();
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM AmenityType");
+            ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            amenityTypes.add(fromResultSet(resultSet));
+            while (resultSet.next()) {
+                amenityTypes.add(fromResultSet(resultSet));
+            }
         }
 
         return amenityTypes;
@@ -106,17 +107,18 @@ public class AmenityTypeAttributeDao {
     public List<String> getAllTextValuesForAttribute(Long attributeId) throws SQLException {
         ArrayList<String> attributeValues = new ArrayList<>();
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
+            );
 
-        statement.setDouble(1, attributeId);
+            statement.setDouble(1, attributeId);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            attributeValues.add(resultSet.getString("value"));
+            while (resultSet.next()) {
+                attributeValues.add(resultSet.getString("value"));
+            }
         }
 
         return attributeValues;
@@ -232,24 +234,25 @@ public class AmenityTypeAttributeDao {
     }
 
     public Optional<MinMax> getMinMaxIntValuesForAttribute(Long attributeId) throws SQLException {
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT MIN(value), MAX(value) FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT MIN(value), MAX(value) FROM AmenityAttributeRecord WHERE amenity_attribute_id = ?"
+            );
 
-        statement.setDouble(1, attributeId);
+            statement.setDouble(1, attributeId);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        if (resultSet.next()) {
-            try {
-                MinMax minMax = new MinMax(
-                        resultSet.getInt(1),
-                        resultSet.getInt(2)
-                );
-                return Optional.of(minMax);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (resultSet.next()) {
+                try {
+                    MinMax minMax = new MinMax(
+                            resultSet.getInt(1),
+                            resultSet.getInt(2)
+                    );
+                    return Optional.of(minMax);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
