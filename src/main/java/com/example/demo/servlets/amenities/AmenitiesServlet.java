@@ -281,12 +281,6 @@ public class AmenitiesServlet extends HttpServlet {
 
     public void edit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
 
-        Enumeration<String> params = request.getParameterNames();
-        while(params.hasMoreElements()){
-            String paramName = params.nextElement();
-            System.out.println("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
-        }
-
         User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
         if (user == null) {
             return;
@@ -308,6 +302,7 @@ public class AmenitiesServlet extends HttpServlet {
         AmenityForm postForm;
 
         List<AmenityTypeAttributeRecordWithName> prevAmenityAttributesWithNames = new ArrayList<>();
+        List<AmenityTypeAttributeRecordWithName> prevAmenityAttributes = new ArrayList<>();
         List<AmenityTypeAttributeRecord> postAmenityAttributes = new ArrayList<>();
 
         if(request.getMethod().equals("GET")){
@@ -334,7 +329,6 @@ public class AmenitiesServlet extends HttpServlet {
                 List<AmenityTypeAttribute> attributes = AmenityTypeAttributeDao.getInstance().getAllByAmenityType(preForm.getTypeId());
                 String value = "";
                 String name = "";
-
 
                 for(AmenityTypeAttribute attribute : attributes){
                     AmenityTypeAttributeRecordWithName attributeRecord = new AmenityTypeAttributeRecordWithName();
@@ -364,7 +358,6 @@ public class AmenitiesServlet extends HttpServlet {
 
         }
         else {
-            System.out.println("POST METHOD");
 
             postForm = new AmenityForm(request);
             postForm.setLocationId(amenity.get().getLocationId());
@@ -372,20 +365,15 @@ public class AmenitiesServlet extends HttpServlet {
 
             String action = request.getParameter("action");
 
-            System.out.println(action);
-
             if (action != null) {
                 if (action.equals("submit")) {
                     Validation v = postForm.validate();
-                    System.out.println(v.getMessages());
                     if (v.isValid()) {
                         Amenity amenitySubmitted = new Amenity();
                         amenitySubmitted.setUserId(user.getId());
                         amenitySubmitted.setName(postForm.getName());
                         amenitySubmitted.setDescription(postForm.getDescription());
                         amenitySubmitted.setId(amenity.get().getId());
-
-                        System.out.println("\n\n\nhere!\n\n\n");
 
                         AmenityDao.getInstance().update(amenitySubmitted);
 
@@ -397,10 +385,17 @@ public class AmenitiesServlet extends HttpServlet {
 
                             postAmenityAttributes.add(attributeRecord);
 
+                            AmenityTypeAttributeRecordWithName prevAttributeRec = new AmenityTypeAttributeRecordWithName();
+                            prevAttributeRec.setAmenityId(amenity.get().getId());
+                            prevAttributeRec.setAmenityAttributeId(attribute.getId());
+                            prevAttributeRec.setValue(AmenityTypeAttributeDao.getInstance().getValueForAttribute(attribute.getId(), amenity.get().getId()));
+                            prevAttributeRec.setName(AmenityTypeAttributeDao.getInstance().getAttributeName(amenity.get().getAmenityTypeId()));
+                            prevAmenityAttributes.add(prevAttributeRec);
+
                             AmenityDao.getInstance().updateAmenityRecord(attributeRecord);
                         }
 
-                        RevisionDao.getInstance().createRevisionForAmenityEdit(amenity.get(), amenitySubmitted, postAmenityAttributes);
+                        RevisionDao.getInstance().createRevisionForAmenityEdit(amenity.get(), amenitySubmitted, prevAmenityAttributes);
 
                         response.sendRedirect(request.getContextPath() + "/amenities?f=get&id=" + amenity.get().getId());
                         return;
