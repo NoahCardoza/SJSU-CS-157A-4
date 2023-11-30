@@ -119,7 +119,7 @@ public class AmenityDao {
 
         Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("UPDATE hidden_gems.Amenity SET user_id = ?, description=?, name=? WHERE id = ?");
+        PreparedStatement statement = conn.prepareStatement("UPDATE Amenity SET user_id = ?, description=?, name=? WHERE id = ?");
 
         statement.setLong(1, amenity.getUserId());
         statement.setString(2, escapeHtml(amenity.getDescription()));
