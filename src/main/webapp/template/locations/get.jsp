@@ -25,8 +25,15 @@
             <img  class="img-thumbnail" width="200" height="200" src="<c:url value="/locations?f=mapImage&id=${location.id}" />"  alt="Map image"/>
 
             <div class="btn-group btn-group-sm mt-2">
-                <a class="btn btn-warning" href="<c:url value="/revisions?f=list&type=Location&id=${location.id}"/>">Revisions</a>
-                <a class="btn btn-secondary" href="<c:url value="/locations?f=edit&id=${location.id}"/>">Edit</a>
+                <a class="btn btn-primary" href="<c:url value="/amenities?f=create&location_id=${location.id}"/>" title="Create Amenity">
+                    <i class="bi bi-plus-circle"></i> Amenity
+                </a>
+                <a class="btn btn-primary" href="<c:url value="/locations?f=edit&id=${location.id}"/>" title="Edit">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </a>
+                <a class="btn btn-primary" href="<c:url value="/revisions?f=list&type=Location&id=${location.id}"/>" title="Revisions">
+                    <i class="bi bi-clock-history"></i> Revisions
+                </a>
             </div>
         </div>
     </div>
