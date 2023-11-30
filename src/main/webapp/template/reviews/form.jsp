@@ -41,7 +41,7 @@
                     <c:forEach var="metric" items="${metrics}">
                         <div class="form-group">
                             <label for="metric-${metric.amenityMetricId}">${metric.name}</label>
-                            <input class="form-control" required min="0" max="5" type="text" id="metric-${metric.amenityMetricId}" name="metric-${metric.amenityMetricId}" placeholder="Rate 0 to 5" value="${metric.value}"/>
+                            <input class="form-control" required min="0" max="5" type="number" id="metric-${metric.amenityMetricId}" name="metric-${metric.amenityMetricId}" placeholder="Rate 0 to 5" value="${metric.value}"/>
                         </div>
                     </c:forEach>
                 </div>

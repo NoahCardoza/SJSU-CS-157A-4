@@ -183,11 +183,8 @@ public class ReviewDao {
                                 ? ", COALESCE((SELECT value FROM ReviewVote WHERE user_id = ? AND review_id = Review.id), 0) AS voted " //if not null, replace Vote value and pair with review and user ID
                                 : " "
                         ) +
-
-                        "FROM Review WHERE amenity_id = ? " + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0 " : " ")) +
-                        "ORDER BY created_at DESC" +
-
-                        "FROM Review WHERE amenity_id = ?" + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0" : " ")) //match review with amenityID
+                        "FROM Review WHERE amenity_id = ? " + ((showHidden.equals(Boolean.FALSE) ? " AND hidden = 0 " : " ")) +  // match review with amenityID
+                        "ORDER BY created_at DESC"
 
         );
         int paramIndex = 1;
