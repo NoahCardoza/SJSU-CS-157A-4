@@ -114,6 +114,7 @@ public class UsersServlet extends HttpServlet {
             }
 
             profile.get().setUsername(form.getUsername());
+            profile.get().setName(form.getName());
             if (form.isPasswordChanged()) {
                 if (Security.checkPassword(form.getOldPassword(), profile.get().getPassword())) {
                     profile.get().setPassword(Security.hashPassword(form.getNewPassword()));
@@ -131,7 +132,7 @@ public class UsersServlet extends HttpServlet {
                         new Alert(
                                 "danger",
                                 switch (e.getErrorCode()) {
-                                    case 1062 -> "Username is already in use.";
+                                    case 1062 -> "Username or name is already in use.";
                                     case 1406 -> "A field is too long.";
                                     case 1048 -> "A required field is missing.";
                                     default -> "An unexpected error occurred.";

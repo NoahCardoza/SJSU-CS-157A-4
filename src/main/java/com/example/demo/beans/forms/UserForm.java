@@ -5,21 +5,16 @@ import jakarta.servlet.http.HttpServletRequest;
 public class UserForm {
     private String username;
     private String email;
+    private String name;
     private String oldPassword;
     private String newPassword;
 
     private boolean passwordChanged = false;
 
-    public UserForm(String username, String email, String oldPassword, String newConfirmation) {
-        this.username = username;
-        this.email = email;
-        this.oldPassword = oldPassword;
-        this.newPassword = newConfirmation;
-    }
-
     public UserForm(HttpServletRequest request) {
         this.username = request.getParameter("username");
         this.email = request.getParameter("email");
+        this.name = request.getParameter("name");
         this.oldPassword = request.getParameter("oldPassword");
         this.newPassword = request.getParameter("newPassword");
     }
@@ -31,6 +26,10 @@ public class UserForm {
 
         if (email == null || email.isBlank()) {
             return "Email is required.";
+        }
+
+        if (name == null || name.isBlank()) {
+            return "Name is required.";
         }
 
         if (!(newPassword == null || newPassword.isBlank())) {
@@ -51,6 +50,13 @@ public class UserForm {
     }
 
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getUsername() {
         return username;

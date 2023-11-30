@@ -69,6 +69,11 @@
                                 <div id="emailHelp" class="form-text">This feature is coming soon.</div>
                             </div>
                             <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" name="name" class="form-control" id="name" aria-describedby="nameHelp" value="${form.name}">
+                                <div id="nameHelp" class="form-text">By default your name is not shared with other users.</div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="oldPassword" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="oldPassword" name="oldPassword">
                             </div>
