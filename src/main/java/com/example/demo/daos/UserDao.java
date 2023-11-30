@@ -67,17 +67,20 @@ public class UserDao {
     public Long create(User user) throws SQLException {
         try (Connection conn = Database.getConnection()) {
 
-            PreparedStatement statement = conn.prepareStatement(INSERT);
-            statement.setString(1, escapeHtml(user.getUsername()));
-            statement.setString(2, user.getEmail());
-            statement.setString(3, user.getNormalizedEmail());
-            statement.setString(4, user.getPassword());
-            statement.setBoolean(5, user.isVerified() == null ? false : user.isVerified());
-            statement.setString(6, escapeHtml(user.getName()));
+            PreparedStatement ps = conn.prepareStatement(INSERT, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, escapeHtml(user.getUsername()));
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getNormalizedEmail());
+            ps.setString(4, user.getPassword());
+            ps.setBoolean(5, user.isVerified() == null ? false : user.isVerified());
+            ps.setString(6, escapeHtml(user.getName()));
 
-            statement.executeUpdate();
+            ps.executeUpdate();
 
-            user.setId(Database.getLastInsertedId("User"));
+            ResultSet rs = ps.getGeneratedKeys();
+            rs.next();
+            user.setId(rs.getLong(1));
+
             // get the id of the newly created user
             return user.getId();
         }

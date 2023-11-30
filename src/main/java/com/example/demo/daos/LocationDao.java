@@ -101,23 +101,28 @@ public class LocationDao {
 
     public Long create(Location location) throws SQLException {
         try (Connection conn = Database.getConnection()) {
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            statement.setLong(1, location.getUserId());
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO Location (user_id, parent_location_id, longitude, latitude, name, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            ps.setLong(1, location.getUserId());
             if (location.getParentLocationId() == null) {
-                statement.setNull(2, Types.INTEGER);
+                ps.setNull(2, Types.INTEGER);
             } else {
-                statement.setDouble(2, location.getParentLocationId());
+                ps.setDouble(2, location.getParentLocationId());
             }
-            statement.setDouble(3, location.getLongitude());
-            statement.setDouble(4, location.getLatitude());
-            statement.setString(5, escapeHtml(location.getName()));
-            statement.setString(6, escapeHtml(location.getAddress()));
-            statement.setString(7, escapeHtml(location.getDescription()));
+            ps.setDouble(3, location.getLongitude());
+            ps.setDouble(4, location.getLatitude());
+            ps.setString(5, escapeHtml(location.getName()));
+            ps.setString(6, escapeHtml(location.getAddress()));
+            ps.setString(7, escapeHtml(location.getDescription()));
 
-            statement.executeUpdate();
+            ps.executeUpdate();
 
-            location.setId(Database.getLastInsertedId("Location"));
-
+            ResultSet rs = ps.getGeneratedKeys();
+            rs.next();
+            location.setId(rs.getLong(1));
+            
             return location.getId();
         }
     }

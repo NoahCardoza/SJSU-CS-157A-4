@@ -98,16 +98,21 @@ public class ReviewDao {
     public static Long create(Review review) throws SQLException {
         try (Connection conn = Database.getConnection()) {
 
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO Review (amenity_id,user_id, description,name) VALUES (?, ?, ?, ?)"); //insert review description and name based on the userID and amenityID selected
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO Review (amenity_id,user_id, description,name) VALUES (?, ?, ?, ?)", //insert review description and name based on the userID and amenityID selected
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
 
-            statement.setLong(1, review.getAmenityId());
-            statement.setLong(2, review.getUserId());
-            statement.setString(3, escapeHtml(review.getDescription()));
-            statement.setString(4, escapeHtml(review.getName()));
+            ps.setLong(1, review.getAmenityId());
+            ps.setLong(2, review.getUserId());
+            ps.setString(3, escapeHtml(review.getDescription()));
+            ps.setString(4, escapeHtml(review.getName()));
 
-            statement.executeUpdate();
+            ps.executeUpdate();
 
-            review.setId(Database.getLastInsertedId("Review"));
+            ResultSet rs = ps.getGeneratedKeys();
+            rs.next();
+            review.setId(rs.getLong(1));
 
             return review.getId();
         }

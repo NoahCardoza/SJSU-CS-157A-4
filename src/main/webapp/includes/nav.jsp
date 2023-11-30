@@ -25,7 +25,7 @@
                     <a class="nav-link <%= path.equals(request.getContextPath() + "/") ? "active" : "" %>" aria-current="page" href="<c:url value="/" />">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= path.startsWith("/locations") ? "active" : "" %>" href="<c:url value="/locations?f=map"/>">Map</a>
+                    <a class="nav-link <%= path.startsWith("/locations") && path.contains("f=map") ? "active" : "" %>" href="<c:url value="/locations?f=map"/>">Map</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <%= path.startsWith("/search") ? "active" : "" %>" href="<c:url value="/search"/>">Search</a>

@@ -21,13 +21,4 @@ public class Database {
             throw new RuntimeException(e);
         }
     }
-
-    static public Long getLastInsertedId(String table) throws SQLException {
-        try (Connection conn = getConnection()) {
-            PreparedStatement ps = conn.prepareStatement("SELECT last_insert_id() FROM " + table + ";");
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            return rs.getLong(1);
-        }
-    }
 }
