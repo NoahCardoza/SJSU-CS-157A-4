@@ -117,9 +117,6 @@ public class AmenityDao {
     //TODO: need to update this statement with amenity
     public void update(Amenity amenity) throws SQLException {
 
-        System.out.println("UPDATE METHOD");
-        System.out.println(amenity);
-
         Connection conn = Database.getConnection();
 
         PreparedStatement statement = conn.prepareStatement("UPDATE hidden_gems.Amenity SET user_id = ?, description=?, name=? WHERE id = ?");

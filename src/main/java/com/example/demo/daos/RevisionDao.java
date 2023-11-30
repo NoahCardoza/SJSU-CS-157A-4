@@ -2,6 +2,7 @@ package com.example.demo.daos;
 
 import com.example.demo.Database;
 import com.example.demo.beans.entities.*;
+import software.amazon.awssdk.awscore.util.SignerOverrideUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -192,7 +193,8 @@ public class RevisionDao {
         return revisionId;
     }
 
-    public Long createRevisionForAmenityEdit(Amenity prev, Amenity next, List<AmenityTypeAttributeRecord> nextAttr) throws SQLException {
+    public Long createRevisionForAmenityEdit(Amenity prev, Amenity next, List<AmenityTypeAttributeRecordWithName> prevAttr) throws SQLException {
+
         ArrayList<String> columns = new ArrayList<>();
         ArrayList<String> preValue = new ArrayList<>();
         ArrayList<String> nextValue = new ArrayList<>();
@@ -212,41 +214,43 @@ public class RevisionDao {
             nextValue.add(next.getDescription());
         }
 
-        if (columns.isEmpty()) {
-            return null;
-        }
-
         Revision amenityRevision = new Revision();
         amenityRevision.setUserId(userId);
         amenityRevision.setTableName("Amenity");
         amenityRevision.setPrimaryKey(prev.getId());
         Long revisionId = RevisionDao.getInstance().create(amenityRevision);
 
-        for (int i = 0; i < columns.size(); i++) {
-            RevisionEdit edit = new RevisionEdit();
-            edit.setRevisionId(revisionId);
+        if(!columns.isEmpty()){
+            for (int i = 0; i < columns.size(); i++) {
+                RevisionEdit edit = new RevisionEdit();
+                edit.setRevisionId(revisionId);
 
-            edit.setTableName("Amenity");
-            edit.setPrimaryKey(prev.getId());
-            edit.setColumnName(columns.get(i));
-            edit.setPreviousValue(preValue.get(i));
-            edit.setNewValue(nextValue.get(i));
-            RevisionEditDao.getInstance().create(edit);
+                edit.setTableName("Amenity");
+                edit.setPrimaryKey(prev.getId());
+                edit.setColumnName(columns.get(i));
+                edit.setPreviousValue(preValue.get(i));
+                edit.setNewValue(nextValue.get(i));
+                RevisionEditDao.getInstance().create(edit);
+            }
         }
 
         // Attribute revision
-        for(AmenityTypeAttributeRecord curNewAttr : nextAttr){
+        for(AmenityTypeAttributeRecordWithName oldAttr : prevAttr){
 
-            String prevVal = AmenityTypeAttributeDao.getInstance().getValueForAttribute(curNewAttr.getAmenityAttributeId(), curNewAttr.getAmenityId());
+            String newVal = AmenityTypeAttributeDao.getInstance().getValueForAttribute(oldAttr.getAmenityAttributeId(), oldAttr.getAmenityId());
 
-            if(valuesDiffer(prevVal, curNewAttr.getValue())){
+            System.out.println(newVal);
+            System.out.println(oldAttr.getValue());
+
+            if(valuesDiffer(newVal, oldAttr.getValue())){
                 RevisionEdit edit = new RevisionEdit();
                 edit.setRevisionId(revisionId);
 
                 edit.setTableName("AmenityAttributeRecord");
-                edit.setPrimaryKey(curNewAttr.getAmenityAttributeId());
-                edit.setPreviousValue(prevVal);
-                edit.setNewValue(curNewAttr.getValue());
+                edit.setPrimaryKey(oldAttr.getAmenityAttributeId());
+                edit.setColumnName(oldAttr.getName());
+                edit.setPreviousValue(oldAttr.getValue());
+                edit.setNewValue(newVal);
                 RevisionEditDao.getInstance().create(edit);
             }
         }
