@@ -78,7 +78,8 @@ public class RevisionDao {
                                 : " "
                         ) +
                     "FROM Revision " +
-                    "WHERE table_name = ? AND primary_key = ?"
+                    "WHERE table_name = ? AND primary_key = ? " +
+                    "ORDER BY created_at DESC"
         );
         int paramIndex = 1;
         if (currentUser != null) {
@@ -96,6 +97,8 @@ public class RevisionDao {
             revision.setVotes(resultSet.getInt("votes"));
             if (currentUser != null) {
                 revision.setVoted(resultSet.getInt("voted"));
+            } else {
+                revision.setVoted(0);
             }
             revisions.add(revision);
         }

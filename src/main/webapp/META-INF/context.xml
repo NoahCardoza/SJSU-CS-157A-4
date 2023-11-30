@@ -6,7 +6,7 @@
         type="javax.sql.DataSource"
         username="${RDS_USERNAME}"
         password="${RDS_PASSWORD}"
-        driverClassName="com.mysql.jdbc.Driver"
+        driverClassName="com.mysql.cj.jdbc.Driver"
         url="jdbc:mysql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}"
         maxTotal="16"
         maxIdle="8"

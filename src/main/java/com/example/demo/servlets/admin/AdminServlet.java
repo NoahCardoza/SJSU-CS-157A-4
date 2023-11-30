@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -147,7 +148,7 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    private void amenityTypeCreatePost(HttpServletRequest request, HttpServletResponse response) {
+    private void amenityTypeCreatePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         AmenityType amenityType = new AmenityType();
         amenityType.setName(request.getParameter("name"));
         amenityType.setDescription(request.getParameter("description"));
@@ -155,12 +156,10 @@ public class AdminServlet extends HttpServlet {
         String attributes = request.getParameter("attributes");
         String metrics = request.getParameter("metrics");
 
-        // TODO: validate
-
         try {
-            amenityType.setId(AmenityTypeDao.getInstance().create(amenityType));
-
             List<String> attributeList = Arrays.asList(attributes.split(","));
+            List<AmenityTypeAttribute> attributeObjects = new ArrayList<AmenityTypeAttribute>();
+            List<AmenityTypeMetric> metricObjects = new ArrayList<AmenityTypeMetric>();
 
             for(String attribute:attributeList){
                 List<String> attributeWithType = Arrays.asList(attribute.split(":"));
@@ -169,7 +168,8 @@ public class AdminServlet extends HttpServlet {
                 newAttribute.setName(attributeWithType.get(0));
                 newAttribute.setAmenityTypeId(amenityType.getId());
                 newAttribute.setType(attributeWithType.get(1));
-                AmenityTypeAttributeDao.getInstance().create(newAttribute);
+
+                attributeObjects.add(newAttribute);
             }
 
             List<String> metricList = Arrays.asList(metrics.split(","));
@@ -177,14 +177,34 @@ public class AdminServlet extends HttpServlet {
                 AmenityTypeMetric newMetric = new AmenityTypeMetric();
                 newMetric.setName(metric);
                 newMetric.setAmenityTypeId(amenityType.getId());
-                AmenityTypeMetricDao.getInstance().create(newMetric);
+                metricObjects.add(newMetric);
             }
 
+            amenityType.setId(AmenityTypeDao.getInstance().create(amenityType));
+            for(AmenityTypeAttribute attribute:attributeObjects){
+                attribute.setAmenityTypeId(amenityType.getId());
+                AmenityTypeAttributeDao.getInstance().create(attribute);
+            }
+            for(AmenityTypeMetric metric:metricObjects){
+                metric.setAmenityTypeId(amenityType.getId());
+                AmenityTypeMetricDao.getInstance().create(metric);
+            }
             response.sendRedirect(request.getContextPath() + "/admin");
-        } catch (SQLException | IOException e) {
+
+        } catch (RuntimeException e){
             e.printStackTrace();
             request.setAttribute("amenityType", amenityType);
-            request.setAttribute("alert", new Alert("danger", "Failed to insert amenity type."));
+            request.setAttribute("alert", new Alert("danger", "Failed parse input."));
+            request.getRequestDispatcher("/template/admin/amenityTypeCreate.jsp").forward(request, response);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("amenityType", amenityType);
+            if (e.getErrorCode() == 1062) {
+                request.setAttribute("alert", new Alert("danger", "Failed to insert amenity type. Duplicate name."));
+            } else {
+                request.setAttribute("alert", new Alert("danger", "Failed to insert amenity type."));
+            }
+            request.getRequestDispatcher("/template/admin/amenityTypeCreate.jsp").forward(request, response);
         }
     }
 

@@ -22,22 +22,23 @@ public class LocationDao {
     private LocationDao() {}
 
     public List<Location> getAll() throws SQLException {
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        List<Location> results = new ArrayList<>();
+            List<Location> results = new ArrayList<>();
 
-        if (conn == null) {
+            if (conn == null) {
+                return results;
+            }
+
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location");
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                results.add(fromResultSet(resultSet));
+            }
+
             return results;
         }
-
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location");
-        ResultSet resultSet = statement.executeQuery();
-
-        while (resultSet.next()) {
-            results.add(fromResultSet(resultSet));
-        }
-
-        return results;
     }
 
     public Optional<Location> get(long id) throws SQLException {
@@ -123,39 +124,43 @@ public class LocationDao {
 
 
     public void update(Location location) throws SQLException {
-        PreparedStatement ps = Database.getConnection().prepareStatement("UPDATE Location SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("UPDATE Location SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
 
-        ps.setLong(1, location.getUserId());
+            ps.setLong(1, location.getUserId());
 
-        if (location.getParentLocationId() == null) {
-            ps.setNull(2, Types.INTEGER);
-        } else {
-            ps.setDouble(2, location.getParentLocationId());
+            if (location.getParentLocationId() == null) {
+                ps.setNull(2, Types.INTEGER);
+            } else {
+                ps.setDouble(2, location.getParentLocationId());
+            }
+            ps.setDouble(3, location.getLongitude());
+            ps.setDouble(4, location.getLatitude());
+            ps.setString(5, escapeHtml(location.getName()));
+            ps.setString(6, escapeHtml(location.getAddress()));
+            ps.setString(7, escapeHtml(location.getDescription()));
+            ps.setLong(8, location.getId());
+
+            ps.executeUpdate();
         }
-        ps.setDouble(3, location.getLongitude());
-        ps.setDouble(4, location.getLatitude());
-        ps.setString(5, escapeHtml(location.getName()));
-        ps.setString(6, escapeHtml(location.getAddress()));
-        ps.setString(7, escapeHtml(location.getDescription()));
-        ps.setLong(8, location.getId());
-
-        ps.executeUpdate();
     }
 
     public ArrayList<Location> search(Double longitude, Double latitude, Integer radius) throws SQLException {
-        PreparedStatement ps = Database.getConnection().prepareStatement("SELECT * FROM Location WHERE ST_Distance_Sphere(point(longitude, latitude), point(?, ?)) <= ?");
-        ps.setDouble(1, longitude);
-        ps.setDouble(2, latitude);
-        ps.setDouble(3, radius);
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM Location WHERE ST_Distance_Sphere(point(longitude, latitude), point(?, ?)) <= ?");
+            ps.setDouble(1, longitude);
+            ps.setDouble(2, latitude);
+            ps.setDouble(3, radius);
 
-        ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-        ArrayList<Location> locations = new ArrayList<>();
+            ArrayList<Location> locations = new ArrayList<>();
 
-        while (rs.next()) {
-            locations.add(fromResultSet(rs));
+            while (rs.next()) {
+                locations.add(fromResultSet(rs));
+            }
+
+            return locations;
         }
-
-        return locations;
     }
 }

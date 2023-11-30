@@ -38,7 +38,7 @@ public class SignupServlet extends HttpServlet {
 
             try {
                 UserDao.getInstance().verifyEmail(userId);
-                Guard.redirectToLogin(request, response, new Alert("success", "Your email has been verified!"));
+                Guard.redirectTo(request, response, 301, "/login", new Alert("success", "Your email has been verified!"));
                 return;
             } catch (SQLException e) {
                 e.printStackTrace();

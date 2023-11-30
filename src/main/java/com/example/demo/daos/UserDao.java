@@ -38,7 +38,9 @@ public class UserDao {
         ResultSet resultSet = statement.executeQuery();
 
         if (resultSet.next()) {
-            return Optional.of(fromResultSet(resultSet));
+            User user = fromResultSet(resultSet);
+            user.setName(resultSet.getString("name"));
+            return Optional.of(user);
         }
 
         return Optional.empty();
@@ -57,7 +59,6 @@ public class UserDao {
         user.setPassword(resultSet.getString("password"));
         user.setCreatedAt(resultSet.getTimestamp("created_at"));
         user.setVerified(resultSet.getBoolean("verified"));
-        user.setName(resultSet.getString("name"));
 
         return user;
     }

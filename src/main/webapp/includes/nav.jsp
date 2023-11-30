@@ -11,7 +11,7 @@
     }
 %>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light px-2">
+<nav class="navbar navbar-expand-sm navbar-light bg-light px-2">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
             <img src="<c:url value="/img/logo-sm.png"/>" alt="Hidden Gems" style="height: 30px">
@@ -41,7 +41,7 @@
                     </li>
                 </c:if>
                 <c:if test="${!isLoggedIn}">
-                    <li class="nav-item ms-lg-auto">
+                    <li class="nav-item ms-sm-auto">
                         <a class="nav-link <%= path.startsWith("/login") ? "active" : "" %>" href="<c:url value="/login" />">Login</a>
                     </li>
                     <li class="nav-item">
@@ -49,7 +49,7 @@
                     </li>
                 </c:if>
                 <c:if test="${isLoggedIn}">
-                    <li class="nav-item ms-lg-auto">
+                    <li class="nav-item ms-sm-auto">
                         <a class="nav-link" href="<c:url value="/users?f=get&id=${user.id}" />">
                             <i class="bi bi-person-circle"></i>
                             ${user.username}

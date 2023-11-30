@@ -74,28 +74,29 @@ public class AmenityTypeAttributeDao {
     public List<AmenityTypeAttribute> getAllByAmenityType(Long amenityTypeId) throws SQLException {
         ArrayList<AmenityTypeAttribute> amenityTypes = new ArrayList<>();
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT * FROM AmenityTypeAttribute WHERE amenity_type_id IN (" +
-                        "WITH RECURSIVE amenity_type_hierarchy AS (\n" +
-                                "        SELECT id, parent_amenity_type_id\n" +
-                                "        FROM AmenityType\n" +
-                                "        WHERE id = ?\n" +
-                                "        UNION ALL\n" +
-                                "        SELECT\n" +
-                                "        e.id,\n" +
-                                "        e.parent_amenity_type_id\n" +
-                                "        FROM AmenityType e, amenity_type_hierarchy\n" +
-                                "        WHERE amenity_type_hierarchy.parent_amenity_type_id = e.id\n" +
-                                "    ) SELECT id FROM amenity_type_hierarchy)"
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT * FROM AmenityTypeAttribute WHERE amenity_type_id IN (" +
+                            "WITH RECURSIVE amenity_type_hierarchy AS (\n" +
+                            "        SELECT id, parent_amenity_type_id\n" +
+                            "        FROM AmenityType\n" +
+                            "        WHERE id = ?\n" +
+                            "        UNION ALL\n" +
+                            "        SELECT\n" +
+                            "        e.id,\n" +
+                            "        e.parent_amenity_type_id\n" +
+                            "        FROM AmenityType e, amenity_type_hierarchy\n" +
+                            "        WHERE amenity_type_hierarchy.parent_amenity_type_id = e.id\n" +
+                            "    ) SELECT id FROM amenity_type_hierarchy)"
+            );
 
-        statement.setDouble(1, amenityTypeId);
+            statement.setDouble(1, amenityTypeId);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            amenityTypes.add(fromResultSet(resultSet));
+            while (resultSet.next()) {
+                amenityTypes.add(fromResultSet(resultSet));
+            }
         }
 
         return amenityTypes;

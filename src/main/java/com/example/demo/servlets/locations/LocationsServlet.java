@@ -463,7 +463,7 @@ public class LocationsServlet extends HttpServlet {
                             request.setAttribute("alert", new Alert("danger", v.getMessages().get(0)));
                         }
                     } else if (action.equals("select")) {
-                        request.setAttribute("alert", new Alert("success", "Amenity type selected!"));
+                        request.setAttribute("alert", new Alert("success", "Location parent selected!"));
                     } else {
                         request.setAttribute("alert", new Alert("danger", "Invalid action"));
                     }

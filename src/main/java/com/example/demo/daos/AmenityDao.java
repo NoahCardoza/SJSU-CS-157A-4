@@ -153,7 +153,7 @@ public class AmenityDao {
             }
             else {
                 PreparedStatement ps = conn.prepareStatement(
-                        "UPDATE hidden_gems.AmenityAttributeRecord SET value = ? WHERE amenity_attribute_id = ? AND amenity_id = ?"
+                        "UPDATE AmenityAttributeRecord SET value = ? WHERE amenity_attribute_id = ? AND amenity_id = ?"
                 );
 
                 ps.setString(1, escapeHtml(record.getValue()));

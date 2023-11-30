@@ -10,10 +10,11 @@
 
 <div class="card" id="review-${review.id}">
     <div class="card-header d-flex justify-content-between align-items-center" >
-        <span class="text-muted">
-            <i class="bi bi-person-circle"></i>
-                ${review.user.username}
-        </span>
+        <div class="text-muted d-flex align-items-center">
+            <a href="<c:url value="/users?f=get&id=${review.user.id}"/>" class="btn btn-link text-muted ps-0 text-decoration-none">
+                <i class="bi bi-person-circle me-2"></i>${review.user.username}
+            </a>
+        </div>
         <span class="small text-muted">
             <%-- TODO: make timeZone dynamic --%>
             <fmt:formatDate pattern="d MMMM, YYYY 'at' hh:mm:ss a" value = "${review.createdAt}" timeZone="GMT-8" />
