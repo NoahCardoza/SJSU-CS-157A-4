@@ -69,25 +69,28 @@ public class AmenityTypeDao {
     }
 
     public Long create(AmenityType amenityType) throws SQLException {
-        Long id = 0L;
 
-        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityType (name, description) VALUES (?, ?)");
+        try (Connection conn = Database.getConnection()) {
+            Long id = 0L;
 
-        ps.setString(1, escapeHtml(amenityType.getName()));
-        ps.setString(2, escapeHtml(amenityType.getDescription()));
-        //ps.setLong(4, amenityType.getParentAmenityTypeId());
-        ps.executeUpdate();
+            var ps = conn.prepareStatement("INSERT INTO AmenityType (name, description) VALUES (?, ?)");
+
+            ps.setString(1, escapeHtml(amenityType.getName()));
+            ps.setString(2, escapeHtml(amenityType.getDescription()));
+            //ps.setLong(4, amenityType.getParentAmenityTypeId());
+            ps.executeUpdate();
 
 
-        var ret = Database.getConnection().prepareStatement("SELECT id FROM AmenityType WHERE name = ?");
-        ret.setString(1, escapeHtml(amenityType.getName()));
-        ResultSet  rs = ret.executeQuery();
+            var ret = Database.getConnection().prepareStatement("SELECT id FROM AmenityType WHERE name = ?");
+            ret.setString(1, escapeHtml(amenityType.getName()));
+            ResultSet  rs = ret.executeQuery();
 
-        while(rs.next()){
-            id = rs.getLong("id");
+            while(rs.next()){
+                id = rs.getLong("id");
+            }
+
+            return id;
         }
-
-        return id;
     }
 
     public void update(AmenityType amenityType) throws SQLException {

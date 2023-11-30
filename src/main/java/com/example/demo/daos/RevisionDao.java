@@ -199,62 +199,63 @@ public class RevisionDao {
         ArrayList<String> preValue = new ArrayList<>();
         ArrayList<String> nextValue = new ArrayList<>();
 
-        // Amenity Revision
-        Long userId = next.getUserId();
+        try (Connection conn = Database.getConnection()) {
+            // Amenity Revision
+            Long userId = next.getUserId();
 
-        if (valuesDiffer(prev.getName(), next.getName())) {
-            columns.add("name");
-            preValue.add(prev.getName());
-            nextValue.add(next.getName());
-        }
-
-        if (valuesDiffer(prev.getDescription(), next.getDescription())) {
-            columns.add("description");
-            preValue.add(prev.getDescription());
-            nextValue.add(next.getDescription());
-        }
-
-        Revision amenityRevision = new Revision();
-        amenityRevision.setUserId(userId);
-        amenityRevision.setTableName("Amenity");
-        amenityRevision.setPrimaryKey(prev.getId());
-        Long revisionId = RevisionDao.getInstance().create(amenityRevision);
-
-        if(!columns.isEmpty()){
-            for (int i = 0; i < columns.size(); i++) {
-                RevisionEdit edit = new RevisionEdit();
-                edit.setRevisionId(revisionId);
-
-                edit.setTableName("Amenity");
-                edit.setPrimaryKey(prev.getId());
-                edit.setColumnName(columns.get(i));
-                edit.setPreviousValue(preValue.get(i));
-                edit.setNewValue(nextValue.get(i));
-                RevisionEditDao.getInstance().create(edit);
+            if (valuesDiffer(prev.getName(), next.getName())) {
+                columns.add("name");
+                preValue.add(prev.getName());
+                nextValue.add(next.getName());
             }
-        }
 
-        // Attribute revision
-        for(AmenityTypeAttributeRecordWithName oldAttr : prevAttr){
-
-            String newVal = AmenityTypeAttributeDao.getInstance().getValueForAttribute(oldAttr.getAmenityAttributeId(), oldAttr.getAmenityId());
-
-            if(valuesDiffer(newVal, oldAttr.getValue())){
-                RevisionEdit edit = new RevisionEdit();
-                edit.setRevisionId(revisionId);
-
-                edit.setTableName("AmenityAttributeRecord");
-                edit.setPrimaryKey(oldAttr.getAmenityAttributeId());
-                edit.setColumnName("value");
-                edit.setPreviousValue(oldAttr.getValue());
-                edit.setNewValue(newVal);
-                RevisionEditDao.getInstance().create(edit);
+            if (valuesDiffer(prev.getDescription(), next.getDescription())) {
+                columns.add("description");
+                preValue.add(prev.getDescription());
+                nextValue.add(next.getDescription());
             }
+
+            Revision amenityRevision = new Revision();
+            amenityRevision.setUserId(userId);
+            amenityRevision.setTableName("Amenity");
+            amenityRevision.setPrimaryKey(prev.getId());
+            Long revisionId = RevisionDao.getInstance().create(amenityRevision);
+
+            if(!columns.isEmpty()){
+                for (int i = 0; i < columns.size(); i++) {
+                    RevisionEdit edit = new RevisionEdit();
+                    edit.setRevisionId(revisionId);
+
+                    edit.setTableName("Amenity");
+                    edit.setPrimaryKey(prev.getId());
+                    edit.setColumnName(columns.get(i));
+                    edit.setPreviousValue(preValue.get(i));
+                    edit.setNewValue(nextValue.get(i));
+                    RevisionEditDao.getInstance().create(edit);
+                }
+            }
+
+            // Attribute revision
+            for(AmenityTypeAttributeRecordWithName oldAttr : prevAttr){
+
+                String newVal = AmenityTypeAttributeDao.getInstance().getValueForAttribute(oldAttr.getAmenityAttributeId(), oldAttr.getAmenityId());
+
+                if(valuesDiffer(newVal, oldAttr.getValue())){
+                    RevisionEdit edit = new RevisionEdit();
+                    edit.setRevisionId(revisionId);
+
+                    edit.setTableName("AmenityAttributeRecord");
+                    edit.setPrimaryKey(oldAttr.getAmenityAttributeId());
+                    edit.setColumnName("value");
+                    edit.setPreviousValue(oldAttr.getValue());
+                    edit.setNewValue(newVal);
+                    RevisionEditDao.getInstance().create(edit);
+                }
+            }
+
+
+            return revisionId;
         }
-
-
-        return revisionId;
-
     }
 
 

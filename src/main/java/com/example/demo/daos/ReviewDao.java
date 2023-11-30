@@ -237,21 +237,21 @@ public class ReviewDao {
     public static List<String> getAllImagesForAmenity(Long amenityId) throws SQLException {
         ArrayList<String> urls = new ArrayList<>();
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT url FROM ReviewImage x LEFT JOIN Review y ON y.hidden = 0 AND x.review_id = y.id WHERE amenity_id = ?"
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT url FROM ReviewImage x LEFT JOIN Review y ON y.hidden = 0 AND x.review_id = y.id WHERE amenity_id = ?"
+            );
 
-        statement.setDouble(1, amenityId);
+            statement.setDouble(1, amenityId);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            urls.add(resultSet.getString("url"));
+            while (resultSet.next()) {
+                urls.add(resultSet.getString("url"));
+            }
+
+            return urls;
         }
-
-        return urls;
-
     }
 
     public static void vote(Review review, User user, int value) throws SQLException {

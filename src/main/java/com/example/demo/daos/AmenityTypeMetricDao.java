@@ -27,11 +27,14 @@ public class AmenityTypeMetricDao {
     private AmenityTypeMetricDao() {}
 
     public void create(AmenityTypeMetric amenityTypeMetric) throws SQLException {
-        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityTypeMetric (amenity_type_id, name) VALUES (?, ?)");
 
-        ps.setLong(1, amenityTypeMetric.getAmenityTypeId());
-        ps.setString(2, escapeHtml(amenityTypeMetric.getName()));
-        ps.executeUpdate();
+        try (Connection conn = Database.getConnection()) {
+            var ps = conn.prepareStatement("INSERT INTO AmenityTypeMetric (amenity_type_id, name) VALUES (?, ?)");
+
+            ps.setLong(1, amenityTypeMetric.getAmenityTypeId());
+            ps.setString(2, escapeHtml(amenityTypeMetric.getName()));
+            ps.executeUpdate();
+        }
     }
 
     private AmenityTypeMetric fromResultSet(ResultSet resultSet) throws SQLException {
@@ -79,9 +82,8 @@ public class AmenityTypeMetricDao {
     public List<AmenityTypeMetricRecordAveragesWithName> getAmenityMetricAverages(Amenity amenity) throws SQLException {
         ArrayList<AmenityTypeMetricRecordAveragesWithName> amenityTypes = new ArrayList<>();
 
-        Connection conn = Database.getConnection();
-
-        PreparedStatement statement = conn.prepareStatement("""
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("""
             SELECT amenity_type_id, name, AVG(value) AS value
             FROM (
                     SELECT * FROM AmenityTypeMetric WHERE amenity_type_id IN (
@@ -105,20 +107,21 @@ public class AmenityTypeMetricDao {
             GROUP BY amenity_type_id, name
         """);
 
-        statement.setDouble(1, amenity.getAmenityTypeId());
-        statement.setDouble(2, amenity.getId());
+            statement.setDouble(1, amenity.getAmenityTypeId());
+            statement.setDouble(2, amenity.getId());
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            AmenityTypeMetricRecordAveragesWithName amenityTypeMetric = new AmenityTypeMetricRecordAveragesWithName();
+            while (resultSet.next()) {
+                AmenityTypeMetricRecordAveragesWithName amenityTypeMetric = new AmenityTypeMetricRecordAveragesWithName();
 
-            amenityTypeMetric.setAmenityTypeMetricId(resultSet.getLong("amenity_type_id"));
-            amenityTypeMetric.setName(resultSet.getString("name"));
-            amenityTypeMetric.setValue(resultSet.getFloat("value"));
-            amenityTypes.add(amenityTypeMetric);
+                amenityTypeMetric.setAmenityTypeMetricId(resultSet.getLong("amenity_type_id"));
+                amenityTypeMetric.setName(resultSet.getString("name"));
+                amenityTypeMetric.setValue(resultSet.getFloat("value"));
+                amenityTypes.add(amenityTypeMetric);
+            }
+            return amenityTypes;
         }
-        return amenityTypes;
 }
 
 }

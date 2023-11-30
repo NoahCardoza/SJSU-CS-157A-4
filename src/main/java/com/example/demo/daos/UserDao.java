@@ -81,12 +81,9 @@ public class UserDao {
     }
 
     public boolean isUnique(User user) throws SQLException {
-        Connection conn = Database.getConnection();
 
-        PreparedStatement ps;
-
-        try {
-            ps = conn.prepareStatement("SELECT * FROM User WHERE username=? OR email=? OR normalized_email=?");
+        try(Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM User WHERE username=? OR email=? OR normalized_email=?");
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());

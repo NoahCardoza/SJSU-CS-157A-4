@@ -35,48 +35,54 @@ public class AmenityDao {
     }
 
     public Optional<Amenity> get(long id) throws SQLException {
-        Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity WHERE id = ?");
-        statement.setDouble(1, id);
 
-        ResultSet resultSet = statement.executeQuery();
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity WHERE id = ?");
+            statement.setDouble(1, id);
 
-        if (resultSet.next()) {
-            return Optional.of(fromResultSet(resultSet));
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return Optional.of(fromResultSet(resultSet));
+            }
+
+            return Optional.empty();
         }
 
-        return Optional.empty();
     }
 
 
     public void delete(long id) throws SQLException {
-        Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("DELETE FROM Amenity WHERE id = ?");
-        statement.setDouble(1, id);
+        try (Connection conn = Database.getConnection()) {
 
-        statement.executeQuery();
+            PreparedStatement statement = conn.prepareStatement("DELETE FROM Amenity WHERE id = ?");
+            statement.setDouble(1, id);
+
+            statement.executeQuery();
+        }
     }
 
     public List<Amenity> getAll() throws SQLException {
         ArrayList<Amenity> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity");
-        ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            amenityTypes.add(fromResultSet(resultSet));
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity");
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                amenityTypes.add(fromResultSet(resultSet));
+            }
+
+            return amenityTypes;
         }
-
-        return amenityTypes;
     }
 
     public void create(Amenity amenity) throws SQLException {
 
-        Connection conn = Database.getConnection();
-
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO Amenity (amenity_type_id, location_id, user_id, description, name) \n" +
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO Amenity (amenity_type_id, location_id, user_id, description, name) \n" +
                 "VALUES (?, ?, ?, ?, ?)",
                 PreparedStatement.RETURN_GENERATED_KEYS);
 
@@ -93,13 +99,13 @@ public class AmenityDao {
         rs.next();
 
         amenity.setId(rs.getLong(1));
-
+        }
     }
 
     public void createAmenityRecord(AmenityTypeAttributeRecord record) {
-        PreparedStatement ps = null;
-        try {
-            ps = Database.getConnection().prepareStatement(
+
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO AmenityAttributeRecord (amenity_attribute_id, amenity_id, value) VALUES (?, ?, ?)",
                     PreparedStatement.RETURN_GENERATED_KEYS
             );
@@ -109,7 +115,8 @@ public class AmenityDao {
             ps.setString(3, escapeHtml(record.getValue()));
 
             ps.executeUpdate();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -117,16 +124,16 @@ public class AmenityDao {
     //TODO: need to update this statement with amenity
     public void update(Amenity amenity) throws SQLException {
 
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("UPDATE Amenity SET user_id = ?, description=?, name=? WHERE id = ?");
 
-        PreparedStatement statement = conn.prepareStatement("UPDATE Amenity SET user_id = ?, description=?, name=? WHERE id = ?");
+            statement.setLong(1, amenity.getUserId());
+            statement.setString(2, escapeHtml(amenity.getDescription()));
+            statement.setString(3, escapeHtml(amenity.getName()));
+            statement.setLong(4, amenity.getId());
 
-        statement.setLong(1, amenity.getUserId());
-        statement.setString(2, escapeHtml(amenity.getDescription()));
-        statement.setString(3, escapeHtml(amenity.getName()));
-        statement.setLong(4, amenity.getId());
-
-        statement.executeUpdate();
+            statement.executeUpdate();
+        }
     }
 
     public void updateAmenityRecord(AmenityTypeAttributeRecord record) throws SQLException {

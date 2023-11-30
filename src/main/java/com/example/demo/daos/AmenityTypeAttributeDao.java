@@ -59,12 +59,16 @@ public class AmenityTypeAttributeDao {
     }
 
     public void create(AmenityTypeAttribute amenityTypeAttribute) throws SQLException {
-        var ps = Database.getConnection().prepareStatement("INSERT INTO AmenityTypeAttribute (amenity_type_id, name, type) VALUES (?, ?, ?)");
 
-        ps.setLong(1, amenityTypeAttribute.getAmenityTypeId());
-        ps.setString(2, escapeHtml(amenityTypeAttribute.getName()));
-        ps.setString(3, escapeHtml(amenityTypeAttribute.getType()));
-        ps.executeUpdate();
+        try (Connection conn = Database.getConnection()) {
+            var ps = conn.prepareStatement("INSERT INTO AmenityTypeAttribute (amenity_type_id, name, type) VALUES (?, ?, ?)");
+
+            ps.setLong(1, amenityTypeAttribute.getAmenityTypeId());
+            ps.setString(2, escapeHtml(amenityTypeAttribute.getName()));
+            ps.setString(3, escapeHtml(amenityTypeAttribute.getType()));
+            ps.executeUpdate();
+        }
+
     }
 
     public List<AmenityTypeAttribute> getAllByAmenityType(Long amenityTypeId) throws SQLException {
@@ -120,61 +124,64 @@ public class AmenityTypeAttributeDao {
     public String getAllValuesForAttribute(Long attributeId, Long amenityId) throws SQLException {
         String attributeValue = "";
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
                 "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?"
-        );
+            );
 
-        statement.setDouble(1, attributeId);
-        statement.setDouble(2, amenityId);
+            statement.setDouble(1, attributeId);
+            statement.setDouble(2, amenityId);
 
 
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            attributeValue += resultSet.getString("value");
+            while (resultSet.next()) {
+                attributeValue += resultSet.getString("value");
+            }
+
+            return attributeValue;
         }
 
-        return attributeValue;
     }
 
     public String getValueForAttribute(Long attributeId, Long amenityId) throws SQLException {
         String attributeValue = "";
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?"
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT DISTINCT value FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?"
+            );
 
-        statement.setDouble(1, attributeId);
-        statement.setDouble(2, amenityId);
+            statement.setDouble(1, attributeId);
+            statement.setDouble(2, amenityId);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        if (resultSet.next()) {
-            attributeValue = resultSet.getString("value");
+            if (resultSet.next()) {
+                attributeValue = resultSet.getString("value");
+            }
+            return attributeValue;
         }
-        return attributeValue;
     }
 
     public String getAttributeName(Long attributeId) throws SQLException {
 
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement(
-                "SELECT name FROM AmenityTypeAttribute WHERE id = ?"
-        );
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT name FROM AmenityTypeAttribute WHERE id = ?"
+            );
 
-        statement.setLong(1, attributeId);
+            statement.setLong(1, attributeId);
 
-        ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-        if (resultSet.next()) {
-            return resultSet.getString("name");
+            if (resultSet.next()) {
+                return resultSet.getString("name");
+            }
+
+            return "";
         }
-
-        return "";
-
     }
 
     public List<AmenityTypeAttributeRecordWithName> getAmenityAttributeRecords(Amenity amenity) throws SQLException {
