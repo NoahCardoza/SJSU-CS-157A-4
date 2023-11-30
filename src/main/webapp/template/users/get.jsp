@@ -28,7 +28,7 @@
                         <i class="bi bi-person-fill" style="font-size: 64px"></i>
                     </div>
                     <div class="mt-3 mb-4">
-                        <h4 class="mb-2">Jane Doe</h4>
+                        <h4 class="mb-2">${profile.name}</h4>
                     </div>
                     <p class="text-muted mb-4">@${profile.username}</p>
                     <div class="d-flex justify-content-around text-center mt-5 mb-2">

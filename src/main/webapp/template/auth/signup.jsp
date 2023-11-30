@@ -23,6 +23,11 @@
                    <input type="text" name="username" class="form-control" id="username" value="${form.username}">
                 </div>
                 <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" id="name" aria-describedby="nameHelp" value="${form.email}">
+                    <div id="nameHelp" class="form-text">By default your name is not shared with other users.</div>
+                </div>
+                <div class="mb-3">
                     <label for="email" class="form-label">Email Address</label>
                     <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp" value="${form.email}">
                     <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>

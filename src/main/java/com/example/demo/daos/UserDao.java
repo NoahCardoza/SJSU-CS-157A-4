@@ -18,7 +18,7 @@ public class UserDao {
     private static final String DELETE_USER = "DELETE FROM User WHERE id = ?";
     private static final String SELECT_ALL = "SELECT * FROM User";
     private static final String SELECT_FUZZY_SEARCH = "SELECT * FROM User WHERE username LIKE ? OR email LIKE ? OR normalized_email LIKE ?";
-    private static final String INSERT = "INSERT INTO User (username, email, normalized_email, password, verified) VALUES (?, ?, ?, ?, ?)";
+    private static final String INSERT = "INSERT INTO User (username, email, normalized_email, password, verified, name) VALUES (?, ?, ?, ?, ?, ?)";
     static UserDao instance = null;
     static public UserDao getInstance() {
         if (instance == null) {
@@ -57,6 +57,7 @@ public class UserDao {
         user.setPassword(resultSet.getString("password"));
         user.setCreatedAt(resultSet.getTimestamp("created_at"));
         user.setVerified(resultSet.getBoolean("verified"));
+        user.setName(resultSet.getString("name"));
 
         return user;
     }

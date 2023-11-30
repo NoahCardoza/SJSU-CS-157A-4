@@ -54,7 +54,7 @@ public class SignupForm {
         Validation v = new Validation();
 
         if(name == null){
-            v.addMessage("Name is requied");
+            v.addMessage("Name is required.");
         }
 
         if(username == null){

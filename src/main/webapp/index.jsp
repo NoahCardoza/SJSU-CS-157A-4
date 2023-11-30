@@ -99,8 +99,9 @@
                                 <label for="username">Username</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="text" name="name" class="form-control" id="name" placeholder="">
+                                <input type="text" name="name" class="form-control" id="name" placeholder="" aria-describedby="nameHelp">
                                 <label for="name">Name</label>
+                                <div id="nameHelp" class="form-text">By default your name is not shared with other users.</div>
                             </div>
                             <div class="form-floating mb-3">
                                 <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="">
