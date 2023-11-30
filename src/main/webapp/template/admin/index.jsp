@@ -28,7 +28,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Description</th>
-                                <th>Actions</th>
+                                <th width="120">Actions</th>
                             </tr>
                         </thead>
                         <tbody>

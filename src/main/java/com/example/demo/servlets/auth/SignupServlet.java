@@ -12,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import software.amazon.awssdk.http.HttpStatusCode;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -99,9 +100,11 @@ public class SignupServlet extends HttpServlet {
                                 );
 
                             }
-                            Guard.redirectToLogin(
+                            Guard.redirectTo(
                                     request,
                                     response,
+                                    302,
+                                    "/login",
                                     new Alert("success", "Your account has been created! Please check your email to verify your account.")
                             );
                             return;

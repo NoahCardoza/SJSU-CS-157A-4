@@ -16,20 +16,22 @@
     </head>
     <body>
         <%@include file="../../includes/nav.jsp" %>
+        <form method="POST" class="mt-5" id="new-location-form">
         <div class="container mt-5">
+            <div class="row gy-2">
+                <div class="col-12">
             <h1>Edit Amenity</h1>
-
-           <form method="POST" class="mt-5" id="new-location-form">
-                <div class="row">
+                </div>
+                <div class="col-12">
                     <%@include file="../../includes/alerts.jsp" %>
-                    <div class="col mb-3 d-flex justify-content-between align-items-center">
+                    <div class="col d-flex justify-content-between align-items-center">
                             <p>Location: <b> ${form.locationName} </b> </p>
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="col-12">
                     <%@include file="../../includes/alerts.jsp" %>
-                    <div class="col mb-3 d-flex justify-content-between align-items-center">
+                    <div class="col d-flex justify-content-between align-items-center">
                             <p>Amenity Type: <b> ${form.typeName} </b></p>
                     </div>
                 </div>
@@ -38,14 +40,16 @@
                 <input type="hidden" name="locationName" id="locationName" value="${form.locationName}">
                 <input type="hidden" name="typeId" id="typeId" value="${form.typeId}">
                 <input type="hidden" name="typeName" id="typeName" value="${form.typeName}">
-
-
+            </div>
+            <div class="row gy-2 mt-3">
                 <c:if test="${form.attributes.size() > 0}">
-                    <p>Attributes</p>
-                    <div class="row">
+                    <div class="col-12">
+                        <p class="fw-bold">Attributes</p>
+                    </div>
+
+
                         <c:forEach var="amenityTypeAttribute" items="${amenityAttributesWithNames}">
-                            <div class="form-group col-12 col-md-6 g-2">
-                                <div class="form-group">
+                            <div class="col-12 col-md-6">
                                     <label for="amenityTypeAttribute-${amenityTypeAttribute.amenityAttributeId}">${amenityTypeAttribute.name}</label>
                                     <c:choose>
                                         <c:when test="${amenityTypeAttribute.type == 'text'}">
@@ -62,18 +66,25 @@
                                             </select>
                                         </c:when>
                                     </c:choose>
-                                </div>
                             </div>
                         </c:forEach>
-                    </div>
                </c:if>
-
+                <div class="col-12">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" id="name" name="name" value="${form.name}" class="form-control mb-3" placeholder="Name" />
+                </div>
+                <div class="col-12">
                 <label for="description" class="form-label">Description</label>
                 <textarea id="description" name="description" class="form-control mb-3" placeholder="Description">${form.description}</textarea>
+                </div>
+                <div class="col-12">
                 <input type="hidden" name="redirect" value="${pathWithQueryString}">
                 <button type="submit" class="btn btn-primary w-100" name="action" value="submit">Submit</button>
+                </div>
+
+            </div>
         </div>
+        </form>
+        <hg:footer />
     </body>
 </html>
