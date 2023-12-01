@@ -1,9 +1,9 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Login Page</title>
+        <title>LHG | Login</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
@@ -25,7 +25,7 @@
                     <input type="password" name="password" class="form-control" id="exampleInputPassword1">
                 </div>
                 <div class="mb-3 form-check">
-                    <input type="checkbox" name="keepMeLoggedIn" class="form-check-input" id="exampleCheck1">
+                    <input type="checkbox" name="remember_me" class="form-check-input" id="exampleCheck1">
                     <label class="form-check-label" for="exampleCheck1">Keep me logged in</label>
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>

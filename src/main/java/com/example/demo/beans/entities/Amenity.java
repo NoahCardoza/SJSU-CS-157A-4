@@ -1,13 +1,17 @@
 package com.example.demo.beans.entities;
 
-public class Amenity {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Amenity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Long id;
     private Long amenityTypeId;
     private Long locationId;
     private Long userId;
     private String description;
     private String name;
-    private Boolean accessible;
     private String createdAt;
     private String updatedAt;
 
@@ -47,9 +51,7 @@ public class Amenity {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public void setDescription(String description) { this.description = description; }
 
     public String getName() {
         return name;
@@ -57,14 +59,6 @@ public class Amenity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Boolean getAccessible() {
-        return accessible;
-    }
-
-    public void setAccessible(Boolean accessible) {
-        this.accessible = accessible;
     }
 
     public String getCreatedAt() {
@@ -92,7 +86,6 @@ public class Amenity {
                 ", userId=" + userId +
                 ", description='" + description + '\'' +
                 ", name='" + name + '\'' +
-                ", accessible=" + accessible +
                 ", createdAt='" + createdAt + '\'' +
                 ", updatedAt='" + updatedAt + '\'' +
                 '}';

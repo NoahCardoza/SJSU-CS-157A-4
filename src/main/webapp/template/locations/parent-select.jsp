@@ -1,11 +1,8 @@
-<%@ page import="java.util.HashMap" %>
 <%@ page import="com.example.demo.Util" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 
-<%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
-<%--@elvariable id="form" type="List<com.example.demo.beans.forms.LocationForm>"--%>
 <%--@elvariable id="postParams" type="java.util.HashMap"--%>
 
 <%
@@ -15,7 +12,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Locations</title>
+        <title>LHG | Location | Parent Select</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>

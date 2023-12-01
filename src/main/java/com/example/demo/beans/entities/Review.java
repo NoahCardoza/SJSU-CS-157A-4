@@ -1,6 +1,9 @@
 package com.example.demo.beans.entities;
 
-import java.sql.*;
+
+import java.sql.Timestamp;
+
+import java.util.List;
 
 
 public class Review {
@@ -10,11 +13,33 @@ public class Review {
     private String description;
     private String name;
     private Boolean hidden;
-    private String createdAt;
-    private String updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
+    private List<String> images;
+    private User user;
+
+    private List<AmenityTypeMetricRecordWithName> metrics;
+
+    private Integer voted;
+    private Integer votes;
 
     public Review() {
         // Default constructor
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public float calculateAverageRating() {
+        int sum = metrics.stream().mapToInt(AmenityTypeMetricRecord::getValue).sum();
+
+        return (float) sum / metrics.size();
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+
     }
 
     public Long getId() {
@@ -46,6 +71,11 @@ public class Review {
     }
 
     public void setDescription(String description) {
+        if (description != null) {
+            description = description.trim();
+            description = description.replaceAll("(\\r\\n|\\r|\\n){2,}", "\n\n");
+        }
+        
         this.description = description;
     }
 
@@ -57,7 +87,7 @@ public class Review {
         this.name = name;
     }
 
-    public Boolean getHidden() {
+    public Boolean isHidden() {
         return hidden;
     }
 
@@ -65,20 +95,52 @@ public class Review {
         this.hidden = hidden;
     }
 
-    public String getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public List<AmenityTypeMetricRecordWithName> getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(List<AmenityTypeMetricRecordWithName> metrics) {
+        this.metrics = metrics;
+    }
+
+    public void setVotes(int votes) {
+        this.votes = votes;
+    }
+
+    public int getVotes() {
+        return votes;
+    }
+
+    public void setVoted(int voted) {
+        this.votes = voted;
+    }
+
+    public int getVoted() {
+        return votes;
     }
 
     @Override

@@ -1,9 +1,20 @@
 package com.example.demo;
 
+import com.example.demo.beans.entities.Location;
+import com.example.demo.daos.LocationDao;
+import com.example.demo.servlets.search.SearchServlet;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Util {
@@ -31,7 +42,11 @@ public class Util {
             return null;
         }
 
-        return Integer.parseInt(s);
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     static public Long parseLongOrNull(String s) {
@@ -41,7 +56,11 @@ public class Util {
             return null;
         }
 
-        return Long.parseLong(s);
+        try {
+            return Long.parseLong(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     static public Long nullIfZero(Long l) {
@@ -111,5 +130,31 @@ public class Util {
         }
 
         return request.getRequestURI();
+    }
+
+    public static String captureTemplateOutput(HttpServletRequest request, HttpServletResponse response, String template) throws ServletException, IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream ps = new PrintStream(baos);
+        final PrintWriter writer = new PrintWriter(ps);
+
+        HttpServletResponseWrapper wrapper = new HttpServletResponseWrapper((HttpServletResponse) response) {
+            @Override public PrintWriter getWriter() {
+                return writer;
+            }
+        };
+
+        request.getRequestDispatcher("/template/locations/ajaxForm.jsp").forward(request, wrapper);
+
+        return baos.toString();
+    }
+
+    public static Long parseLongOrDefault(String id, Long defaultValue) {
+        Long parsed = parseLongOrNull(id);
+
+        if (parsed == null) {
+            return defaultValue;
+        }
+
+        return parsed;
     }
 }

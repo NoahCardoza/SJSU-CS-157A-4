@@ -7,3 +7,7 @@
             ${alert.message}
     </div>
 </c:if>
+
+<%--<div class="alert alert-danger" role="alert">--%>
+<%--    Testing--%>
+<%--</div>--%>

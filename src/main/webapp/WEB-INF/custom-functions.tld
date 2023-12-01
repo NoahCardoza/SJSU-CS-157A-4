@@ -10,9 +10,31 @@
 >
     <tlib-version>1.0</tlib-version>
     <short-name>cfn</short-name>
-    <function>
-        <name>contains</name>
-        <function-class>com.example.demo.jstl.JstlFunctions</function-class>
-        <function-signature>boolean contains(java.util.String[], java.lang.String)</function-signature>
-    </function>
+    <tag>
+        <name>to-cdn-url</name>
+        <tag-class>com.example.demo.taglib.ToCdnUrlTag</tag-class>
+        <body-content>
+            empty
+        </body-content>
+        <attribute>
+            <name>url</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>width</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>height</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>func</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
 </taglib>

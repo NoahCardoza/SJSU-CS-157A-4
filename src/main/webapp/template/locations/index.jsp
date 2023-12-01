@@ -1,12 +1,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 
 <%--@elvariable id="locations" type="List<com.example.demo.daos.LocationDao>"--%>
 
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Locations</title>
+        <title>LHG | Locations</title>
         <%@include file="../../includes/head.jsp" %>
     </head>
     <body>
@@ -24,7 +24,7 @@
                 </tr>
                 <c:forEach var="location" items="${locations}">
                     <tr>
-                        <td scope="row"><a href="/locations?f=get&id=${location.id}">${location.id}</a></td>
+                        <td scope="row"><a href="<c:url value="/locations?f=get&id=${location.id}"/>">${location.id}</a></td>
                         <td>${location.name}</td>
                         <td>${location.address}</td>
                         <td>${location.description}</td>
@@ -33,7 +33,7 @@
                     </tr>
                 </c:forEach>
             </table>
-            <a class="btn btn-primary float-end" href="/locations?f=create">New</a>
+            <a class="btn btn-primary float-end" href="<c:url value="/locations?f=create"/>">New</a>
         </div>
     </body>
 </html>

@@ -1,11 +1,14 @@
 package com.example.demo.filters;
 
 import com.example.demo.Database;
+import com.example.demo.Guard;
 import com.example.demo.Util;
+import com.example.demo.beans.Alert;
 import com.example.demo.beans.entities.User;
 import com.example.demo.daos.UserDao;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -30,7 +33,19 @@ public class UserSessionFilter implements Filter {
             if (userId != null) {
                 try {
                     Optional<User> user = UserDao.getInstance().get(userId);
-                    user.ifPresent(value -> request.setAttribute("user", value));
+                    if (user.isPresent()) {
+                        if (user.get().isBanned()) {
+                            session.invalidate();
+                            Guard.redirectToLogin(
+                                    (HttpServletRequest) request,
+                                    (HttpServletResponse) response,
+                                    new Alert("danger", "Your account has been banned.")
+                            );
+                            return;
+                        }
+
+                        request.setAttribute("user", user.get());
+                    }
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -38,11 +53,5 @@ public class UserSessionFilter implements Filter {
         }
 
         chain.doFilter(request, response);
-
-        try {
-            Database.closeConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

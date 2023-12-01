@@ -4,7 +4,6 @@ public class AmenityTypeAttribute {
     private Long id;
     private Long amenityTypeId;
     private String name;
-    private String icon;
     private String type;
 
     // Constructors
@@ -12,11 +11,10 @@ public class AmenityTypeAttribute {
         // Default constructor
     }
 
-    public AmenityTypeAttribute(Long id, Long amenityTypeId, String name, String icon, String type) {
+    public AmenityTypeAttribute(Long id, Long amenityTypeId, String name, String type) {
         this.id = id;
         this.amenityTypeId = amenityTypeId;
         this.name = name;
-        this.icon = icon;
         this.type = type;
     }
 
@@ -45,14 +43,6 @@ public class AmenityTypeAttribute {
         this.name = name;
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
     public String getType() {
         return type;
     }
@@ -61,13 +51,20 @@ public class AmenityTypeAttribute {
         this.type = type;
     }
 
+    public String generatePlaceholderText() {
+        return switch (this.type) {
+            case "number" -> "Enter a number";
+            case "text" -> "Enter text";
+            case "boolean" -> "Select yes or no";
+            default -> "Enter a value";
+        };
+    }
     @Override
     public String toString() {
         return "AmenityTypeAttribute{" +
                 "id=" + id +
                 ", amenityTypeId=" + amenityTypeId +
                 ", name='" + name + '\'' +
-                ", icon='" + icon + '\'' +
                 ", type='" + type + '\'' +
                 '}';
     }

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context>
+<Context allowCasualMultipartParsing="true">
     <Resource
         name="jdbc/hidden_gems"
         auth="Container"
         type="javax.sql.DataSource"
-        username="${DBMS_USERNAME}"
-        password="${DBMS_PASSWORD}"
-        driverClassName="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://${DBMS_HOST}:${DBMS_PORT}/${DBMS_SCHEMA}"
-        maxTotal="16"
+        username="${RDS_USERNAME}"
+        password="${RDS_PASSWORD}"
+        driverClassName="com.mysql.cj.jdbc.Driver"
+        url="jdbc:mysql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}"
+        maxTotal="32"
         maxIdle="8"
     />
 

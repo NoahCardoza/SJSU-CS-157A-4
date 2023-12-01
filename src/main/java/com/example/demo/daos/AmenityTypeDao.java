@@ -11,7 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.demo.Security.escapeHtml;
+
 public class AmenityTypeDao {
+    public static final String DELETE_AMENITY_TYPE = "DELETE FROM AmenityType WHERE id = ?";
+    public static final String UPDATE_AMENITY_TYPE = "UPDATE AmenityType SET name = ?, description = ?, parent_amenity_type_id = ? WHERE id = ?";
+    public static final String SELECT_ALL_AMENITY_TYPES = "SELECT * FROM AmenityType";
+    public static final String SELECT_AMENITY_TYPE_BY_ID = "SELECT * FROM AmenityType WHERE id = ?";
     static AmenityTypeDao instance = null;
     static public AmenityTypeDao getInstance() {
         if (instance == null) {
@@ -27,7 +33,6 @@ public class AmenityTypeDao {
 
         amenityType.setId(resultSet.getLong("id"));
         amenityType.setName(resultSet.getString("name"));
-        amenityType.setIcon(resultSet.getString("icon"));
         amenityType.setDescription(resultSet.getString("description"));
         amenityType.setParentAmenityTypeId(resultSet.getLong("parent_amenity_type_id"));
 
@@ -35,13 +40,14 @@ public class AmenityTypeDao {
     }
 
     public Optional<AmenityType> get(long id) throws SQLException {
-        var ps = Database.getConnection().prepareStatement("SELECT * FROM AmenityType WHERE id = ?");
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(SELECT_AMENITY_TYPE_BY_ID);
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
 
-        ps.setLong(1, id);
-        var rs = ps.executeQuery();
-
-        if (rs.next()) {
-            return Optional.of(fromResultSet(rs));
+            if (resultSet.next()) {
+                return Optional.of(fromResultSet(resultSet));
+            }
         }
 
         return Optional.empty();
@@ -49,35 +55,61 @@ public class AmenityTypeDao {
 
     public List<AmenityType> getAll() throws SQLException {
         ArrayList<AmenityType> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM AmenityType");
-        ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            amenityTypes.add(fromResultSet(resultSet));
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(SELECT_ALL_AMENITY_TYPES);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                amenityTypes.add(fromResultSet(resultSet));
+            }
         }
 
         return amenityTypes;
     }
 
     public Long create(AmenityType amenityType) throws SQLException {
-        return null;
+
+        try (Connection conn = Database.getConnection()) {
+            Long id = 0L;
+
+            var ps = conn.prepareStatement("INSERT INTO AmenityType (name, description) VALUES (?, ?)");
+
+            ps.setString(1, escapeHtml(amenityType.getName()));
+            ps.setString(2, escapeHtml(amenityType.getDescription()));
+            //ps.setLong(4, amenityType.getParentAmenityTypeId());
+            ps.executeUpdate();
+
+
+            var ret = conn.prepareStatement("SELECT id FROM AmenityType WHERE name = ?");
+            ret.setString(1, escapeHtml(amenityType.getName()));
+            ResultSet  rs = ret.executeQuery();
+
+            while(rs.next()){
+                id = rs.getLong("id");
+            }
+
+            return id;
+        }
     }
 
     public void update(AmenityType amenityType) throws SQLException {
-        var ps = Database.getConnection().prepareStatement("UPDATE AmenityType SET name = ?, icon = ?, description = ?, parent_amenity_type_id = ? WHERE id = ?");
-
-        ps.setString(1, amenityType.getName());
-        ps.setString(2, amenityType.getIcon());
-        ps.setString(3, amenityType.getDescription());
-        ps.setLong(4, amenityType.getParentAmenityTypeId());
-        ps.setLong(5, amenityType.getId());
-        ps.executeUpdate();
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(UPDATE_AMENITY_TYPE);
+            statement.setString(1, escapeHtml(amenityType.getName()));
+            statement.setString(2, escapeHtml(amenityType.getDescription()));
+            statement.setLong(3, amenityType.getParentAmenityTypeId());
+            statement.setLong(4, amenityType.getId());
+            statement.executeUpdate();
+        }
     }
 
     public void delete(Long amenityTypeId) throws SQLException {
-        var ps = Database.getConnection().prepareStatement("DELETE FROM AmenityType WHERE id = ?");
-        ps.setLong(1, amenityTypeId);
-        ps.executeUpdate();
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(DELETE_AMENITY_TYPE);
+            statement.setLong(1, amenityTypeId);
+            statement.executeUpdate();
+        }
     }
+
 }

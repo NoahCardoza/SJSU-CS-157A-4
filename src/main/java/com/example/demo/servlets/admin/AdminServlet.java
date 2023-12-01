@@ -1,17 +1,12 @@
 package com.example.demo.servlets.admin;
 
+import com.example.demo.Guard;
 import com.example.demo.Util;
 import com.example.demo.Validation;
 import com.example.demo.beans.Alert;
-import com.example.demo.beans.entities.AmenityType;
-import com.example.demo.beans.entities.AmenityWithImage;
-import com.example.demo.beans.entities.Location;
-import com.example.demo.beans.entities.User;
+import com.example.demo.beans.entities.*;
 import com.example.demo.beans.forms.LocationForm;
-import com.example.demo.daos.AmenityDao;
-import com.example.demo.daos.AmenityTypeDao;
-import com.example.demo.daos.LocationDao;
-import com.example.demo.daos.UserDao;
+import com.example.demo.daos.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,6 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +39,9 @@ public class AdminServlet extends HttpServlet {
 
         try {
             switch (function) {
-                // TODO: amenityTypeNew
+                case "amenityTypeCreate":
+                    amenityTypeCreate(request, response);
+                    break;
                 case "amenityTypeEdit":
                     amenityTypeEdit(request, response);
                     break;
@@ -75,42 +74,14 @@ public class AdminServlet extends HttpServlet {
             AmenityTypeDao.getInstance().delete(amenityTypeId);
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("alert", new Alert("danger", "Failed to delete amenity type."));
+            if (e.getErrorCode() == 1451) {
+                request.getSession().setAttribute("alert", new Alert("danger", "Failed to delete amenity type. There are amenities of this type."));
+            } else {
+                request.getSession().setAttribute("alert", new Alert("danger", "Failed to delete amenity type."));
+            }
         }
 
         response.sendRedirect(request.getContextPath() + "/admin");
-    }
-
-    public void get(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-
-        Long locationId = Util.parseLongOrNull(request.getParameter("id"));
-
-        if (locationId == null) {
-            response.sendRedirect(request.getContextPath() + "/locations");
-            return;
-        }
-
-        Optional<Location> location = LocationDao.getInstance().get(locationId);
-
-        if (location.isPresent()) {
-            request.setAttribute(
-                    "location",
-                    location.get()
-            );
-        } else {
-            System.out.println("Location not found");
-            response.sendRedirect(request.getContextPath() + "/locations");
-            return;
-        }
-
-        List<AmenityWithImage> amenities = AmenityDao.getInstance().getFromLocationId(locationId);
-
-        request.setAttribute(
-                "amenities",
-                amenities
-        );
-
-        request.getRequestDispatcher("template/locations/get.jsp").forward(request, response);
     }
 
     public void create(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -129,21 +100,14 @@ public class AdminServlet extends HttpServlet {
                 String action = request.getParameter("action");
 
                 if (action != null && action.equals("submit")) {
-                    Optional<User> user = UserDao.getInstance().fromSession(request.getSession());
-                    if (!user.isPresent()) {
-                        response.setStatus(401);
-                        request.setAttribute(
-                                "alert",
-                                new Alert("danger", "You must be logged in to create a location.")
-                        );
-                        response.sendRedirect(request.getContextPath() + "/login");
-                        return;
-                    }
+                    User user = Guard.requireAuthenticationWithMessage(request, response, "You must be logged in to create a location.");
+                    if (user == null) return;
+
                     Validation v = form.validate();
 
                     if (v.isValid()) {
                         Location location = new Location();
-                        location.setUserId(user.get().getId());
+                        location.setUserId(user.getId());
                         location.setName(form.getName());
                         location.setDescription(form.getDescription());
                         location.setAddress(form.getAddress());
@@ -171,26 +135,96 @@ public class AdminServlet extends HttpServlet {
                 break;
         }
     }
-    public void amenityTypeEdit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+    public void amenityTypeCreate(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
         switch (request.getMethod()) {
             case "GET":
-                amenityTypeEditGet(request, response);
+                request.getRequestDispatcher("/template/admin/amenityTypeCreate.jsp").forward(request, response);
                 break;
             case "POST":
-                amenityTypeEditPost(request, response);
+                amenityTypeCreatePost(request, response);
                 break;
         }
     }
 
-    private void amenityTypeEditPost(HttpServletRequest request, HttpServletResponse response) {
+    private void amenityTypeCreatePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        AmenityType amenityType = new AmenityType();
+        amenityType.setName(request.getParameter("name"));
+        amenityType.setDescription(request.getParameter("description"));
+
+        String attributes = request.getParameter("attributes");
+        String metrics = request.getParameter("metrics");
+
+        try {
+            List<String> attributeList = Arrays.asList(attributes.split(","));
+            List<AmenityTypeAttribute> attributeObjects = new ArrayList<AmenityTypeAttribute>();
+            List<AmenityTypeMetric> metricObjects = new ArrayList<AmenityTypeMetric>();
+
+            for(String attribute:attributeList){
+                List<String> attributeWithType = Arrays.asList(attribute.split(":"));
+
+                AmenityTypeAttribute newAttribute = new AmenityTypeAttribute();
+                newAttribute.setName(attributeWithType.get(0));
+                newAttribute.setAmenityTypeId(amenityType.getId());
+                newAttribute.setType(attributeWithType.get(1));
+
+                attributeObjects.add(newAttribute);
+            }
+
+            List<String> metricList = Arrays.asList(metrics.split(","));
+            for(String metric:metricList){
+                AmenityTypeMetric newMetric = new AmenityTypeMetric();
+                newMetric.setName(metric);
+                newMetric.setAmenityTypeId(amenityType.getId());
+                metricObjects.add(newMetric);
+            }
+
+            amenityType.setId(AmenityTypeDao.getInstance().create(amenityType));
+            for(AmenityTypeAttribute attribute:attributeObjects){
+                attribute.setAmenityTypeId(amenityType.getId());
+                AmenityTypeAttributeDao.getInstance().create(attribute);
+            }
+            for(AmenityTypeMetric metric:metricObjects){
+                metric.setAmenityTypeId(amenityType.getId());
+                AmenityTypeMetricDao.getInstance().create(metric);
+            }
+            response.sendRedirect(request.getContextPath() + "/admin");
+
+        } catch (RuntimeException e){
+            e.printStackTrace();
+            request.setAttribute("amenityType", amenityType);
+            request.setAttribute("alert", new Alert("danger", "Failed parse input."));
+            request.getRequestDispatcher("/template/admin/amenityTypeCreate.jsp").forward(request, response);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("amenityType", amenityType);
+            if (e.getErrorCode() == 1062) {
+                request.setAttribute("alert", new Alert("danger", "Failed to insert amenity type. Duplicate name."));
+            } else {
+                request.setAttribute("alert", new Alert("danger", "Failed to insert amenity type."));
+            }
+            request.getRequestDispatcher("/template/admin/amenityTypeCreate.jsp").forward(request, response);
+        }
+    }
+
+
+
+    public void amenityTypeEdit(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        switch (request.getMethod()) {
+            case "GET" -> amenityTypeEditGet(request, response);
+            case "POST" -> amenityTypeEditPost(request, response);
+        }
+    }
+
+    private void amenityTypeEditPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         AmenityType amenityType = new AmenityType();
         amenityType.setId(Util.parseLongOrNull(request.getParameter("id")));
         amenityType.setParentAmenityTypeId(Util.parseLongOrNull(request.getParameter("parentAmenityTypeId")));
         amenityType.setName(request.getParameter("name"));
         amenityType.setDescription(request.getParameter("description"));
-        amenityType.setIcon(request.getParameter("icon"));
 
-        // TODO: validate
+        // TODO: validate, for now trust the admin users
 
         try {
             AmenityTypeDao.getInstance().update(amenityType);
@@ -199,6 +233,7 @@ public class AdminServlet extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("amenityType", amenityType);
             request.setAttribute("alert", new Alert("danger", "Failed to update amenity type."));
+            response.sendRedirect(request.getContextPath() + "/admin?f=amenityTypeEdit&id=" + amenityType.getId());
         }
     }
 

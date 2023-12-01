@@ -1,18 +1,35 @@
 package com.example.demo.beans.entities;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.sql.*;
+import java.util.List;
 
-public class Location {
-    Long id;
-    Long userId;
-    Long parentLocationId;
-    Double longitude;
-    Double latitude;
-    String name;
-    String address;
-    String description;
-    String createdAt;
-    String updatedAt;
+public class Location implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private Long id;
+    private Long userId;
+    private Long parentLocationId;
+    private Double longitude;
+    private Double latitude;
+    private String name;
+    private String address;
+    private String description;
+    private String createdAt;
+    private String updatedAt;
+
+    // utility fields
+    private List<Amenity> amenities;
+
+    public List<Amenity> getAmenities() {
+        return amenities;
+    }
+
+    public void setAmenities(List<Amenity> amenities) {
+        this.amenities = amenities;
+    }
 
     public Long getId() {
         return id;

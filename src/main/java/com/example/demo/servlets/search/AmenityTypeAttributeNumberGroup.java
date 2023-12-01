@@ -6,21 +6,20 @@ import com.example.demo.daos.AmenityTypeAttributeDao;
 import jakarta.servlet.ServletRequest;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 
 import static com.example.demo.daos.AmenityTypeAttributeDao.TYPE_NUMBER_ID_PREFIX;
 
 public class AmenityTypeAttributeNumberGroup {
-    ServletRequest request;
-    List<AmenityTypeAttribute> attributes;
+    private ServletRequest request;
+    private List<AmenityTypeAttribute> attributes;
 
     public AmenityTypeAttributeNumberGroup(ServletRequest request) {
         this.request = request;
         this.attributes = new ArrayList<>();
     }
+
+
 
     public void add(AmenityTypeAttribute attribute) {
         this.attributes.add(attribute);
@@ -45,7 +44,7 @@ public class AmenityTypeAttributeNumberGroup {
                 String currentValue = request.getParameter(formId) == null ? "" : request.getParameter(formId);
 
                 joiner.add(
-                        "<div class=\"row mb-2\">\n" +
+                        "<div class=\"mb-2\">\n" +
                                 "   <label for=\"" + formId + "\" class=\"form-label\">" + attribute.getName() + "</label>\n" +
                                 "       <select class=\"form-select\" name=\"" + formId + "\" id=\"" + formId + "\">\n" +
                                 "<option value=\"0\">All</option>");

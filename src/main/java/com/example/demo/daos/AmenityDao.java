@@ -1,11 +1,9 @@
 package com.example.demo.daos;
 
 import com.example.demo.Database;
-import com.example.demo.beans.entities.Amenity;
-import com.example.demo.beans.entities.AmenityWithImage;
-import com.example.demo.beans.entities.Location;
-import com.example.demo.beans.entities.ReviewImage;
+import com.example.demo.beans.entities.*;
 import com.example.demo.servlets.search.AmenityFilter;
+import static com.example.demo.Security.escapeHtml;
 
 import java.sql.*;
 import java.util.*;
@@ -30,7 +28,6 @@ public class AmenityDao {
         amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
         amenity.setLocationId(resultSet.getLong("location_id"));
         amenity.setUserId(resultSet.getLong("user_id"));
-        amenity.setAccessible(resultSet.getBoolean("accessible"));
         amenity.setCreatedAt(resultSet.getString("created_at"));
         amenity.setUpdatedAt(resultSet.getString("updated_at"));
 
@@ -38,170 +35,255 @@ public class AmenityDao {
     }
 
     public Optional<Amenity> get(long id) throws SQLException {
-        Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity WHERE id = ?");
-        statement.setDouble(1, id);
 
-        ResultSet resultSet = statement.executeQuery();
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity WHERE id = ?");
+            statement.setDouble(1, id);
 
-        if (resultSet.next()) {
-            return Optional.of(fromResultSet(resultSet));
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return Optional.of(fromResultSet(resultSet));
+            }
+
+            return Optional.empty();
         }
 
-        return Optional.empty();
     }
 
 
     public void delete(long id) throws SQLException {
-        Connection conn = Database.getConnection();
 
-        PreparedStatement statement = conn.prepareStatement("DELETE FROM Amenity WHERE id = ?");
-        statement.setDouble(1, id);
+        try (Connection conn = Database.getConnection()) {
+
+            PreparedStatement statement = conn.prepareStatement("DELETE FROM Amenity WHERE id = ?");
+            statement.setDouble(1, id);
+
+            statement.executeQuery();
+        }
     }
 
     public List<Amenity> getAll() throws SQLException {
         ArrayList<Amenity> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity");
-        ResultSet resultSet = statement.executeQuery();
 
-        while (resultSet.next()) {
-            amenityTypes.add(fromResultSet(resultSet));
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Amenity");
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                amenityTypes.add(fromResultSet(resultSet));
+            }
+
+            return amenityTypes;
         }
-
-        return amenityTypes;
     }
 
-    public Long create(Amenity amenityType) throws SQLException {
-        return null;
+    public void create(Amenity amenity) throws SQLException {
+
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO Amenity (amenity_type_id, location_id, user_id, description, name) \n" +
+                "VALUES (?, ?, ?, ?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS);
+
+        statement.setLong(1, amenity.getAmenityTypeId());
+        statement.setLong(2, amenity.getLocationId());
+        statement.setLong(3, amenity.getUserId());
+        statement.setString(4, escapeHtml(amenity.getDescription()));
+        statement.setString(5, escapeHtml(amenity.getName()));
+
+        statement.executeUpdate();
+
+        ResultSet rs = statement.getGeneratedKeys();
+
+        rs.next();
+
+        amenity.setId(rs.getLong(1));
+        }
+    }
+
+    public void createAmenityRecord(AmenityTypeAttributeRecord record) {
+
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO AmenityAttributeRecord (amenity_attribute_id, amenity_id, value) VALUES (?, ?, ?)",
+                    PreparedStatement.RETURN_GENERATED_KEYS
+            );
+
+            ps.setLong(1, record.getAmenityAttributeId());
+            ps.setLong(2, record.getAmenityId());
+            ps.setString(3, escapeHtml(record.getValue()));
+
+            ps.executeUpdate();
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //TODO: need to update this statement with amenity
     public void update(Amenity amenity) throws SQLException {
 
-        /*PreparedStatement ps = Database.getConnection().prepareStatement("UPDATE Amenity SET user_id = ?, parent_location_id = ?, longitude = ?, latitude = ?, name = ?, address = ?, description = ? WHERE id = ?");
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement("UPDATE Amenity SET user_id = ?, description=?, name=? WHERE id = ?");
 
-        ps.setLong(1, location.getUserId());
+            statement.setLong(1, amenity.getUserId());
+            statement.setString(2, escapeHtml(amenity.getDescription()));
+            statement.setString(3, escapeHtml(amenity.getName()));
+            statement.setLong(4, amenity.getId());
 
-        if (location.getParentLocationId() == null) {
-            ps.setNull(2, Types.INTEGER);
-        } else {
-            ps.setDouble(2, location.getParentLocationId());
+            statement.executeUpdate();
         }
-        ps.setDouble(3, location.getLongitude());
-        ps.setDouble(4, location.getLatitude());
-        ps.setString(5, location.getName());
-        ps.setString(6, location.getAddress());
-        ps.setString(7, location.getDescription());
-        ps.setLong(8, location.getId());
+    }
 
-        ps.executeUpdate();*/
+    public void updateAmenityRecord(AmenityTypeAttributeRecord record) throws SQLException {
+
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement initialStatement = conn.prepareStatement(
+                "SELECT * FROM AmenityAttributeRecord WHERE amenity_attribute_id = ? AND amenity_id = ?"
+            );
+
+            initialStatement.setLong(1, record.getAmenityAttributeId());
+            initialStatement.setLong(2, record.getAmenityId());
+
+            ResultSet rs = initialStatement.executeQuery();
+
+            if(!rs.next()){
+                createAmenityRecord(record);
+            }
+            else {
+                PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE AmenityAttributeRecord SET value = ? WHERE amenity_attribute_id = ? AND amenity_id = ?"
+                );
+
+                ps.setString(1, escapeHtml(record.getValue()));
+                ps.setLong(2, record.getAmenityAttributeId());
+                ps.setLong(3, record.getAmenityId());
+
+                ps.executeUpdate();
+            }
+
+        }
+
 
     }
 
-    public List<AmenityWithImage> getWithFilter(AmenityFilter filter) throws SQLException {
+    public List<AmenityWithImage> getWithFilter(AmenityFilter filter, List<Location> locations) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getConnection();
 
-        PreparedStatement stmt ;
-        ResultSet resultSet;
-        ArrayList<String> params = new ArrayList<>();
-        String filterSubQuery = "";
-        String statement = "SELECT *, (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image FROM Amenity\n";
-        if (filter.getAmenityTypeId() != null) {
-            statement = statement +
-                    "WHERE\n" +
-                    "    Amenity.amenity_type_id IN (\n" +
-                    "    WITH RECURSIVE amenity_type_hierarchy AS (\n" +
-                    "        SELECT    id,\n" +
-                    "                parent_amenity_type_id\n" +
-                    "        FROM AmenityType\n" +
-                    "        WHERE id = ?\n" +
-                    "\n" +
-                    "        UNION ALL\n" +
-                    "\n" +
-                    "        SELECT\n" +
-                    "        e.id,\n" +
-                    "        e.parent_amenity_type_id\n" +
-                    "        FROM AmenityType e, amenity_type_hierarchy\n" +
-                    "        WHERE amenity_type_hierarchy.id = e.parent_amenity_type_id\n" +
-                    "    ) SELECT id FROM amenity_type_hierarchy\n" +
-                    ")";
-            params.add(filter.getAmenityTypeId().toString());
-        }
+        try (Connection conn = Database.getConnection()) {
 
-        if (!filter.getBooleanAttributes().isEmpty() || !filter.getNumberAttributes().isEmpty() || !filter.getTextAttributes().isEmpty()) {
-            StringJoiner joiner = new StringJoiner(",");
-            StringJoiner valueJoiner = new StringJoiner(",");
-            ArrayList<String> valueParams = new ArrayList<>();
-            ArrayList<String> idParams = new ArrayList<>();
-
-            filterSubQuery = "SELECT DISTINCT amenity_id FROM AmenityAttributeRecord WHERE value IN (";
-
-            if (!filter.getBooleanAttributes().isEmpty()) {
-                valueJoiner.add("'T'"); // find all the true values
-                for (String attributeId : filter.getBooleanAttributes()) {
-                    joiner.add("?");
-                    idParams.add(attributeId);
+            PreparedStatement stmt;
+            ResultSet resultSet;
+            ArrayList<String> params = new ArrayList<>();
+            String filterSubQuery = "";
+            String statement = "SELECT *, (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image FROM Amenity\n";
+            boolean whereAdded = false;
+            if (locations != null) {
+                StringJoiner locationIds = new StringJoiner(",");
+                for (Location location : locations) {
+                    locationIds.add(location.getId().toString());
                 }
+                statement = statement + "WHERE location_id IN (" + locationIds + ")\n";
+                whereAdded = true;
             }
-            filter.getTextAttributes().forEach((attributeId, values) -> {
-                // TODO: later we might move to OR instead of AND logic
-                // right now there should only every be one value per attribute
-                for (String value : values) {
-                    valueJoiner.add("?");
-                    joiner.add("?");
-                    valueParams.add(value);
-                    idParams.add(attributeId);
+            if (filter.getAmenityTypeId() != null) {
+                if (!whereAdded) {
+                    statement = statement + "WHERE\n";
+                    whereAdded = true;
+                } else {
+                    statement = statement + "AND\n";
                 }
-            });
+                statement = statement +
+                        "    Amenity.amenity_type_id IN (\n" +
+                        "    WITH RECURSIVE amenity_type_hierarchy AS (\n" +
+                        "        SELECT    id,\n" +
+                        "                parent_amenity_type_id\n" +
+                        "        FROM AmenityType\n" +
+                        "        WHERE id = ?\n" +
+                        "\n" +
+                        "        UNION ALL\n" +
+                        "\n" +
+                        "        SELECT\n" +
+                        "        e.id,\n" +
+                        "        e.parent_amenity_type_id\n" +
+                        "        FROM AmenityType e, amenity_type_hierarchy\n" +
+                        "        WHERE amenity_type_hierarchy.id = e.parent_amenity_type_id\n" +
+                        "    ) SELECT id FROM amenity_type_hierarchy\n" +
+                        ")";
+                params.add(filter.getAmenityTypeId().toString());
+            }
 
-            filter.getNumberAttributes().forEach((attributeId, values) -> {
-                // TODO: later we might move to min/max instead of exact value
-                // right now there should only every be one value per attribute
-                for (String value : values) {
-                    valueJoiner.add("?");
-                    joiner.add("?");
-                    valueParams.add(value);
-                    idParams.add(attributeId);
+            if (!filter.getBooleanAttributes().isEmpty() || !filter.getNumberAttributes().isEmpty() || !filter.getTextAttributes().isEmpty()) {
+                StringJoiner joiner = new StringJoiner(",");
+                StringJoiner valueJoiner = new StringJoiner(",");
+                ArrayList<String> valueParams = new ArrayList<>();
+                ArrayList<String> idParams = new ArrayList<>();
+
+                filterSubQuery = "SELECT DISTINCT amenity_id FROM AmenityAttributeRecord WHERE value IN (";
+
+                if (!filter.getBooleanAttributes().isEmpty()) {
+                    valueJoiner.add("'T'"); // find all the true values
+                    for (String attributeId : filter.getBooleanAttributes()) {
+                        joiner.add("?");
+                        idParams.add(attributeId);
+                    }
                 }
-            });
+                filter.getTextAttributes().forEach((attributeId, values) -> {
+                    // TODO: later we might move to OR instead of AND logic
+                    // right now there should only every be one value per attribute
+                    for (String value : values) {
+                        valueJoiner.add("?");
+                        joiner.add("?");
+                        valueParams.add(value);
+                        idParams.add(attributeId);
+                    }
+                });
 
-            filterSubQuery = filterSubQuery + valueJoiner + ") AND amenity_attribute_id IN (" + joiner + ") GROUP BY amenity_id HAVING COUNT(*) >= ?\n";
+                filter.getNumberAttributes().forEach((attributeId, values) -> {
+                    // TODO: later we might move to min/max instead of exact value
+                    // right now there should only every be one value per attribute
+                    for (String value : values) {
+                        valueJoiner.add("?");
+                        joiner.add("?");
+                        valueParams.add(value);
+                        idParams.add(attributeId);
+                    }
+                });
 
-            params.addAll(valueParams);
-            params.addAll(idParams);
-            params.add(String.valueOf(filter.getBooleanAttributes().size() + filter.getNumberAttributes().size() + filter.getTextAttributes().size()));
-        }
+                filterSubQuery = filterSubQuery + valueJoiner + ") AND amenity_attribute_id IN (" + joiner + ") GROUP BY amenity_id HAVING COUNT(*) >= ?\n";
 
-        if (!filterSubQuery.isEmpty()) {
-            statement = statement + "AND Amenity.id IN (" + filterSubQuery + ")\n";
-        }
+                params.addAll(valueParams);
+                params.addAll(idParams);
+                params.add(String.valueOf(filter.getBooleanAttributes().size() + filter.getNumberAttributes().size() + filter.getTextAttributes().size()));
+            }
 
-        stmt = conn.prepareStatement(statement);
-        for (int i = 0; i < params.size(); i++) {
-            stmt.setString(i+1, params.get(i));
-        }
-        System.out.println(stmt.toString());
-        resultSet = stmt.executeQuery();
+            if (!filterSubQuery.isEmpty()) {
+                statement = statement + "AND Amenity.id IN (" + filterSubQuery + ")\n";
+            }
 
-        while (resultSet.next()) {
-            AmenityWithImage amenity = new AmenityWithImage();
+            stmt = conn.prepareStatement(statement);
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setString(i + 1, params.get(i));
+            }
+            resultSet = stmt.executeQuery();
 
-            amenity.setId(resultSet.getLong("id"));
-            amenity.setName(resultSet.getString("name"));
-            amenity.setDescription(resultSet.getString("description"));
-            amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
-            amenity.setLocationId(resultSet.getLong("location_id"));
-            amenity.setUserId(resultSet.getLong("user_id"));
-            amenity.setAccessible(resultSet.getBoolean("accessible"));
-            amenity.setCreatedAt(resultSet.getString("created_at"));
-            amenity.setUpdatedAt(resultSet.getString("updated_at"));
-            ReviewImage reviewImage = new ReviewImage();
-            reviewImage.setUrl(resultSet.getString("image"));
-            amenity.setImage(reviewImage);
-            amenityTypes.add(amenity);
+            while (resultSet.next()) {
+                AmenityWithImage amenity = new AmenityWithImage();
+
+                amenity.setId(resultSet.getLong("id"));
+                amenity.setName(resultSet.getString("name"));
+                amenity.setDescription(resultSet.getString("description"));
+                amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
+                amenity.setLocationId(resultSet.getLong("location_id"));
+                amenity.setUserId(resultSet.getLong("user_id"));
+                amenity.setCreatedAt(resultSet.getString("created_at"));
+                amenity.setUpdatedAt(resultSet.getString("updated_at"));
+                ReviewImage reviewImage = new ReviewImage();
+                reviewImage.setUrl(resultSet.getString("image"));
+                amenity.setImage(reviewImage);
+                amenityTypes.add(amenity);
+            }
         }
 
         return amenityTypes;
@@ -209,57 +291,53 @@ public class AmenityDao {
 
     public List<AmenityWithImage> getFromLocationId(Long locationId) throws SQLException {
         ArrayList<AmenityWithImage> amenityTypes = new ArrayList<>();
-        Connection conn = Database.getConnection();
+        try (Connection conn = Database.getConnection()) {
 
-        PreparedStatement statement;
-        ResultSet resultSet;
+            PreparedStatement statement;
+            ResultSet resultSet;
 
-        statement = conn.prepareStatement("SELECT\n" +
-                "    *,\n" +
-                "    (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image\n" +
-                "FROM Amenity\n" +
-                "WHERE\n" +
-                "    Amenity.location_id IN (\n" +
-                "    WITH RECURSIVE location_hierarchy AS (\n" +
-                "        SELECT  id,\n" +
-                "                parent_location_id\n" +
-                "        FROM Location\n" +
-                "        WHERE id = ?\n" +
-                "\n" +
-                "        UNION ALL\n" +
-                "\n" +
-                "        SELECT\n" +
-                "        e.id,\n" +
-                "        e.parent_location_id\n" +
-                "        FROM Location e, location_hierarchy\n" +
-                "        WHERE location_hierarchy.id = e.parent_location_id\n" +
-                "    ) SELECT id FROM location_hierarchy\n" +
-                ");");
-        statement.setLong(1, locationId);
+            statement = conn.prepareStatement("SELECT\n" +
+                    "    *,\n" +
+                    "    (SELECT url FROM ReviewImage WHERE review_id IN (SELECT id FROM Review WHERE amenity_id = Amenity.id ORDER BY id) ORDER BY id LIMIT 1) AS image\n" +
+                    "FROM Amenity\n" +
+                    "WHERE\n" +
+                    "    Amenity.location_id IN (\n" +
+                    "    WITH RECURSIVE location_hierarchy AS (\n" +
+                    "        SELECT  id,\n" +
+                    "                parent_location_id\n" +
+                    "        FROM Location\n" +
+                    "        WHERE id = ?\n" +
+                    "\n" +
+                    "        UNION ALL\n" +
+                    "\n" +
+                    "        SELECT\n" +
+                    "        e.id,\n" +
+                    "        e.parent_location_id\n" +
+                    "        FROM Location e, location_hierarchy\n" +
+                    "        WHERE location_hierarchy.id = e.parent_location_id\n" +
+                    "    ) SELECT id FROM location_hierarchy\n" +
+                    ");");
+            statement.setLong(1, locationId);
 
-        System.out.println(statement);
+            resultSet = statement.executeQuery();
 
-        resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                AmenityWithImage amenity = new AmenityWithImage();
 
-        while (resultSet.next()) {
-            AmenityWithImage amenity = new AmenityWithImage();
-
-            amenity.setId(resultSet.getLong("id"));
-            amenity.setName(resultSet.getString("name"));
-            amenity.setDescription(resultSet.getString("description"));
-            amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
-            amenity.setLocationId(resultSet.getLong("location_id"));
-            amenity.setUserId(resultSet.getLong("user_id"));
-            amenity.setAccessible(resultSet.getBoolean("accessible"));
-            amenity.setCreatedAt(resultSet.getString("created_at"));
-            amenity.setUpdatedAt(resultSet.getString("updated_at"));
-            ReviewImage reviewImage = new ReviewImage();
-            reviewImage.setUrl(resultSet.getString("image"));
-            amenity.setImage(reviewImage);
-            amenityTypes.add(amenity);
+                amenity.setId(resultSet.getLong("id"));
+                amenity.setName(resultSet.getString("name"));
+                amenity.setDescription(resultSet.getString("description"));
+                amenity.setAmenityTypeId(resultSet.getLong("amenity_type_id"));
+                amenity.setLocationId(resultSet.getLong("location_id"));
+                amenity.setUserId(resultSet.getLong("user_id"));
+                amenity.setCreatedAt(resultSet.getString("created_at"));
+                amenity.setUpdatedAt(resultSet.getString("updated_at"));
+                ReviewImage reviewImage = new ReviewImage();
+                reviewImage.setUrl(resultSet.getString("image"));
+                amenity.setImage(reviewImage);
+                amenityTypes.add(amenity);
+            }
         }
-
-        System.out.println(amenityTypes);
 
         return amenityTypes;
     }
