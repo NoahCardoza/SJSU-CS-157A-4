@@ -24,6 +24,14 @@
                     <%@include file="/includes/alerts.jsp" %>
                 </div>
                 <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="<c:url value="/locations?f=get&id=${location.id}"/>">${location.name}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${amenity.name}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-12">
                     <h1>${amenity.name}</h1>
                 </div>
                 <c:if test="${recordedMetrics.size() > 0}">

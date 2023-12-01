@@ -239,7 +239,7 @@ public class UserDao {
             statement.setBoolean(8, user.isVerified());
             statement.setBoolean(9, user.getPrivateProfile());
             statement.setLong(10, user.getId());
-            
+
             statement.executeUpdate();
         }
     }

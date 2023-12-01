@@ -65,7 +65,7 @@ public class AmenitiesServlet extends HttpServlet {
                     locationSelect(request, response);
                     break;
                 default:
-                    getAll(request, response);
+                    response.sendRedirect(request.getContextPath() + "/");
                     break;
             }
         } catch (Exception e) {
@@ -92,6 +92,12 @@ public class AmenitiesServlet extends HttpServlet {
             request.setAttribute(
                     "amenity",
                     amenity.get()
+            );
+            Optional<Location> location = LocationDao.getInstance().get(amenity.get().getLocationId());
+
+            request.setAttribute(
+                    "location",
+                    location.get()
             );
         } else {
             request.getSession().setAttribute("alert", new Alert("danger", "Amenity not found"));
@@ -583,19 +589,6 @@ public class AmenitiesServlet extends HttpServlet {
 
         request.getRequestDispatcher("/template/amenity/location-select.jsp").forward(request, response);
 
-    }
-
-
-    public void getAll(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        List<Amenity> amenities = AmenityDao.getInstance().getAll();
-
-        request.setAttribute(
-                "amenities",
-                amenities
-        );
-
-        // TODO: change the path later
-        request.getRequestDispatcher("template/amenity/view-amenity.jsp").forward(request, response);
     }
 }
 
